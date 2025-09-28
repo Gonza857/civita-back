@@ -1,0 +1,6 @@
+@CivitaBack_HostAddress = http://localhost:5289
+
+GET {{CivitaBack_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
