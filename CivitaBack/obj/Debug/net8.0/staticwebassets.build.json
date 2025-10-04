@@ -1,8 +1,8 @@
 {
   "Version": 1,
-  "Hash": "H3kPaiUS4G64GXERK9xTm3Cg9QX+Zq7erYi4lok5VYA=",
-  "Source": "CivitaBack",
-  "BasePath": "_content/CivitaBack",
+  "Hash": "fxgJ9Gq6mH4RkO1O0i23+onSmPeyPew2mMJwC6jQiCw=",
+  "Source": "CivitaBack.Api",
+  "BasePath": "_content/CivitaBack.Api",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
