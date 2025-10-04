@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CivitaBack.Logica")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+84ec46bcce853ab8e906aa8de195c77f178fcda4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8ee6d576fba39088f4d1a57a9951e9925101cc76")]
 [assembly: System.Reflection.AssemblyProductAttribute("CivitaBack.Logica")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CivitaBack.Logica")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
