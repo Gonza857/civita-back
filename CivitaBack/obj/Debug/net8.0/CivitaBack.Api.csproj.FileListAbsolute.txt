@@ -1,4 +1,11 @@
 C:\Users\gonza\source\repos\tpi\CivitaBack\CivitaBack\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\gonza\source\repos\tpi\CivitaBack\CivitaBack\bin\Debug\net8.0\appsettings.DevEmi.json
+C:\Users\gonza\source\repos\tpi\CivitaBack\CivitaBack\bin\Debug\net8.0\appsettings.DevFede.json
+C:\Users\gonza\source\repos\tpi\CivitaBack\CivitaBack\bin\Debug\net8.0\appsettings.DevGene.json
+C:\Users\gonza\source\repos\tpi\CivitaBack\CivitaBack\bin\Debug\net8.0\appsettings.DevGonza.json
+C:\Users\gonza\source\repos\tpi\CivitaBack\CivitaBack\bin\Debug\net8.0\appsettings.DevLucas.json
+C:\Users\gonza\source\repos\tpi\CivitaBack\CivitaBack\bin\Debug\net8.0\appsettings.DevMartin.json
+C:\Users\gonza\source\repos\tpi\CivitaBack\CivitaBack\bin\Debug\net8.0\appsettings.DevVicky.json
 C:\Users\gonza\source\repos\tpi\CivitaBack\CivitaBack\bin\Debug\net8.0\appsettings.json
 C:\Users\gonza\source\repos\tpi\CivitaBack\CivitaBack\bin\Debug\net8.0\CivitaBack.Api.staticwebassets.endpoints.json
 C:\Users\gonza\source\repos\tpi\CivitaBack\CivitaBack\bin\Debug\net8.0\CivitaBack.Api.exe

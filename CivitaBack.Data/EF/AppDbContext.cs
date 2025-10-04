@@ -8,8 +8,5 @@ public partial class AppDbContext : DbContext
     public DbSet<Test> Usuarios { get; set; }
     public DbSet<TestModelado> NombreTabla { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseNpgsql("Host=localhost;Database=tpi-neocivita;Username=postgres;Password=admin");
-    }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 }
