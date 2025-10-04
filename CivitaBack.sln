@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CivitaBack.Data", "CivitaBa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CivitaBack.Logica", "CivitaBack.Logica\CivitaBack.Logica.csproj", "{403DF7E4-4103-400D-8A49-BD2193D25778}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CivitaBack.Tests", "CivitaBack.Test\CivitaBack.Tests.csproj", "{CEA13D26-E61C-44AF-B96C-984BE97BD50B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{403DF7E4-4103-400D-8A49-BD2193D25778}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{403DF7E4-4103-400D-8A49-BD2193D25778}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{403DF7E4-4103-400D-8A49-BD2193D25778}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEA13D26-E61C-44AF-B96C-984BE97BD50B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEA13D26-E61C-44AF-B96C-984BE97BD50B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEA13D26-E61C-44AF-B96C-984BE97BD50B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEA13D26-E61C-44AF-B96C-984BE97BD50B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
