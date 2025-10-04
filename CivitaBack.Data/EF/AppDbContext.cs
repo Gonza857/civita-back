@@ -8,6 +8,7 @@ public partial class AppDbContext : DbContext
     public DbSet<Test> Usuarios { get; set; }
     public DbSet<TestModelado> NombreTabla { get; set; }
 
+<<<<<<< HEAD
     public DbSet<Partida> Partida { get; set; }
     public DbSet<Usuario> Usuario { get; set; }
     public DbSet<Estructura> Estructura { get; set; }
@@ -29,4 +30,7 @@ public partial class AppDbContext : DbContext
     {
         optionsBuilder.UseNpgsql("Host=localhost;Database=tpi-neocivita;Username=postgres;Password=postgresql");
     }
+=======
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+>>>>>>> decbba690bc8c1f0a2da542d5f09b579b894d5a7
 }

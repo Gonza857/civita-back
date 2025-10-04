@@ -1,1 +1,19 @@
+# Build outputs
+bin/
+obj/
+
+# Configuración de usuario
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Archivos temporales de VS
 .vs/
+
+# Rider IDE
+.idea/
+
+# Paquetes NuGet descargados
+*.nupkg
+packages/
