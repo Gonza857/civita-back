@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack\\CivitaBack.Api.csproj": {}
+    "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack\\CivitaBack.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Data\\CivitaBack.Data.csproj": {
+    "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Data\\CivitaBack.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Data\\CivitaBack.Data.csproj",
+        "projectUniqueName": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Data\\CivitaBack.Data.csproj",
         "projectName": "CivitaBack.Data",
-        "projectPath": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Data\\CivitaBack.Data.csproj",
-        "packagesPath": "C:\\Users\\gonza\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Data\\obj\\",
+        "projectPath": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Data\\CivitaBack.Data.csproj",
+        "packagesPath": "C:\\Users\\Pc\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Data\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\gonza\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -83,24 +83,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Logica\\CivitaBack.Logica.csproj": {
+    "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Logica\\CivitaBack.Logica.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Logica\\CivitaBack.Logica.csproj",
+        "projectUniqueName": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Logica\\CivitaBack.Logica.csproj",
         "projectName": "CivitaBack.Logica",
-        "projectPath": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Logica\\CivitaBack.Logica.csproj",
-        "packagesPath": "C:\\Users\\gonza\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Logica\\obj\\",
+        "projectPath": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Logica\\CivitaBack.Logica.csproj",
+        "packagesPath": "C:\\Users\\Pc\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Logica\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\gonza\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -115,8 +115,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Data\\CivitaBack.Data.csproj": {
-                "projectPath": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Data\\CivitaBack.Data.csproj"
+              "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Data\\CivitaBack.Data.csproj": {
+                "projectPath": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Data\\CivitaBack.Data.csproj"
               }
             }
           }
@@ -152,24 +152,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack\\CivitaBack.Api.csproj": {
+    "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack\\CivitaBack.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack\\CivitaBack.Api.csproj",
+        "projectUniqueName": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack\\CivitaBack.Api.csproj",
         "projectName": "CivitaBack.Api",
-        "projectPath": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack\\CivitaBack.Api.csproj",
-        "packagesPath": "C:\\Users\\gonza\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack\\obj\\",
+        "projectPath": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack\\CivitaBack.Api.csproj",
+        "packagesPath": "C:\\Users\\Pc\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\gonza\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -184,11 +184,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Data\\CivitaBack.Data.csproj": {
-                "projectPath": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Data\\CivitaBack.Data.csproj"
+              "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Data\\CivitaBack.Data.csproj": {
+                "projectPath": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Data\\CivitaBack.Data.csproj"
               },
-              "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Logica\\CivitaBack.Logica.csproj": {
-                "projectPath": "C:\\Users\\gonza\\source\\repos\\tpi\\CivitaBack\\CivitaBack.Logica\\CivitaBack.Logica.csproj"
+              "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Logica\\CivitaBack.Logica.csproj": {
+                "projectPath": "C:\\Users\\Pc\\Desktop\\Neocivita\\Backend\\civita-back\\CivitaBack.Logica\\CivitaBack.Logica.csproj"
               }
             }
           }
@@ -239,7 +239,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CivitaBack.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+71af19460483792dc7419fa3cab3decfc3e8e210")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+84ec46bcce853ab8e906aa8de195c77f178fcda4")]
 [assembly: System.Reflection.AssemblyProductAttribute("CivitaBack.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CivitaBack.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
