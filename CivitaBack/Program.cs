@@ -20,14 +20,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Mostrar todas las variables de entorno
-foreach (System.Collections.DictionaryEntry env in Environment.GetEnvironmentVariables())
-{
-    Console.WriteLine($"{env.Key} = {env.Value}");
-}
-
-// Mostrar solo DEV_PROFILE
-Console.WriteLine("DEV_PROFILE = " + Environment.GetEnvironmentVariable("DEV_PROFILE"));
 
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
