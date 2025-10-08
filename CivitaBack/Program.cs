@@ -4,23 +4,22 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// CORS para Vite Dev
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowViteDev", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // URL del Vite dev server
+        policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
-
+// Cargar configuración con perfiles
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -30,7 +29,7 @@ builder.Configuration
 
 Console.WriteLine("Perfil DEV_PROFILE: " + Environment.GetEnvironmentVariable("DEV_PROFILE"));
 
-
+// Configurar DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -39,7 +38,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -47,11 +46,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
-app.MapControllers();
-
 app.UseCors("AllowViteDev");
-
+app.MapControllers();
 app.Run();

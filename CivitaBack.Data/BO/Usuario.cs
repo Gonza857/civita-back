@@ -14,6 +14,6 @@ namespace CivitaBack.Data.BO
         public string? HashDeContrasena { get; set; }
 
         // Relaciones
-        public List<Partida>? Partida { get; set; }
+        public Partida Partida { get; set; }
     }
 }
