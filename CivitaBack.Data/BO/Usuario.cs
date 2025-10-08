@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace CivitaBack.Data.BO
 {
@@ -14,6 +15,7 @@ namespace CivitaBack.Data.BO
         public string? HashDeContrasena { get; set; }
 
         // Relaciones
+        [JsonIgnore]
         public Partida Partida { get; set; }
     }
 }

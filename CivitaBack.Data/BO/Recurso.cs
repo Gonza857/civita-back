@@ -11,8 +11,6 @@ namespace CivitaBack.Data.BO
 
         public string? Nombre { get; set; }
         public int Cantidad { get; set; }
-        public int Felicidad { get; set; }
-        public int Contaminacion { get; set; }
 
         public int PartidaId { get; set; }
         public Partida? Partida { get; set; }

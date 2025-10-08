@@ -1,4 +1,6 @@
 using CivitaBack.Data.EF;
+using CivitaBack.Data.Repositorio;
+using CivitaBack.Logica;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +37,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseNpgsql(connectionString);
 });
+
+builder.Services.AddScoped<IPartidaLogica, PartidaLogica>();
+builder.Services.AddScoped<IRepositorioPartida, RepositorioPartida>();
 
 var app = builder.Build();
 
