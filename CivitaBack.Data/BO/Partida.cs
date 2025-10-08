@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 
 namespace CivitaBack.Data.BO
@@ -14,6 +15,8 @@ namespace CivitaBack.Data.BO
         public string? JsonMapa { get; set; }
 
         public int UsuarioId { get; set; }
+
+        [JsonIgnore]
         public Usuario? Usuario { get; set; }
 
         // Relaciones
