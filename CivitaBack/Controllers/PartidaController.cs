@@ -1,4 +1,5 @@
-﻿using CivitaBack.Logica;
+﻿using CivitaBack.Data.BO;
+using CivitaBack.Logica;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
@@ -26,6 +27,12 @@ public class PartidaController : ControllerBase
     public IActionResult GetPartidas()
     {
         var partidas = this._partidaServicio.ObtenerPartidas();
-        return Ok(partidas);
+        return Ok(new
+        {
+            mensaje = "Todo OK",
+            exito = true,
+            status = 200,
+            data = partidas
+        });
     }
 }
