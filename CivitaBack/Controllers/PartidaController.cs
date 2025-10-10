@@ -1,5 +1,6 @@
 ﻿using CivitaBack.Data.BO;
 using CivitaBack.Logica;
+using CivitaBack.Logica.Excepciones;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
@@ -9,24 +10,33 @@ namespace CivitaBack.Api.Controllers;
 public class PartidaController : ControllerBase
 {
 
-    private readonly IPartidaLogica _partidaServicio;
+    private readonly IPartidaLogica _partidaLogica;
+    private readonly IRecursoLogica _recursoLogica;
 
-    public PartidaController(IPartidaLogica pl)
+    public PartidaController(IPartidaLogica pl, IRecursoLogica rl)
     {
-        this._partidaServicio = pl;
+        this._partidaLogica = pl;
+        this._recursoLogica = rl;
     }
 
-    [HttpPost]
-    public IActionResult PostPartida()
+    [HttpPost("Iniciar/{idUsuario}")]
+    public IActionResult Iniciar(int idUsuario)
     {
-        var partida = this._partidaServicio.CrearPartida();
-        return Ok(partida);
+        try
+        {
+            Partida partida = this._partidaLogica.CrearPartida(7);
+            this._recursoLogica.ConfigurarInicial(partida);
+            return Ok(partida);
+        } catch (ErrorInternoExcepction e)
+        {
+            return Problem("Ocurrió un error al guardar");
+        }
     }
 
     [HttpGet]
     public IActionResult GetPartidas()
     {
-        var partidas = this._partidaServicio.ObtenerPartidas();
+        var partidas = this._partidaLogica.ObtenerPartidas();
         return Ok(new
         {
             mensaje = "Todo OK",
@@ -39,7 +49,7 @@ public class PartidaController : ControllerBase
     [HttpGet("{id}")]
     public IActionResult GetPartidaPorId(int id)
     {
-        var partida = this._partidaServicio.ObtenerPorUsuarioId(id);
+        var partida = this._partidaLogica.ObtenerPorUsuarioId(id);
         return Ok(new
         {
             mensaje = "Todo OK",

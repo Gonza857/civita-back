@@ -13,7 +13,7 @@ namespace CivitaBack.Logica;
 public interface IPartidaLogica
 {
     PartidaDTO ObtenerPorUsuarioId(int IdUsuario);
-    PartidaDTO CrearPartida();
+    Partida CrearPartida(int idUsuario);
 
     List<PartidaDTO> ObtenerPartidas();
 }
@@ -28,28 +28,25 @@ public class PartidaLogica : IPartidaLogica
         repositorioPartida = repositoriopartida;
     }
 
-    public PartidaDTO CrearPartida()
+    public Partida CrearPartida(int idUsuario)
     {
         Usuario usuario = new Usuario
         {
+            Id = idUsuario,
             Mail = "hardcode@mail.com",
             NombreUsuario = "HardCodeUser123",
             HashDeContrasena = "abc123"
         };
-        Partida creada = this.repositorioPartida.CrearPartida(usuario);
-        return new PartidaDTO 
-        {
-            Id = creada.Id,
-            Partida = creada,
-        };
+
+        return this.repositorioPartida.CrearPartida(usuario);
     }
 
     public List<PartidaDTO> ObtenerPartidas()
     {
-        var partidas = this.repositorioPartida.ObtenerPartidas();
-        return partidas
-          .Select(p => this.PartidaToDTO(p))
-          .ToList();
+            var partidas = this.repositorioPartida.ObtenerPartidas();
+            return partidas
+              .Select(p => this.PartidaToDTO(p))
+              .ToList();
     }
 
     public PartidaDTO ObtenerPorUsuarioId(int IdUsuario)

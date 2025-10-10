@@ -15,12 +15,12 @@ public interface IRepositorioPartida
     Partida CrearPartida(Usuario usuario);
     List<Partida> ObtenerPartidas();
 }
-public class RepositorioPartida : IRepositorioPartida
+public class PartidaRepositorio : IRepositorioPartida
 {
 
     private readonly AppDbContext _context;
 
-    public RepositorioPartida(AppDbContext context)
+    public PartidaRepositorio(AppDbContext context)
     {
         _context = context;
     }
@@ -28,9 +28,6 @@ public class RepositorioPartida : IRepositorioPartida
 
     public Partida CrearPartida(Usuario usuario)
     {
-        _context.Add(usuario);
-        _context.SaveChanges();
-
         Partida partida = new Partida
         {
             UsuarioId = usuario.Id
