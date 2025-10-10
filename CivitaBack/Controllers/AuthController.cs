@@ -24,11 +24,15 @@ namespace CivitaBack.Api.Controllers
             try
             {
                 var usuario = await _authLogica.RegistrarUsuarioAsync(request.NombreUsuario, request.Mail, request.Password);
-                return Ok(new { usuario.Id, usuario.NombreUsuario, usuario.Mail });
+                return Ok(new { mensaje = "Usuario registrado correctamente!", usuario });
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { error = "Error interno del servidor." });
             }
         }
     }
