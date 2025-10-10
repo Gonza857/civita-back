@@ -12,7 +12,7 @@ namespace CivitaBack.Logica;
 
 public interface IPartidaLogica
 {
-    Partida ObtenerPorUsuarioId(int IdUsuario);
+    PartidaDTO ObtenerPorUsuarioId(int IdUsuario);
     PartidaDTO CrearPartida();
 
     List<PartidaDTO> ObtenerPartidas();
@@ -52,9 +52,11 @@ public class PartidaLogica : IPartidaLogica
           .ToList();
     }
 
-    public Partida ObtenerPorUsuarioId(int IdUsuario)
+    public PartidaDTO ObtenerPorUsuarioId(int IdUsuario)
     {
-        throw new NotImplementedException();
+        Partida partida = this.repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
+        if (partida == null) throw new Exception("Partida no encontrada");
+        return this.PartidaToDTO(partida);
     }
 
     private PartidaDTO PartidaToDTO (Partida partida)

@@ -47,6 +47,6 @@ public class RepositorioPartida : IRepositorioPartida
 
     public Partida ObtenerPorUsuarioId(int IdUsuario)
     {
-        throw new NotImplementedException();
+        return _context.Partida.FirstOrDefault((p) => p.UsuarioId == IdUsuario);
     }
 }

@@ -35,4 +35,17 @@ public class PartidaController : ControllerBase
             data = partidas
         });
     }
+
+    [HttpGet("{id}")]
+    public IActionResult GetPartidaPorId(int id)
+    {
+        var partida = this._partidaServicio.ObtenerPorUsuarioId(id);
+        return Ok(new
+        {
+            mensaje = "Todo OK",
+            exito = true,
+            status = 200,
+            data = partida
+        });
+    }
 }
