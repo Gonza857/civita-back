@@ -51,6 +51,10 @@ builder.Services.AddScoped<ILogroRepositorio, LogroRepositorio>();
 
 builder.Services.AddScoped<IRecursoLogica, RecursoLogica>();
 builder.Services.AddScoped<IRecursoRepositorio, RecursoRepositorio>();
+//builder.Services.AddScoped<IRepositorioPartida, RepositorioPartida>();
+builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
+builder.Services.AddScoped<IAuthLogica, AuthLogica>();
+
 
 var app = builder.Build();
 
