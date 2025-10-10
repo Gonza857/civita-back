@@ -40,6 +40,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IPartidaLogica, PartidaLogica>();
 builder.Services.AddScoped<IRepositorioPartida, RepositorioPartida>();
+builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
+builder.Services.AddScoped<IAuthLogica, AuthLogica>();
+
 
 var app = builder.Build();
 
