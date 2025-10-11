@@ -11,7 +11,7 @@ namespace CivitaBack.Data.Repositorio;
 
 public interface ILogroRepositorio : IRepositorioBase<Logro>
 {
-
+    void Actualizar();
 }
 public class LogroRepositorio : ILogroRepositorio
 {
@@ -25,6 +25,11 @@ public class LogroRepositorio : ILogroRepositorio
     public void Actualizar(Logro entidad)
     {
         throw new NotImplementedException();
+    }
+
+    public void Actualizar()
+    {
+        _context.SaveChanges();
     }
 
     public void Eliminar(int id)

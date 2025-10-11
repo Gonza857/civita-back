@@ -1,4 +1,5 @@
 ﻿using CivitaBack.Data.BO;
+using CivitaBack.Data.DTO;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Excepciones;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,13 @@ public class PartidaController : ControllerBase
 
     private readonly IPartidaLogica _partidaLogica;
     private readonly IRecursoLogica _recursoLogica;
+    private readonly IAuthLogica _authLogica;
 
-    public PartidaController(IPartidaLogica pl, IRecursoLogica rl)
+    public PartidaController(IPartidaLogica pl, IRecursoLogica rl, IAuthLogica al)
     {
         this._partidaLogica = pl;
         this._recursoLogica = rl;
+        this._authLogica = al;
     }
 
     [HttpPost("Iniciar/{idUsuario}")]
@@ -37,25 +40,28 @@ public class PartidaController : ControllerBase
     public IActionResult GetPartidas()
     {
         var partidas = this._partidaLogica.ObtenerPartidas();
-        return Ok(new
+        return Ok(partidas);
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchPartida([FromBody] PartidaDTO partidaDTO, int id)
+    {
+        try
         {
-            mensaje = "Todo OK",
-            exito = true,
-            status = 200,
-            data = partidas
-        });
+            Usuario usuario = await this._authLogica.ObtenerPorId(partidaDTO.UsuarioId);
+            this._partidaLogica.Actualizar(partidaDTO, usuario);
+            return Ok();
+        } catch (Exception ex) 
+        {
+            return Problem(ex.Message);
+        }
+        
     }
 
     [HttpGet("{id}")]
     public IActionResult GetPartidaPorId(int id)
     {
         var partida = this._partidaLogica.ObtenerPorUsuarioId(id);
-        return Ok(new
-        {
-            mensaje = "Todo OK",
-            exito = true,
-            status = 200,
-            data = partida
-        });
+        return Ok(partida);
     }
 }

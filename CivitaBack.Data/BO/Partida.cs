@@ -21,7 +21,7 @@ namespace CivitaBack.Data.BO
 
         // Relaciones
         [JsonIgnore]
-        public List<Recurso>? Recurso { get; set; }
+        public List<Recurso>? Recursos { get; set; }
         public List<Evento>? Evento { get; set; }
         public List<Tienda>? Tienda { get; set; }
         public List<EstructuraEnMapa>? EstructuraEnMapa { get; set; }

@@ -14,6 +14,8 @@ public interface ITipoLogroLogica
     TipoLogroDTO ObtenerPorId(int Id);
     TipoLogroDTO Guardar(TipoLogroDTO nuevoTipologro);
 
+    void Actualizar(TipoLogroDTO tipoLogro, int idTipoLogro);
+
     List<TipoLogroDTO> ObtenerTiposLogro();
 
     void Eliminar(int Id);
@@ -25,6 +27,14 @@ public class TipoLogroLogica : ITipoLogroLogica
     public TipoLogroLogica(ITipoLogroRepositorio rtl)
     {
         repositorioTipoLogro = rtl;
+    }
+
+    public void Actualizar(TipoLogroDTO tipoLogro, int idTipoLogro)
+    {
+        if (tipoLogro == null || idTipoLogro == null) throw new Exception("Ocurrió un error al actualizar el Tipo de Logro");
+        var tipoLogroBuscado = this.repositorioTipoLogro.ObtenerPorId(idTipoLogro);
+        tipoLogroBuscado.Nombre = tipoLogro.Nombre;
+        this.repositorioTipoLogro.Actualizar();
     }
 
     public void Eliminar(int Id)

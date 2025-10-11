@@ -8,6 +8,6 @@ namespace CivitaBack.Data.DTO;
 
 public class TipoLogroDTO
 {
-    public int? Id { get; set; }
+    public int Id { get; set; }
     public string Nombre { get; set; }
 }

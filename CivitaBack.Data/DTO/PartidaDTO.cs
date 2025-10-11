@@ -10,6 +10,14 @@ namespace CivitaBack.Data.DTO;
 public class PartidaDTO
 {
     public int Id { get; set; }
-    public Partida Partida { get; set; } // Ya trae la partida
+    public int UsuarioId { get; set; }
+
+    public string? Usuario { get; set; }
+
+    public int Energia {  get; set; }
+    public int Felicidad { get; set; }
+    public int Contaminacion { get; set; }
+    public int EcoCoins { get; set; }
+    public Partida? Partida { get; set; } 
 
 }

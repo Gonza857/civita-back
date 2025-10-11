@@ -20,13 +20,7 @@ public class LogroController : ControllerBase
     public IActionResult Listado()
     {
         var logros = _logroLogica.ObtenerListado();
-        return Ok(new
-        {
-            mensaje = "Todo OK",
-            exito = true,
-            status = 200,
-            data = logros
-        });
+        return Ok(logros);
     }
 
     [HttpPost]
@@ -43,13 +37,29 @@ public class LogroController : ControllerBase
     public IActionResult Eliminar(int id)
     {
         _logroLogica.Eliminar(id);
-        return Ok(new
+        return Ok();
+
+    }
+
+    [HttpGet("{id}")]
+    public IActionResult GetLogroPorId(int id)
+    {
+        var logro = this._logroLogica.ObtenerPorId(id);
+        return Ok(logro);
+    }
+
+    [HttpPatch("{id}")]
+    public IActionResult PatchLogro([FromBody] LogroDTO logroDTO, int id)
+    {
+        try
         {
-            mensaje = "Todo OK",
-            exito = true,
-            status = 200,
-            data = 1
-        });
+            this._logroLogica.Actualizar(logroDTO, id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message);
+        }
 
     }
 

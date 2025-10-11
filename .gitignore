@@ -17,3 +17,6 @@ obj/
 # Paquetes NuGet descargados
 *.nupkg
 packages/
+
+# Visual Studio launch settings
+**/Properties/launchSettings.json

@@ -14,6 +14,8 @@ public interface ITipoLogroRepositorio
     List<TipoLogro> ObtenerTodos();
     TipoLogro ObtenerPorId(int Id);
     void Eliminar(int Id);
+
+    void Actualizar();
 }
 
 public class TipoLogroRepositorio : ITipoLogroRepositorio
@@ -23,6 +25,11 @@ public class TipoLogroRepositorio : ITipoLogroRepositorio
     public TipoLogroRepositorio(AppDbContext context)
     {
         _context = context;
+    }
+
+    public void Actualizar()
+    {
+        _context.SaveChanges();
     }
 
     public void Eliminar(int Id)

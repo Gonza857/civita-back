@@ -14,10 +14,10 @@ public interface ILogroLogica
 {
     LogroDTO ObtenerPorId(int Id);
     LogroDTO Guardar(LogroDTO entidad);
-
     List<LogroDTO> ObtenerListado();
-
     void Eliminar(int Id);
+
+    void Actualizar(LogroDTO logroDTO, int id);
 }
 
 public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
@@ -29,6 +29,21 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
     {
         repositorioLogro = rtl;
         repositorioTipoLogro = itlr;
+    }
+
+    public void Actualizar(LogroDTO logroDTO, int id)
+    {
+        if (logroDTO == null || id == null) throw new Exception("Ocurrió un error al actualizar el Logro");
+        var logroBuscado = this.repositorioLogro.ObtenerPorId(id);
+        var tipoLogroBuscado = this.repositorioTipoLogro.ObtenerPorId(logroDTO.TipoId);
+        if (logroBuscado == null || tipoLogroBuscado == null) throw new Exception("Ocurrió un error al actualizar el Logro");
+
+        logroBuscado.Titulo = logroDTO.Titulo;
+        logroBuscado.Descripcion = logroDTO.Descripcion;
+        logroBuscado.Titulo = logroDTO.Titulo;
+        logroBuscado.TipoLogro = tipoLogroBuscado;
+
+        this.repositorioLogro.Actualizar();
     }
 
     public void Eliminar(int Id)

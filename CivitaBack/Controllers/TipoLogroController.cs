@@ -22,13 +22,7 @@ public class TipoLogroController : ControllerBase
     public IActionResult Listado()
     {
         var tiposLogros = this._tipoLogroLogica.ObtenerTiposLogro();
-        return Ok(new
-        {
-            mensaje = "Todo OK",
-            exito = true,
-            status = 200,
-            data = tiposLogros
-        });
+        return Ok(tiposLogros);
     }
 
     [HttpPost]
@@ -45,13 +39,29 @@ public class TipoLogroController : ControllerBase
     public IActionResult Eliminar(int id) 
     {
         this._tipoLogroLogica.Eliminar(id);
-        return Ok(new
+        return Ok();
+
+    }
+
+    [HttpGet("{id}")]
+    public IActionResult getTipoLogroPorId(int id)
+    {
+        var tipoLogro = this._tipoLogroLogica.ObtenerPorId(id);
+        return Ok(tipoLogro);
+    }
+
+    [HttpPatch("{id}")]
+    public IActionResult PatchTipoLogro([FromBody] TipoLogroDTO tipoLogroDTO, int id)
+    {
+        try
         {
-            mensaje = "Todo OK",
-            exito = true,
-            status = 200,
-            data = 1
-        });
+            this._tipoLogroLogica.Actualizar(tipoLogroDTO, id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message);
+        }
 
     }
 }
