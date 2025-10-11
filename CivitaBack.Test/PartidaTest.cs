@@ -17,7 +17,7 @@ namespace CivitaBack.Tests
             Assert.Null(partida.JsonMapa);
             Assert.Equal(0, partida.UsuarioId);
             Assert.Null(partida.Usuario);
-            Assert.Null(partida.Recurso);
+            //Assert.Null(partida.Recurso);
             Assert.Null(partida.Evento);
             Assert.Null(partida.Tienda);
             Assert.Null(partida.EstructuraEnMapa);

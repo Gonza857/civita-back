@@ -14,21 +14,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CivitaBack.Logica;
-
-public interface IAuthLogica
+namespace CivitaBack.Logica
 {
-    Task<Usuario> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password);
-    Task<Usuario> ObtenerPorId(int id);
-}
-public class AuthLogica : IAuthLogica
-{
-    private readonly IRepositorioUsuario _repositorioUsuario;
-
-    public AuthLogica(IRepositorioUsuario repositorioUsuario)
+    public interface IAuthLogica
     {
         Task<Usuario> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password);
         Task<LoginResponse> LoginAsync(LoginRequest request);
+        Task<Usuario> ObtenerPorId(int id);
 
     }
     public class AuthLogica : IAuthLogica
@@ -42,6 +34,13 @@ public class AuthLogica : IAuthLogica
             _repositorioUsuario = repositorioUsuario;
             _configuration = configuration;
 
+        }
+
+        public Task<Usuario> ObtenerPorId(int id)
+        {
+            Task<Usuario> usuario = this._repositorioUsuario.ObtenerPorId(id);
+            if (usuario == null) throw new Exception("No se encontró el usuario");
+            return usuario;
         }
 
         public async Task<Usuario> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password)
@@ -63,12 +62,12 @@ public class AuthLogica : IAuthLogica
 
             var hash = PasswordHelper.HashPassword(password);
 
-        var usuario = new Usuario
-        {
-            NombreUsuario = nombreUsuario,
-            Mail = mail,
-            HashDeContrasena = hash
-        };
+            var usuario = new Usuario
+            {
+                NombreUsuario = nombreUsuario,
+                Mail = mail,
+                HashDeContrasena = hash
+            };
 
             return await _repositorioUsuario.CrearUsuario(usuario);
         }
