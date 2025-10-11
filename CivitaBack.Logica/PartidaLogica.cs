@@ -34,6 +34,11 @@ public class PartidaLogica : IPartidaLogica
     public void Actualizar(PartidaDTO partida, Usuario usuario)
     {
         if (partida == null && usuario == null) throw new ErrorInternoExcepction("Ocurrió un error al actualizar la Partida");
+
+        if (partida.Energia < 0 || partida.Felicidad < 0 ||
+            partida.EcoCoins < 0 || partida.Contaminacion < 0)
+            throw new PartidaExcepcion("Los valores de los recursos no pueden ser negativos");
+
         var partidaBuscada = this.repositorioPartida.ObtenerPorUsuarioId(usuario.Id);
         if (partidaBuscada == null) throw new ErrorInternoExcepction("Ocurrió un error al actualizar la Partida");
 
@@ -60,6 +65,9 @@ public class PartidaLogica : IPartidaLogica
 
     public Partida CrearPartida(int idUsuario)
     {
+        Partida partidaExistente = this.repositorioPartida.ObtenerPorUsuarioId(idUsuario);
+        if (partidaExistente != null) throw new PartidaExcepcion("Ya tienes una partida empezada.");
+
         Usuario usuario = new Usuario
         {
             Id = idUsuario,

@@ -51,11 +51,12 @@ public class PartidaController : ControllerBase
             Usuario usuario = await this._authLogica.ObtenerPorId(partidaDTO.UsuarioId);
             this._partidaLogica.Actualizar(partidaDTO, usuario);
             return Ok();
-        } catch (Exception ex) 
-        {
-            return Problem(ex.Message);
+        } catch (PartidaExcepcion ex) {
+            return Conflict(new { message = ex.Message });
+        } catch (Exception ex) {
+            return Problem("Ocurrió un error en el servidor.");
         }
-        
+
     }
 
     [HttpGet("{id}")]
