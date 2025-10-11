@@ -5,9 +5,10 @@ on:
     branches: [desarrollo]
   pull_request:
     branches: [desarrollo]
+  workflow_dispatch: # Permite disparar manualmente
 
 jobs:
-  build-and-test:
+  test:
     runs-on: windows-latest
 
     steps:
@@ -19,21 +20,17 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 8.0.x # o la versión que uses
+          dotnet-version: 8.0.x
 
-      # 3. Restore dependencias
+      # 3. Restore dependencias (por si no hay artifact)
       - name: Restore dependencies
         run: dotnet restore
 
-      # 4. Build del proyecto
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
-
-      # 5. Ejecutar tests
+      # 4. Ejecutar tests directamente apuntando al proyecto de tests
       - name: Run Tests
-        run: dotnet test --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"
+        run: dotnet test ./CivitaBack.Test/CivitaBack.Test.csproj --configuration Release --logger "trx;LogFileName=test_results.trx"
 
-      # 6. (Opcional) Subir resultados como artefacto
+      # 5. Subir resultados como artefacto
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:

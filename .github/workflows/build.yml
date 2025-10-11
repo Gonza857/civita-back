@@ -1,4 +1,4 @@
-name: CI - Build .NET API
+name: .NET Build
 
 on:
   push:
@@ -8,19 +8,30 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-      - name: 🧭 Checkout repository
-        uses: actions/checkout@v4
+      # 1. Checkout del repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: 🧰 Setup .NET
-        uses: actions/setup-dotnet@v4
+      # 2. Setup .NET SDK
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "8.0.x" # o la versión que uses (7.0, etc.)
+          dotnet-version: 8.0.x
 
-      - name: 📦 Restore dependencies
+      # 3. Restore dependencias
+      - name: Restore dependencies
         run: dotnet restore
 
-      - name: 🏗️ Build project
+      # 4. Build del proyecto
+      - name: Build
         run: dotnet build --configuration Release --no-restore
+
+      # 5. Subir artefacto del build
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: "**/bin/Release/**"
