@@ -1,23 +1,40 @@
-﻿using Xunit;
-using Moq;
-using CivitaBack.Logica;
+﻿using CivitaBack.Data.BO;
+using CivitaBack.Data.DTO;
 using CivitaBack.Data.Repositorio;
-using CivitaBack.Data.BO;
+using CivitaBack.Logica;
+using CivitaBack.Logica.Helpers;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace CivitaBack.Tests
 {
-    public class ServicioAuthTests
+    public class AuthLogicaTest
     {
+
+        private readonly Mock<IRepositorioUsuario> mockRepo;
+        private readonly IConfiguration configuration;
+        private readonly AuthLogica servicio;
+
+        public AuthLogicaTest()
+        {
+            mockRepo = new Mock<IRepositorioUsuario>();
+
+            configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string> { { "Jwt:Key", "S3gura!ClaveDeJWT2025!A7k@dF#9hL$3gT%qW&8zV^1sP*4bX" } })
+                .Build();
+
+            servicio = new AuthLogica(mockRepo.Object, configuration);
+        }
+
         [Fact]
         public async Task RegistrarUsuario_Correto_RetornaUsuario()
         {
-            var mockRepo = new Mock<IRepositorioUsuario>();
+
             mockRepo.Setup(r => r.ObtenerUsuarioPorMail(It.IsAny<string>())).ReturnsAsync((Usuario?)null);
             mockRepo.Setup(r => r.ObtenerUsuarioPorNombre(It.IsAny<string>())).ReturnsAsync((Usuario?)null);
             mockRepo.Setup(r => r.CrearUsuario(It.IsAny<Usuario>())).ReturnsAsync((Usuario u) => u);
-
-            var servicio = new AuthLogica(mockRepo.Object);
 
             var nombre = "Martin";
             var mail = "martin@ejemplo.com";
@@ -35,14 +52,41 @@ namespace CivitaBack.Tests
         [Fact]
         public async Task RegistrarUsuario_EmailExistente_LanzaExcepcion()
         {
-            var mockRepo = new Mock<IRepositorioUsuario>();
             mockRepo.Setup(r => r.ObtenerUsuarioPorMail(It.IsAny<string>())).ReturnsAsync(new Usuario());
-            var servicio = new AuthLogica(mockRepo.Object);
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
                 servicio.RegistrarUsuarioAsync("Martin", "martin@ejemplo.com", "123456")
             );
+        }
+
+        [Fact]
+        public async Task LoginAsync_UsuarioValido_RetornaToken()
+        {
+            // Arrange
+            var usuario = new Usuario
+            {
+                NombreUsuario = "martin",
+                Mail = "martin@test.com",
+                HashDeContrasena = PasswordHelper.HashPassword("password123")
+            };
+
+            mockRepo.Setup(r => r.ObtenerUsuarioPorMail("martin@test.com"))
+                    .ReturnsAsync(usuario);
+
+            var loginRequest = new LoginRequest
+            {
+                Mail = "martin@test.com",
+                Password = "password123"
+            };
+
+            // Act
+            var resultado = await servicio.LoginAsync(loginRequest);
+
+            // Assert
+            Assert.NotNull(resultado.Token);
+            Assert.Equal("martin", resultado.NombreUsuario);
+            Assert.Equal("martin@test.com", resultado.Mail);
         }
     }
 }
