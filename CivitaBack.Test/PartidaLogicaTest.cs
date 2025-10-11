@@ -60,7 +60,7 @@ public class PartidaLogicaTest
     }
 
     [Fact]
-    public void ActualizarPartida_OK()
+    public void Actualizar_SaleOK()
     {
         // Arrange
         Partida partidaMock = new Partida

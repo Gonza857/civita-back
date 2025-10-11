@@ -1,0 +1,41 @@
+name: .NET Tests
+
+on:
+  push:
+    branches: [desarrollo]
+  pull_request:
+    branches: [desarrollo]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+      # 1. Checkout del repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Setup .NET SDK
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x # o la versión que uses
+
+      # 3. Restore dependencias
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # 4. Build del proyecto
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      # 5. Ejecutar tests
+      - name: Run Tests
+        run: dotnet test --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"
+
+      # 6. (Opcional) Subir resultados como artefacto
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: "**/test_results.trx"
