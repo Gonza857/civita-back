@@ -28,7 +28,7 @@ jobs:
 
       # 4. Ejecutar tests directamente apuntando al proyecto de tests
       - name: Run Tests
-        run: dotnet test ./CivitaBack.Tests/CivitaBack.Tests.csproj --configuration Release --logger "trx;LogFileName=test_results.trx"
+        run: dotnet test ./CivitaBack.Test/CivitaBack.Tests.csproj --configuration Release --logger "trx;LogFileName=test_results.trx"
 
       # 5. Subir resultados como artefacto
       - name: Upload Test Results
