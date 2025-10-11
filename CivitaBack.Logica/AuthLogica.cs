@@ -20,6 +20,7 @@ namespace CivitaBack.Logica
     {
         Task<Usuario> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password);
         Task<LoginResponse> LoginAsync(LoginRequest request);
+        Task<Usuario> ObtenerPorId(int id);
 
     }
     public class AuthLogica : IAuthLogica
@@ -33,6 +34,13 @@ namespace CivitaBack.Logica
             _repositorioUsuario = repositorioUsuario;
             _configuration = configuration;
 
+        }
+
+        public Task<Usuario> ObtenerPorId(int id)
+        {
+            Task<Usuario> usuario = this._repositorioUsuario.ObtenerPorId(id);
+            if (usuario == null) throw new Exception("No se encontró el usuario");
+            return usuario;
         }
 
         public async Task<Usuario> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password)

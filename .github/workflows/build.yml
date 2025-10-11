@@ -1,0 +1,37 @@
+name: .NET Build
+
+on:
+  push:
+    branches: [desarrollo]
+  pull_request:
+    branches: [desarrollo]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # 1. Checkout del repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Setup .NET SDK
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      # 3. Restore dependencias
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # 4. Build del proyecto
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      # 5. Subir artefacto del build
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: "**/bin/Release/**"

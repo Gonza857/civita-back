@@ -1,10 +1,11 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
@@ -14,23 +15,27 @@ public interface IRepositorioPartida
 
     Partida CrearPartida(Usuario usuario);
     List<Partida> ObtenerPartidas();
+
+    void Guardar(Partida partida);
+    void Actualizar();
 }
-public class RepositorioPartida : IRepositorioPartida
+public class PartidaRepositorio : IRepositorioPartida
 {
 
     private readonly AppDbContext _context;
 
-    public RepositorioPartida(AppDbContext context)
+    public PartidaRepositorio(AppDbContext context)
     {
         _context = context;
     }
 
+    public void Actualizar()
+    {
+        _context.SaveChanges();
+    }
 
     public Partida CrearPartida(Usuario usuario)
     {
-        _context.Add(usuario);
-        _context.SaveChanges();
-
         Partida partida = new Partida
         {
             UsuarioId = usuario.Id
@@ -40,13 +45,25 @@ public class RepositorioPartida : IRepositorioPartida
         return partida;
     }
 
+    public void Guardar(Partida partida)
+    {
+        _context.Add(partida);
+        _context.SaveChanges();
+    }
+
     public List<Partida> ObtenerPartidas()
     {
-        return _context.Partida.ToList();
+        return _context.Partida
+            .Include(p => p.Usuario)
+            .Include(p => p.Recursos)
+            .ToList();
     }
 
     public Partida ObtenerPorUsuarioId(int IdUsuario)
     {
-        throw new NotImplementedException();
+        return _context.Partida
+            .Include(p => p.Recursos)
+            .Include(p => p.Usuario)
+            .FirstOrDefault((p) => p.UsuarioId == IdUsuario);
     }
 }

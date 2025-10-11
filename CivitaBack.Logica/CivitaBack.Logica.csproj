@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CivitaBack.Data\CivitaBack.Data.csproj" />
+    <ProjectReference Include="..\CivitaBack.Utils\CivitaBack.Utils.csproj" />
   </ItemGroup>
 
 </Project>

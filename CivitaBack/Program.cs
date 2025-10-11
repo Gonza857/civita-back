@@ -1,3 +1,4 @@
+using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
 using CivitaBack.Data.Repositorio;
 using CivitaBack.Logica;
@@ -20,7 +21,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials(); // credenciales
     });
 });
 
@@ -42,7 +44,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddScoped<IPartidaLogica, PartidaLogica>();
-builder.Services.AddScoped<IRepositorioPartida, RepositorioPartida>();
+builder.Services.AddScoped<IRepositorioPartida, PartidaRepositorio>();
+
+builder.Services.AddScoped<ITipoLogroLogica, TipoLogroLogica>();
+builder.Services.AddScoped<ITipoLogroRepositorio, TipoLogroRepositorio>();
+
+builder.Services.AddScoped<ILogroLogica, LogroLogica>();
+builder.Services.AddScoped<ILogroRepositorio, LogroRepositorio>();
+
+builder.Services.AddScoped<IRecursoLogica, RecursoLogica>();
+builder.Services.AddScoped<IRecursoRepositorio, RecursoRepositorio>();
+
 builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 
