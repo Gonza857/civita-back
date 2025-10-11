@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 
-namespace CivitaBack.Logica
+namespace CivitaBack.Logica.Helpers
 {
     public static class PasswordHelper
     {

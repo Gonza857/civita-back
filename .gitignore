@@ -17,3 +17,6 @@ obj/
 # Paquetes NuGet descargados
 *.nupkg
 packages/
+
+# Ignorar configuraciones locales de Visual Studio / .NET
+**/Properties/launchSettings.json
