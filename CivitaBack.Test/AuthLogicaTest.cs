@@ -13,8 +13,8 @@ namespace CivitaBack.Tests
         public async Task RegistrarUsuario_Correto_RetornaUsuario()
         {
             var mockRepo = new Mock<IRepositorioUsuario>();
-            mockRepo.Setup(r => r.obtenerUsuarioPorMail(It.IsAny<string>())).ReturnsAsync((Usuario?)null);
-            mockRepo.Setup(r => r.obtenerUsuarioPorNombre(It.IsAny<string>())).ReturnsAsync((Usuario?)null);
+            mockRepo.Setup(r => r.ObtenerUsuarioPorMail(It.IsAny<string>())).ReturnsAsync((Usuario?)null);
+            mockRepo.Setup(r => r.ObtenerUsuarioPorNombre(It.IsAny<string>())).ReturnsAsync((Usuario?)null);
             mockRepo.Setup(r => r.CrearUsuario(It.IsAny<Usuario>())).ReturnsAsync((Usuario u) => u);
 
             var servicio = new AuthLogica(mockRepo.Object);
@@ -36,7 +36,7 @@ namespace CivitaBack.Tests
         public async Task RegistrarUsuario_EmailExistente_LanzaExcepcion()
         {
             var mockRepo = new Mock<IRepositorioUsuario>();
-            mockRepo.Setup(r => r.obtenerUsuarioPorMail(It.IsAny<string>())).ReturnsAsync(new Usuario());
+            mockRepo.Setup(r => r.ObtenerUsuarioPorMail(It.IsAny<string>())).ReturnsAsync(new Usuario());
             var servicio = new AuthLogica(mockRepo.Object);
 
             // Act & Assert

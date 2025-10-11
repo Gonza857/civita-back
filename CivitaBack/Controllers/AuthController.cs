@@ -35,6 +35,17 @@ namespace CivitaBack.Api.Controllers
                 return StatusCode(500, new { error = "Error interno del servidor." });
             }
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            var resultado = await _authLogica.LoginAsync(request);
+
+            if (resultado == null)
+                return Unauthorized(new { mensaje = "Usuario o contraseña incorrecta" });
+
+            return Ok(resultado);
+        }
     }
 
 }
