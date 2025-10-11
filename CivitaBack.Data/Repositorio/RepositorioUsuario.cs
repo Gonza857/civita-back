@@ -12,11 +12,13 @@ namespace CivitaBack.Data.Repositorio
 {
     public interface IRepositorioUsuario
     {
-        Task<Usuario> obtenerUsuarioPorMail(string mail);
-        Task<Usuario> obtenerUsuarioPorNombre(string nombreUsuario);
+        Task<Usuario> ObtenerUsuarioPorMail(string mail);
+        Task<Usuario> ObtenerUsuarioPorNombre(string nombreUsuario);
         Task<Usuario> CrearUsuario(Usuario usuario);
 
         Task<Usuario> ObtenerPorId(int id);
+        Task<List<Usuario>> ObtenerTodosLosUsuarios();
+
     }
 
     public class RepositorioUsuario : IRepositorioUsuario
@@ -28,12 +30,12 @@ namespace CivitaBack.Data.Repositorio
             _context = context;
         }
 
-        public async Task<Usuario> obtenerUsuarioPorMail(string mail)
+        public async Task<Usuario> ObtenerUsuarioPorMail(string mail)
         {
             return await _context.Usuario.FirstOrDefaultAsync(u => u.Mail == mail);
         }
 
-        public async Task<Usuario> obtenerUsuarioPorNombre(string nombreUsuario)
+        public async Task<Usuario> ObtenerUsuarioPorNombre(string nombreUsuario)
         {
             return await _context.Usuario.FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
         }
@@ -49,5 +51,11 @@ namespace CivitaBack.Data.Repositorio
         {
             return _context.Usuario.FirstOrDefaultAsync(u => u.Id == id);
         }
+        
+        public async Task<List<Usuario>> ObtenerTodosLosUsuarios()
+        {
+            return await _context.Usuario.ToListAsync();
+        }
+
     }
 }

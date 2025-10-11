@@ -18,5 +18,5 @@ obj/
 *.nupkg
 packages/
 
-# Visual Studio launch settings
+# Ignorar configuraciones locales de Visual Studio / .NET
 **/Properties/launchSettings.json

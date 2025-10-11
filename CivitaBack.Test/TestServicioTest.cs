@@ -1,55 +1,71 @@
 using CivitaBack.Data.BO;
 using CivitaBack.Logica;
 using Moq;
+using Xunit;
 
-namespace CivitaBack.Tests;
-
-
-public class TestServicioTest
+namespace CivitaBack.Tests
 {
-    [Fact]
-    public void ObtenerTest_DeberiaRetornarLista()
+    public class TestServicioTest
     {
-        // Arrange
-        var mockRepo = new Mock<ITestRepositorio>();
+        private readonly Mock<ITestRepositorio> mockRepo;
+        private readonly TestServicio testServicio;
 
-        // Configuramos el mock:
-        mockRepo
-            .Setup(r => r.ObtenerTests())
-            .Returns(new List<Test>());
+        public TestServicioTest()
+        {
+            mockRepo = new Mock<ITestRepositorio>();
+            testServicio = new TestServicio(mockRepo.Object);
+        }
 
-        var servicio = new TestServicio(mockRepo.Object);
+        [Fact]
+        public void Constructor_ConRepositorio_AsignaCorrectamente()
+        {
+            // Arrange
+            var mockRepositorio = new Mock<ITestRepositorio>();
 
-        // Act
-        var resultado = servicio.ObtenerTests();
+            // Act
+            var servicio = new TestServicio(mockRepositorio.Object);
 
-        // Assert
-        Assert.Empty(resultado);
-    }
+            // Assert
+            Assert.NotNull(servicio);
+        }
 
-    [Fact]
-    public void Test()
-    {
-        // Arrange
-        var mockRepo = new Mock<ITestRepositorio>();
+        [Fact]
+        public void ObtenerTests_RetornaListaVacia()
+        {
+            // Act
+            var resultado = testServicio.ObtenerTests();
 
-        Partida partida = new Partida();
-        Usuario usuario = new Usuario { NombreUsuario = "Hola" };
-        //usuario.Partida = partida;
+            // Assert
+            Assert.NotNull(resultado);
+            Assert.Empty(resultado);
+        }
 
+        [Fact]
+        public void ObtenerTests_MultipleCalls_AlwaysReturnsEmptyList()
+        {
+            // Act
+            var resultado1 = testServicio.ObtenerTests();
+            var resultado2 = testServicio.ObtenerTests();
+            var resultado3 = testServicio.ObtenerTests();
 
+            // Assert
+            Assert.NotNull(resultado1);
+            Assert.NotNull(resultado2);
+            Assert.NotNull(resultado3);
+            Assert.Empty(resultado1);
+            Assert.Empty(resultado2);
+            Assert.Empty(resultado3);
+        }
 
-        // Configuramos el mock:
-        mockRepo
-            .Setup(r => r.ObtenerTests())
-            .Returns(new List<Test>());
+        [Fact]
+        public void ObtenerTests_ReturnsNewListInstance()
+        {
+            // Act
+            var resultado1 = testServicio.ObtenerTests();
+            var resultado2 = testServicio.ObtenerTests();
 
-        var servicio = new TestServicio(mockRepo.Object);
-
-        // Act
-        var resultado = servicio.ObtenerTests();
-
-        // Assert
-        Assert.Empty(resultado);
+            // Assert
+            Assert.NotSame(resultado1, resultado2);
+        }
     }
 }
