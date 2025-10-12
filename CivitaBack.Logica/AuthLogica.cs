@@ -59,9 +59,6 @@ namespace CivitaBack.Logica
             if (await _repositorioUsuario.ObtenerUsuarioPorMail(mail) != null)
                 throw new ValidacionRegistroException("El correo ya está en uso.");
 
-            if (await ObtenerUsuarioPorNombre(nombreUsuario) != null)
-                throw new ValidacionRegistroException("El nombre de usuario ya está en uso.");
-
             if (!Regex.IsMatch(mail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
                 throw new ValidacionRegistroException("El correo no tiene un formato válido.");
 
