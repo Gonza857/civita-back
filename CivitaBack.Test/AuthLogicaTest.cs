@@ -47,7 +47,6 @@ namespace CivitaBack.Tests
             Assert.NotNull(resultado);
             Assert.Equal(nombre, resultado.NombreUsuario);
             Assert.Equal(mail, resultado.Mail);
-            Assert.NotNull(resultado.HashDeContrasena);
         }
 
         [Fact]

@@ -14,12 +14,14 @@ public class PartidaController : ControllerBase
     private readonly IPartidaLogica _partidaLogica;
     private readonly IRecursoLogica _recursoLogica;
     private readonly IAuthLogica _authLogica;
+    private readonly IUsuarioLogica _usuarioLogica;
 
-    public PartidaController(IPartidaLogica pl, IRecursoLogica rl, IAuthLogica al)
+    public PartidaController(IPartidaLogica pl, IRecursoLogica rl, IAuthLogica al, IUsuarioLogica ul)
     {
         this._partidaLogica = pl;
         this._recursoLogica = rl;
         this._authLogica = al;
+        this._usuarioLogica = ul;
     }
 
     [HttpPost("Iniciar/{idUsuario}")]
@@ -48,7 +50,7 @@ public class PartidaController : ControllerBase
     {
         try
         {
-            Usuario usuario = await this._authLogica.ObtenerPorId(partidaDTO.UsuarioId);
+            Usuario usuario = await this._usuarioLogica.ObtenerPorId(partidaDTO.UsuarioId);
             this._partidaLogica.Actualizar(partidaDTO, usuario);
             return Ok();
         } catch (PartidaExcepcion ex) {

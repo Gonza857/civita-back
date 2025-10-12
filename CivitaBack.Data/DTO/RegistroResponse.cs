@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace CivitaBack.Data.DTO
 {
-    public class RegistroDTO
+    public class RegistroResponse
     {
+        public int Id { get; set; }
         public string NombreUsuario { get; set; }
         public string Mail { get; set; }
-        public string Password { get; set; }
     }
 }
