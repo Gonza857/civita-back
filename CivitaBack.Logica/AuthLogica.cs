@@ -1,6 +1,7 @@
 ﻿using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Logica.Excepciones;
 using CivitaBack.Logica.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -21,15 +22,15 @@ namespace CivitaBack.Logica
         Task<Usuario> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password);
         Task<LoginResponse> LoginAsync(LoginRequest request);
         Task<Usuario> ObtenerPorId(int id);
+        Task<Usuario> ObtenerUsuarioPorNombre(string nombre);
 
     }
     public class AuthLogica : IAuthLogica
     {
-        private readonly IRepositorioUsuario _repositorioUsuario;
+        private readonly IUsuarioRepositorio _repositorioUsuario;
         private readonly IConfiguration _configuration;
 
-
-        public AuthLogica(IRepositorioUsuario repositorioUsuario, IConfiguration configuration)
+        public AuthLogica(IUsuarioRepositorio repositorioUsuario, IConfiguration configuration)
         {
             _repositorioUsuario = repositorioUsuario;
             _configuration = configuration;
@@ -43,22 +44,26 @@ namespace CivitaBack.Logica
             return usuario;
         }
 
+        public async Task<Usuario> ObtenerUsuarioPorNombre(string nombre)
+        {
+            Usuario usuario = await _repositorioUsuario.ObtenerUsuarioPorNombre(nombre);
+            if (usuario == null) throw new Exception("No se encontró el usuario");
+            return usuario;
+        }
+
         public async Task<Usuario> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password)
         {
             if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(mail) || string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException("Todos los campos son obligatorios.");
+                throw new ValidacionRegistroException("Todos los campos son obligatorios.");
 
             if (await _repositorioUsuario.ObtenerUsuarioPorMail(mail) != null)
-                throw new ArgumentException("El correo ya está en uso.");
-
-            if (await _repositorioUsuario.ObtenerUsuarioPorNombre(nombreUsuario) != null)
-                throw new ArgumentException("El nombre de usuario ya está en uso.");
+                throw new ValidacionRegistroException("El correo ya está en uso.");
 
             if (!Regex.IsMatch(mail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                throw new ArgumentException("El correo no tiene un formato válido.");
+                throw new ValidacionRegistroException("El correo no tiene un formato válido.");
 
             if (password.Length < 4)
-                throw new ArgumentException("La contraseña debe tener al menos 4 caracteres.");
+                throw new ValidacionRegistroException("La contraseña debe tener al menos 4 caracteres.");
 
             var hash = PasswordHelper.HashPassword(password);
 
@@ -77,7 +82,7 @@ namespace CivitaBack.Logica
             var usuario = await _repositorioUsuario.ObtenerUsuarioPorMail(request.Mail);
 
             if (usuario == null || !PasswordHelper.VerifyPassword(request.Password, usuario.HashDeContrasena))
-                return null;
+                throw new AutenticacionException("Usuario o contraseña incorrectos.");
 
             var token = GenerarToken(usuario);
 
@@ -85,7 +90,8 @@ namespace CivitaBack.Logica
             {
                 Token = token,
                 NombreUsuario = usuario.NombreUsuario,
-                Mail = usuario.Mail
+                Mail = usuario.Mail,
+                IdUsuario = usuario.Id
             };
         }
 

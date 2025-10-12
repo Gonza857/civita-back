@@ -13,7 +13,7 @@ public interface IRepositorioPartida
 {
     Partida ObtenerPorUsuarioId(int IdUsuario);
 
-    Partida CrearPartida(Usuario usuario);
+    Partida CrearPartida(int idUsuario);
     List<Partida> ObtenerPartidas();
 
     void Guardar(Partida partida);
@@ -34,11 +34,11 @@ public class PartidaRepositorio : IRepositorioPartida
         _context.SaveChanges();
     }
 
-    public Partida CrearPartida(Usuario usuario)
+    public Partida CrearPartida(int idUsuario)
     {
         Partida partida = new Partida
         {
-            UsuarioId = usuario.Id
+            UsuarioId = idUsuario,
         };
         _context.Add(partida);
         _context.SaveChanges();
