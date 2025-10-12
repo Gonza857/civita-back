@@ -14,15 +14,17 @@ namespace CivitaBack.Api.Controllers
     {
         private readonly IAuthLogica _authLogica;
         private readonly IPartidaLogica _partidaLogica;
+        private readonly IUsuarioLogica _usuarioLogica;
 
-        public AuthController(IAuthLogica authLogica , IPartidaLogica partidaLogica)
+        public AuthController(IAuthLogica authLogica , IPartidaLogica partidaLogica, IUsuarioLogica usuarioLogica)
         {
             _authLogica = authLogica;
             _partidaLogica = partidaLogica;
+            _usuarioLogica = usuarioLogica;
         }
 
         [HttpPost("registro")]
-        public async Task<IActionResult> Registrar([FromBody] RegistroDto request)
+        public async Task<IActionResult> Registrar([FromBody] RegistroDTO request)
         {
             try
             {
@@ -75,7 +77,7 @@ namespace CivitaBack.Api.Controllers
         [HttpGet("existeNombre")]
         public async Task<IActionResult> ExisteNombre([FromQuery] string nombre)
         {
-            var existe = await _authLogica.ObtenerUsuarioPorNombre(nombre) != null;
+            var existe = await _usuarioLogica.ObtenerUsuarioPorNombre(nombre) != null;
             return Ok(new { existe = true });
         }
     }

@@ -56,7 +56,10 @@ builder.Services.AddScoped<IRecursoLogica, RecursoLogica>();
 builder.Services.AddScoped<IRecursoRepositorio, RecursoRepositorio>();
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
+builder.Services.AddScoped<IUsuarioLogica, UsuarioLogica>();
+
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
