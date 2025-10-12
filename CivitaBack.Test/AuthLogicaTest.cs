@@ -2,6 +2,7 @@
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.Repositorio;
 using CivitaBack.Logica;
+using CivitaBack.Logica.Excepciones;
 using CivitaBack.Logica.Helpers;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -13,13 +14,13 @@ namespace CivitaBack.Tests
     public class AuthLogicaTest
     {
 
-        private readonly Mock<IRepositorioUsuario> mockRepo;
+        private readonly Mock<IUsuarioRepositorio> mockRepo;
         private readonly IConfiguration configuration;
         private readonly AuthLogica servicio;
 
         public AuthLogicaTest()
         {
-            mockRepo = new Mock<IRepositorioUsuario>();
+            mockRepo = new Mock<IUsuarioRepositorio>();
 
             configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string> { { "Jwt:Key", "S3gura!ClaveDeJWT2025!A7k@dF#9hL$3gT%qW&8zV^1sP*4bX" } })
@@ -55,7 +56,7 @@ namespace CivitaBack.Tests
             mockRepo.Setup(r => r.ObtenerUsuarioPorMail(It.IsAny<string>())).ReturnsAsync(new Usuario());
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() =>
+            await Assert.ThrowsAsync<ValidacionRegistroException>(() =>
                 servicio.RegistrarUsuarioAsync("Martin", "martin@ejemplo.com", "123456")
             );
         }

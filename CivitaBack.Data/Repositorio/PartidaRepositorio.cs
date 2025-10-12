@@ -38,7 +38,7 @@ public class PartidaRepositorio : IRepositorioPartida
     {
         Partida partida = new Partida
         {
-            UsuarioId = idUsuario
+            UsuarioId = idUsuario,
         };
         _context.Add(partida);
         _context.SaveChanges();
