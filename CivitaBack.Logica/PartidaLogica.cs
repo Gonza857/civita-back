@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
@@ -14,15 +13,17 @@ public interface IPartidaLogica
 {
     Partida ObtenerPorUsuarioId(int IdUsuario);
     PartidaDTO CrearPartida();
-
     List<PartidaDTO> ObtenerPartidas();
-}
 
+    Task GuardarMapaAsync(GuardarMapaDTO dto);
+
+    Task<GuardarMapaDTO?> ObtenerMapaAsync(int partidaId);
+
+}
 public class PartidaLogica : IPartidaLogica
 {
-
     private readonly IRepositorioPartida repositorioPartida;
-    
+
     public PartidaLogica(IRepositorioPartida repositoriopartida)
     {
         repositorioPartida = repositoriopartida;
@@ -37,7 +38,7 @@ public class PartidaLogica : IPartidaLogica
             HashDeContrasena = "abc123"
         };
         Partida creada = this.repositorioPartida.CrearPartida(usuario);
-        return new PartidaDTO 
+        return new PartidaDTO
         {
             Id = creada.Id,
             Partida = creada,
@@ -57,7 +58,7 @@ public class PartidaLogica : IPartidaLogica
         throw new NotImplementedException();
     }
 
-    private PartidaDTO PartidaToDTO (Partida partida)
+    private PartidaDTO PartidaToDTO(Partida partida)
     {
         return new PartidaDTO
         {
@@ -65,4 +66,28 @@ public class PartidaLogica : IPartidaLogica
             Partida = partida,
         };
     }
+
+ 
+    public async Task GuardarMapaAsync(GuardarMapaDTO dto)
+    {
+        if (dto == null || dto.PartidaId <= 0)
+            throw new ArgumentException("Datos inválidos para guardar el mapa.");
+
+        //Actualiza el JSON del mapa
+        await repositorioPartida.ActualizarMapaAsync(dto.PartidaId, dto.JsonMapa);
+
+        //Si vienen estructuras, sincronizarlas
+        if (dto.Estructuras != null && dto.Estructuras.Any())
+        {
+            await repositorioPartida.ActualizarEstructurasMapaAsync(dto.PartidaId, dto.Estructuras);
+        }
+    }
+
+    public async Task<GuardarMapaDTO?> ObtenerMapaAsync(int partidaId)
+    {
+        return await repositorioPartida.ObtenerMapaAsync(partidaId);
+    }
+
+
+
 }
