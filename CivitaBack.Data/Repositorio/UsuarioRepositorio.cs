@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio
 {
-    public interface IRepositorioUsuario
+    public interface IUsuarioRepositorio
     {
         Task<Usuario> ObtenerUsuarioPorMail(string mail);
         Task<Usuario> ObtenerUsuarioPorNombre(string nombreUsuario);
@@ -21,11 +21,12 @@ namespace CivitaBack.Data.Repositorio
 
     }
 
-    public class RepositorioUsuario : IRepositorioUsuario
+    public class UsuarioRepositorio : IUsuarioRepositorio
     {
         private readonly AppDbContext _context;
+       
 
-        public RepositorioUsuario(AppDbContext context)
+        public UsuarioRepositorio(AppDbContext context)
         {
             _context = context;
         }

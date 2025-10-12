@@ -68,15 +68,9 @@ public class PartidaLogica : IPartidaLogica
         Partida partidaExistente = this.repositorioPartida.ObtenerPorUsuarioId(idUsuario);
         if (partidaExistente != null) throw new PartidaExcepcion("Ya tienes una partida empezada.");
 
-        Usuario usuario = new Usuario
-        {
-            Id = idUsuario,
-            Mail = "hardcode@mail.com",
-            NombreUsuario = "HardCodeUser123",
-            HashDeContrasena = "abc123"
-        };
+        if (idUsuario <= 0) throw new PartidaExcepcion("El Id del usuario es inválido.");
 
-        return this.repositorioPartida.CrearPartida(usuario);
+        return this.repositorioPartida.CrearPartida(idUsuario);
     }
 
     public List<PartidaDTO> ObtenerPartidas()
