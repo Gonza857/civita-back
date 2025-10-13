@@ -35,6 +35,42 @@ namespace CivitaBack.Api.Controllers
             }
         }
 
+        //  Aumentar energía
+        [HttpPost("subirEnergia/{idPartida}")]
+        public IActionResult SubirEnergia(int idPartida)
+        {
+            try
+            {
+                _recursoLogica.ModificarEnergia(idPartida, 10);
+                return Ok(new { mensaje = "Energía aumentada correctamente." });
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return Problem("Ocurrió un error al modificar la energía.");
+            }
+        }
 
+        //  Reducir energía
+        [HttpPost("bajarEnergia/{idPartida}")]
+        public IActionResult BajarEnergia(int idPartida)
+        {
+            try
+            {
+                _recursoLogica.ModificarEnergia(idPartida, -10);
+                return Ok(new { mensaje = "Energía reducida correctamente." });
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return Problem("Ocurrió un error al modificar la energía.");
+            }
+        }
     }
 }
