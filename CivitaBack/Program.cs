@@ -55,22 +55,12 @@ builder.Services.AddScoped<ILogroRepositorio, LogroRepositorio>();
 builder.Services.AddScoped<IRecursoLogica, RecursoLogica>();
 builder.Services.AddScoped<IRecursoRepositorio, RecursoRepositorio>();
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
-=======
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioLogica, UsuarioLogica>();
 
 builder.Services.AddScoped<ILogroPartidaRepositorio, LogroPartidaRepositorio>();
 builder.Services.AddScoped<ILogroPartidaLogica, LogroPartidaLogica>();
 
->>>>>>> Stashed changes
-=======
-builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
-builder.Services.AddScoped<IUsuarioLogica, UsuarioLogica>();
-
->>>>>>> desarrollo
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 
 

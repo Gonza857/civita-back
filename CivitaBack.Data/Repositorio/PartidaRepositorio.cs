@@ -9,47 +9,26 @@ using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 
-<<<<<<< HEAD
 namespace CivitaBack.Data.Repositorio;
 
 public interface IPartidaRepositorio
 {
+    // 🧱 Métodos básicos (de la rama desarrollo)
     Partida ObtenerPorUsuarioId(int IdUsuario);
-
-    Partida CrearPartida(Usuario usuario);
+    Partida CrearPartida(int idUsuario);
     List<Partida> ObtenerPartidas();
-
     void Guardar(Partida partida);
     void Actualizar();
+
+    // 🧠 Métodos asincrónicos (de tu rama)
+    Task ActualizarMapaAsync(int partidaId, string jsonMapa);
+    Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraEnMapaDTO> estructuras);
+    Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId);
+    Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId);
 }
-public class PartidaRepositorio : IPartidaRepositorio
+
+    public class PartidaRepositorio : IPartidaRepositorio
 {
-
-    private readonly AppDbContext _context;
-
-    public PartidaRepositorio(AppDbContext context)
-=======
-namespace CivitaBack.Data.Repositorio
-{
-    public interface IRepositorioPartida
->>>>>>> desarrollo
-    {
-        // 🧱 Métodos básicos (de la rama desarrollo)
-        Partida ObtenerPorUsuarioId(int IdUsuario);
-        Partida CrearPartida(int idUsuario);
-        List<Partida> ObtenerPartidas();
-        void Guardar(Partida partida);
-        void Actualizar();
-
-        // 🧠 Métodos asincrónicos (de tu rama)
-        Task ActualizarMapaAsync(int partidaId, string jsonMapa);
-        Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraEnMapaDTO> estructuras);
-        Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId);
-        Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId);
-    }
-
-    public class PartidaRepositorio : IRepositorioPartida
-    {
         private readonly AppDbContext _context;
 
         public PartidaRepositorio(AppDbContext context)
@@ -244,5 +223,4 @@ namespace CivitaBack.Data.Repositorio
             return JsonSerializer.Serialize(mapaFinal, new JsonSerializerOptions { WriteIndented = true });
         }
     }
-}
 
