@@ -16,13 +16,18 @@ namespace CivitaBack.Tests;
 public class PartidaLogicaTest
 {
     private readonly Mock<IPartidaRepositorio> _mockRepo;
+    private readonly Mock<IRecursoLogica> _mockRecurso;
     private readonly IPartidaLogica _partidaLogica;
     private readonly IRecursoLogica _recursoLogica;
 
     public PartidaLogicaTest()
     {
+        // Creamos los mocks de las dependencias
         _mockRepo = new Mock<IPartidaRepositorio>();
-        _partidaLogica = new PartidaLogica(_mockRepo.Object, _recursoLogica);
+        _mockRecurso = new Mock<IRecursoLogica>();
+
+        // Inyectamos los mocks en el constructor de PartidaLogica
+        _partidaLogica = new PartidaLogica(_mockRepo.Object, _mockRecurso.Object);
     }
 
     [Fact]
