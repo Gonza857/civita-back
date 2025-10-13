@@ -4,17 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
+using CivitaBack.Data.Enum;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Logica.Excepciones;
 
 namespace CivitaBack.Logica
 {
     public interface IPartidaLogica
     {
-        Partida ObtenerPorUsuarioId(int IdUsuario);
-        PartidaDTO CrearPartida();
+        PartidaDTO ObtenerPorUsuarioId(int IdUsuario);
+        Partida CrearPartida(int idUsuario);
+        void Actualizar(PartidaDTO partida, Usuario usuario);
         List<PartidaDTO> ObtenerPartidas();
 
-        // 🆕 Métodos nuevos
+        // 🆕 Métodos de mapa
         Task GuardarMapaAsync(GuardarMapaDTO dto);
         Task<Partida?> ObtenerMapaAsync(int partidaId);
         Task ActualizarMapaAsync(GuardarMapaDTO dto);
@@ -29,47 +32,87 @@ namespace CivitaBack.Logica
             repositorioPartida = repositoriopartida;
         }
 
-        public PartidaDTO CrearPartida()
+        // 🧩 ACTUALIZAR RECURSOS
+        public void Actualizar(PartidaDTO partida, Usuario usuario)
         {
-            Usuario usuario = new Usuario
-            {
-                Mail = "hardcode@mail.com",
-                NombreUsuario = "HardCodeUser123",
-                HashDeContrasena = "abc123"
-            };
-            Partida creada = this.repositorioPartida.CrearPartida(usuario);
-            return new PartidaDTO
-            {
-                Id = creada.Id,
-                Partida = creada,
-            };
+            if (partida == null && usuario == null)
+                throw new ErrorInternoExcepction("Ocurrió un error al actualizar la Partida");
+
+            if (partida.Energia < 0 || partida.Felicidad < 0 ||
+                partida.EcoCoins < 0 || partida.Contaminacion < 0)
+                throw new PartidaExcepcion("Los valores de los recursos no pueden ser negativos");
+
+            var partidaBuscada = this.repositorioPartida.ObtenerPorUsuarioId(usuario.Id);
+            if (partidaBuscada == null)
+                throw new ErrorInternoExcepction("Ocurrió un error al actualizar la Partida");
+
+            var energia = partidaBuscada.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Energia.GetDescription());
+            if (energia != null) energia.Cantidad = partida.Energia;
+
+            var felicidad = partidaBuscada.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Felicidad.GetDescription());
+            if (felicidad != null) felicidad.Cantidad = partida.Felicidad;
+
+            var ecoCoins = partidaBuscada.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.EcoCoins.GetDescription());
+            if (ecoCoins != null) ecoCoins.Cantidad = partida.EcoCoins;
+
+            var contaminacion = partidaBuscada.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Contaminacion.GetDescription());
+            if (contaminacion != null) contaminacion.Cantidad = partida.Contaminacion;
+
+            this.repositorioPartida.Actualizar();
         }
 
+        // 🧱 CREAR PARTIDA
+        public Partida CrearPartida(int idUsuario)
+        {
+            var partidaExistente = this.repositorioPartida.ObtenerPorUsuarioId(idUsuario);
+            if (partidaExistente != null)
+                throw new PartidaExcepcion("Ya tienes una partida empezada.");
+
+            if (idUsuario <= 0)
+                throw new PartidaExcepcion("El Id del usuario es inválido.");
+
+            return this.repositorioPartida.CrearPartida(idUsuario);
+        }
+
+        // 📜 OBTENER TODAS LAS PARTIDAS
         public List<PartidaDTO> ObtenerPartidas()
         {
             var partidas = this.repositorioPartida.ObtenerPartidas();
-            return partidas
-              .Select(p => this.PartidaToDTO(p))
-              .ToList();
+            return partidas.Select(p => this.PartidaToDTO(p)).ToList();
         }
 
-        public Partida ObtenerPorUsuarioId(int IdUsuario)
+        // 🔎 OBTENER PARTIDA POR USUARIO
+        public PartidaDTO ObtenerPorUsuarioId(int IdUsuario)
         {
-            throw new NotImplementedException();
+            var partida = this.repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
+            if (partida == null) throw new Exception("Partida no encontrada");
+            return this.PartidaToDTO(partida);
         }
 
+        // 🔄 CONVERSOR
         private PartidaDTO PartidaToDTO(Partida partida)
         {
-            return new PartidaDTO
+            var partidaDTO = new PartidaDTO
             {
                 Id = partida.Id,
                 Partida = partida,
+                UsuarioId = partida.Usuario?.Id ?? 0,
+                Usuario = partida.Usuario?.NombreUsuario ?? string.Empty,
             };
+
+            partidaDTO.Energia = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Energia.GetDescription())?.Cantidad ?? 0;
+            partidaDTO.Felicidad = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Felicidad.GetDescription())?.Cantidad ?? 0;
+            partidaDTO.EcoCoins = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.EcoCoins.GetDescription())?.Cantidad ?? 0;
+            partidaDTO.Contaminacion = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Contaminacion.GetDescription())?.Cantidad ?? 0;
+
+            return partidaDTO;
         }
 
-        // 🆕 --------------------------------------------------------------------
-        // GUARDAR MAPA COMPLETO (JSON + ESTRUCTURAS)
-        // --------------------------------------------------------------------
+        // 🧠 -------------------------------------------------------------
+        // NUEVOS MÉTODOS DE MAPA (JSON + ESTRUCTURAS)
+        // -------------------------------------------------------------
+
+        // 💾 Guardar mapa completo
         public async Task GuardarMapaAsync(GuardarMapaDTO dto)
         {
             if (dto == null || dto.PartidaId <= 0)
@@ -81,35 +124,25 @@ namespace CivitaBack.Logica
                 await repositorioPartida.ActualizarEstructurasMapaAsync(dto.PartidaId, dto.Estructuras);
         }
 
-        // 🆕 --------------------------------------------------------------------
-        // OBTENER MAPA (desde JSON guardado o reconstruir desde estructuras)
-        // --------------------------------------------------------------------
+        // 🧩 Obtener mapa guardado (JSON o reconstruido)
         public async Task<Partida?> ObtenerMapaAsync(int partidaId)
         {
-            // Primero intenta traer el mapa directamente desde el JSON
             var partida = await repositorioPartida.ObtenerPartidaConMapaAsync(partidaId);
-
             if (partida == null)
                 return null;
 
-            // Si el mapa ya tiene Json guardado, lo devolvemos tal cual
             if (!string.IsNullOrWhiteSpace(partida.JsonMapa))
                 return partida;
 
-            // Si no hay Json, lo reconstruimos con los datos base + estructuras
             var mapaReconstruido = await repositorioPartida.ObtenerMapaJsonPorPartidaIdAsync(partidaId);
-
             partida.JsonMapa = mapaReconstruido;
 
-            // Opcional: podés actualizar el snapshot automáticamente
             await repositorioPartida.ActualizarMapaAsync(partidaId, mapaReconstruido);
 
             return partida;
         }
 
-        // 🆕 --------------------------------------------------------------------
-        // ACTUALIZAR MAPA EXISTENTE
-        // --------------------------------------------------------------------
+        // 🔄 Actualizar mapa existente
         public async Task ActualizarMapaAsync(GuardarMapaDTO dto)
         {
             if (dto == null || dto.PartidaId <= 0)
@@ -122,3 +155,4 @@ namespace CivitaBack.Logica
         }
     }
 }
+

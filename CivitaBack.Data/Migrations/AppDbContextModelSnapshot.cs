@@ -175,7 +175,7 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CondicionId")
+                    b.Property<int?>("CondicionId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Descripcion")
@@ -485,9 +485,7 @@ namespace CivitaBack.Data.Migrations
                 {
                     b.HasOne("CivitaBack.Data.BO.Condicion", "Condicion")
                         .WithMany()
-                        .HasForeignKey("CondicionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CondicionId");
 
                     b.HasOne("CivitaBack.Data.BO.TipoLogro", "TipoLogro")
                         .WithMany()

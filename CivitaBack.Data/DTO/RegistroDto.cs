@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CivitaBack.Data.DTO
 {
-    public class RegistroDto
+    public class RegistroDTO
     {
         public string NombreUsuario { get; set; }
         public string Mail { get; set; }

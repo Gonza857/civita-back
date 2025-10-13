@@ -11,5 +11,9 @@ namespace CivitaBack.Data.DTO
         public string Token { get; set; }
         public string NombreUsuario { get; set; }
         public string Mail { get; set; }
+
+        public int IdUsuario{ get; set; }
+
+        public PartidaDTO? Partida { get; set; }
     }
 }

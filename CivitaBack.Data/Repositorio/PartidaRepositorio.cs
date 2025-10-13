@@ -1,65 +1,85 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
-using System.IO;
-using System.Text.Json;
 
 namespace CivitaBack.Data.Repositorio
 {
     public interface IRepositorioPartida
     {
+        // 🧱 Métodos básicos (de la rama desarrollo)
         Partida ObtenerPorUsuarioId(int IdUsuario);
-        Partida CrearPartida(Usuario usuario);
+        Partida CrearPartida(int idUsuario);
         List<Partida> ObtenerPartidas();
+        void Guardar(Partida partida);
+        void Actualizar();
 
-        // 🆕 Métodos asincrónicos
+        // 🧠 Métodos asincrónicos (de tu rama)
         Task ActualizarMapaAsync(int partidaId, string jsonMapa);
         Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraEnMapaDTO> estructuras);
         Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId);
         Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId);
     }
 
-    public class RepositorioPartida : IRepositorioPartida
+    public class PartidaRepositorio : IRepositorioPartida
     {
         private readonly AppDbContext _context;
 
-        public RepositorioPartida(AppDbContext context)
+        public PartidaRepositorio(AppDbContext context)
         {
             _context = context;
         }
 
-        public Partida CrearPartida(Usuario usuario)
+        // --------------------------------------------------------------------
+        // 🧱 Métodos básicos (compatibles con rama desarrollo)
+        // --------------------------------------------------------------------
+        public void Actualizar()
         {
-            _context.Add(usuario);
             _context.SaveChanges();
+        }
 
-            Partida partida = new Partida
+        public void Guardar(Partida partida)
+        {
+            _context.Add(partida);
+            _context.SaveChanges();
+        }
+
+        public Partida CrearPartida(int idUsuario)
+        {
+            var partida = new Partida
             {
-                UsuarioId = usuario.Id,
+                UsuarioId = idUsuario,
                 UltimaVez = DateTime.UtcNow
             };
-            _context.Add(partida);
+            _context.Partida.Add(partida);
             _context.SaveChanges();
             return partida;
         }
 
         public List<Partida> ObtenerPartidas()
         {
-            return _context.Partida.ToList();
+            return _context.Partida
+                .Include(p => p.Usuario)
+                .Include(p => p.Recursos)
+                .ToList();
         }
 
         public Partida ObtenerPorUsuarioId(int IdUsuario)
         {
-            throw new NotImplementedException();
+            return _context.Partida
+                .Include(p => p.Recursos)
+                .Include(p => p.Usuario)
+                .FirstOrDefault(p => p.UsuarioId == IdUsuario);
         }
 
         // --------------------------------------------------------------------
-        // 🧠 ACTUALIZAR MAPA Y ESTRUCTURAS
+        // 🧠 Métodos asincrónicos del mapa
         // --------------------------------------------------------------------
         public async Task ActualizarMapaAsync(int partidaId, string jsonMapa)
         {
@@ -95,7 +115,6 @@ namespace CivitaBack.Data.Repositorio
 
                 await _context.EstructuraEnMapa.AddRangeAsync(nuevas);
                 await _context.SaveChangesAsync();
-
                 await transaction.CommitAsync();
             }
             catch
@@ -105,20 +124,16 @@ namespace CivitaBack.Data.Repositorio
             }
         }
 
-
-        // --------------------------------------------------------------------
-        // 🧱 OBTENER MAPA COMPLETO (CONSTRUCTIVO)
-        // --------------------------------------------------------------------
         public async Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId)
         {
             return await _context.Partida
                 .Include(p => p.EstructuraEnMapa)
+                .ThenInclude(em => em.Estructura)
                 .FirstOrDefaultAsync(p => p.Id == partidaId);
         }
 
         public async Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId)
         {
-            // 1️⃣ Buscar la partida y sus estructuras
             var partida = await _context.Partida
                 .Include(p => p.EstructuraEnMapa)
                 .ThenInclude(em => em.Estructura)
@@ -127,7 +142,6 @@ namespace CivitaBack.Data.Repositorio
             if (partida == null)
                 throw new Exception("No se encontró la partida.");
 
-            // 2️⃣ Leer el mapa base desde /wwwroot/assets/mapa/mapa_base.json
             var pathBase = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "mapa", "mapa_base.json");
             if (!File.Exists(pathBase))
                 throw new Exception($"No se encontró el archivo base del mapa en {pathBase}");
@@ -135,23 +149,21 @@ namespace CivitaBack.Data.Repositorio
             var mapaJson = await File.ReadAllTextAsync(pathBase);
             using var doc = JsonDocument.Parse(mapaJson);
 
-            // 🔸 Tomar las capas base (ej: mapa, calle, decoraciones, etc.)
+            // 🔹 Capas base (solo tiles, sin objetos)
             var capasBase = doc.RootElement
                 .GetProperty("layers")
                 .EnumerateArray()
-                .Where(l => l.GetProperty("type").GetString() != "objectgroup") // solo capas de tiles
+                .Where(l => l.GetProperty("type").GetString() != "objectgroup")
                 .Select(l => JsonSerializer.Deserialize<object>(l.GetRawText()))
                 .ToList();
 
-            // 3️⃣ Construir las capas dinámicas desde EstructuraEnMapa
+            // 🔹 Capas dinámicas a partir de estructuras en la BD
             var estructuras = partida.EstructuraEnMapa ?? new List<EstructuraEnMapa>();
             var capasDinamicas = new Dictionary<string, List<object>>();
 
             foreach (var e in estructuras)
             {
-                // 🔸 Usar Nombre de Estructura para el tipo (coincide con Phaser: casa, fabrica, etc.)
                 var tipo = e.Estructura?.Nombre?.ToLower() ?? "desconocido";
-
                 if (!capasDinamicas.ContainsKey(tipo))
                     capasDinamicas[tipo] = new List<object>();
 
@@ -168,7 +180,6 @@ namespace CivitaBack.Data.Repositorio
                 });
             }
 
-            // 🔸 Convertir cada tipo de estructura a una capa Tiled
             var capasEstructuras = capasDinamicas.Select(c => new
             {
                 name = c.Key,
@@ -176,10 +187,8 @@ namespace CivitaBack.Data.Repositorio
                 objects = c.Value
             }).ToList();
 
-            // 4️⃣ Unir las capas base + capas de estructuras
             var todasLasCapas = capasBase.Concat(capasEstructuras).ToList();
 
-            // 5️⃣ Construir el JSON final con metadatos del mapa base
             var mapaFinal = new
             {
                 width = doc.RootElement.GetProperty("width").GetInt32(),
@@ -192,6 +201,6 @@ namespace CivitaBack.Data.Repositorio
 
             return JsonSerializer.Serialize(mapaFinal, new JsonSerializerOptions { WriteIndented = true });
         }
-
     }
 }
+
