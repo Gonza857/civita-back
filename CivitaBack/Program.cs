@@ -2,6 +2,7 @@ using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
 using CivitaBack.Data.Repositorio;
 using CivitaBack.Logica;
+using CivitaBack.Logica.Backgrounds;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -62,6 +63,11 @@ builder.Services.AddScoped<ILogroPartidaRepositorio, LogroPartidaRepositorio>();
 builder.Services.AddScoped<ILogroPartidaLogica, LogroPartidaLogica>();
 
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
+
+builder.Services.AddScoped<ICicloRepositorio, CicloRepositorio>();
+builder.Services.AddScoped<ICicloLogica, CicloLogica>();
+
+builder.Services.AddHostedService<BackgroundCicloLogica>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
