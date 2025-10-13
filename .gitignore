@@ -19,4 +19,4 @@ obj/
 packages/
 
 # Ignorar configuraciones locales de Visual Studio / .NET
-**/Properties/launchSettings.json
+CivitaBack/Properties/launchSettings.json
