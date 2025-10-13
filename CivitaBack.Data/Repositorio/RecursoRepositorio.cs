@@ -23,9 +23,9 @@ public class RecursoRepositorio : IRecursoRepositorio
 
     public void Actualizar(Recurso entidad)
     {
-        throw new NotImplementedException();
+        _context.Recurso.Update(entidad);
+        _context.SaveChanges();
     }
-
     public void Eliminar(int id)
     {
         throw new NotImplementedException();
