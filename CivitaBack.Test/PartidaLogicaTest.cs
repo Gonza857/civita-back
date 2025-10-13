@@ -17,11 +17,12 @@ public class PartidaLogicaTest
 {
     private readonly Mock<IPartidaRepositorio> _mockRepo;
     private readonly IPartidaLogica _partidaLogica;
+    private readonly IRecursoLogica _recursoLogica;
 
     public PartidaLogicaTest()
     {
         _mockRepo = new Mock<IPartidaRepositorio>();
-        _partidaLogica = new PartidaLogica(_mockRepo.Object);
+        _partidaLogica = new PartidaLogica(_mockRepo.Object, _recursoLogica);
     }
 
     [Fact]
