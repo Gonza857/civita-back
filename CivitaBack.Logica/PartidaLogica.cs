@@ -10,7 +10,23 @@ using CivitaBack.Logica.Excepciones;
 
 namespace CivitaBack.Logica
 {
+<<<<<<< HEAD
+    PartidaDTO ObtenerPorUsuarioId(int IdUsuario);
+    Partida CrearPartida(int idUsuario);
+
+    void Actualizar(PartidaDTO partida, Usuario usuario);
+    List<PartidaDTO> ObtenerPartidas();
+}
+
+public class PartidaLogica : IPartidaLogica
+{
+
+    private readonly IPartidaRepositorio repositorioPartida;
+    
+    public PartidaLogica(IPartidaRepositorio repositoriopartida)
+=======
     public interface IPartidaLogica
+>>>>>>> desarrollo
     {
         PartidaDTO ObtenerPorUsuarioId(int IdUsuario);
         Partida CrearPartida(int idUsuario);

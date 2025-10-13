@@ -44,7 +44,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddScoped<IPartidaLogica, PartidaLogica>();
-builder.Services.AddScoped<IRepositorioPartida, PartidaRepositorio>();
+builder.Services.AddScoped<IPartidaRepositorio, PartidaRepositorio>();
 
 builder.Services.AddScoped<ITipoLogroLogica, TipoLogroLogica>();
 builder.Services.AddScoped<ITipoLogroRepositorio, TipoLogroRepositorio>();
@@ -55,9 +55,22 @@ builder.Services.AddScoped<ILogroRepositorio, LogroRepositorio>();
 builder.Services.AddScoped<IRecursoLogica, RecursoLogica>();
 builder.Services.AddScoped<IRecursoRepositorio, RecursoRepositorio>();
 
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
+=======
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioLogica, UsuarioLogica>();
 
+builder.Services.AddScoped<ILogroPartidaRepositorio, LogroPartidaRepositorio>();
+builder.Services.AddScoped<ILogroPartidaLogica, LogroPartidaLogica>();
+
+>>>>>>> Stashed changes
+=======
+builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
+builder.Services.AddScoped<IUsuarioLogica, UsuarioLogica>();
+
+>>>>>>> desarrollo
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 
 

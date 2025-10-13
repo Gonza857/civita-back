@@ -9,9 +9,30 @@ using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 
+<<<<<<< HEAD
+namespace CivitaBack.Data.Repositorio;
+
+public interface IPartidaRepositorio
+{
+    Partida ObtenerPorUsuarioId(int IdUsuario);
+
+    Partida CrearPartida(Usuario usuario);
+    List<Partida> ObtenerPartidas();
+
+    void Guardar(Partida partida);
+    void Actualizar();
+}
+public class PartidaRepositorio : IPartidaRepositorio
+{
+
+    private readonly AppDbContext _context;
+
+    public PartidaRepositorio(AppDbContext context)
+=======
 namespace CivitaBack.Data.Repositorio
 {
     public interface IRepositorioPartida
+>>>>>>> desarrollo
     {
         // 🧱 Métodos básicos (de la rama desarrollo)
         Partida ObtenerPorUsuarioId(int IdUsuario);
