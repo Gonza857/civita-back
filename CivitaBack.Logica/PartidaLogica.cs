@@ -8,42 +8,27 @@ using CivitaBack.Data.Enum;
 using CivitaBack.Data.Repositorio;
 using CivitaBack.Logica.Excepciones;
 
-namespace CivitaBack.Logica
+namespace CivitaBack.Logica;
+
+
+public interface IPartidaLogica
 {
-<<<<<<< HEAD
     PartidaDTO ObtenerPorUsuarioId(int IdUsuario);
     Partida CrearPartida(int idUsuario);
-
     void Actualizar(PartidaDTO partida, Usuario usuario);
     List<PartidaDTO> ObtenerPartidas();
+
+    // 🆕 Métodos de mapa
+    Task GuardarMapaAsync(GuardarMapaDTO dto);
+    Task<Partida?> ObtenerMapaAsync(int partidaId);
+    Task ActualizarMapaAsync(GuardarMapaDTO dto);
 }
-
-public class PartidaLogica : IPartidaLogica
-{
-
-    private readonly IPartidaRepositorio repositorioPartida;
-    
-    public PartidaLogica(IPartidaRepositorio repositoriopartida)
-=======
-    public interface IPartidaLogica
->>>>>>> desarrollo
-    {
-        PartidaDTO ObtenerPorUsuarioId(int IdUsuario);
-        Partida CrearPartida(int idUsuario);
-        void Actualizar(PartidaDTO partida, Usuario usuario);
-        List<PartidaDTO> ObtenerPartidas();
-
-        // 🆕 Métodos de mapa
-        Task GuardarMapaAsync(GuardarMapaDTO dto);
-        Task<Partida?> ObtenerMapaAsync(int partidaId);
-        Task ActualizarMapaAsync(GuardarMapaDTO dto);
-    }
 
     public class PartidaLogica : IPartidaLogica
     {
-        private readonly IRepositorioPartida repositorioPartida;
+        private readonly IPartidaRepositorio repositorioPartida;
 
-        public PartidaLogica(IRepositorioPartida repositoriopartida)
+        public PartidaLogica(IPartidaRepositorio repositoriopartida)
         {
             repositorioPartida = repositoriopartida;
         }
@@ -170,5 +155,4 @@ public class PartidaLogica : IPartidaLogica
                 await repositorioPartida.ActualizarEstructurasMapaAsync(dto.PartidaId, dto.Estructuras);
         }
     }
-}
 
