@@ -38,9 +38,9 @@ namespace CivitaBack.Api.Controllers
             {
                 return BadRequest(new { error = ex.Message });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Error interno del servidor." });
+                return StatusCode(500, new { error = "Error interno del servidor.", detalle = ex.Message });
             }
         }
 
@@ -59,7 +59,7 @@ namespace CivitaBack.Api.Controllers
                     NombreUsuario = resultado.NombreUsuario,
                     Mail = resultado.Mail,
                     IdUsuario = resultado.IdUsuario,
-                    Partida = partidaDTO
+                    IdPartida = partidaDTO.Id
                 };
 
                 return Ok(response);

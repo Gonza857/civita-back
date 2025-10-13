@@ -13,7 +13,7 @@ namespace CivitaBack.Data.DTO
         public string Mail { get; set; }
 
         public int IdUsuario{ get; set; }
+        public int IdPartida{ get; set; }
 
-        public PartidaDTO? Partida { get; set; }
     }
 }
