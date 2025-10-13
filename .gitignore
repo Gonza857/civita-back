@@ -18,5 +18,5 @@ obj/
 *.nupkg
 packages/
 
-CivitaBack/Properties/launchSettings.json
+**/launchSettings.json
 

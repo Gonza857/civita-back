@@ -6,7 +6,7 @@ namespace CivitaBack.Api.Controllers;
 
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class LogroController : ControllerBase
 {
 

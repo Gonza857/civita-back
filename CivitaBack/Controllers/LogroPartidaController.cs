@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class LogroPartidaController : ControllerBase
 {
