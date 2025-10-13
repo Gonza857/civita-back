@@ -45,7 +45,7 @@ public class PartidaLogicaTest
         // Arrange
         _mockRepo.Setup(r => r.ObtenerPorUsuarioId(7))
          .Returns((Partida)null);
-        _mockRepo.Setup(r => r.CrearPartida(It.IsAny<Usuario>()))
+        _mockRepo.Setup(r => r.CrearPartida(It.IsAny<int>()))
          .Returns(new Partida
          {
              Id = 1,

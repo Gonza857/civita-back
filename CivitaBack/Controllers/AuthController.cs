@@ -2,6 +2,7 @@
 using CivitaBack.Data;
 using Microsoft.AspNetCore.Mvc;
 using CivitaBack.Data.DTO;
+using CivitaBack.Logica.Excepciones;
 
 
 namespace CivitaBack.Api.Controllers
@@ -12,21 +13,28 @@ namespace CivitaBack.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthLogica _authLogica;
+        private readonly IPartidaLogica _partidaLogica;
+        private readonly IUsuarioLogica _usuarioLogica;
 
-        public AuthController(IAuthLogica authLogica)
+        public AuthController(IAuthLogica authLogica , IPartidaLogica partidaLogica, IUsuarioLogica usuarioLogica)
         {
             _authLogica = authLogica;
+            _partidaLogica = partidaLogica;
+            _usuarioLogica = usuarioLogica;
         }
 
         [HttpPost("registro")]
-        public async Task<IActionResult> Registrar([FromBody] RegistroDto request)
+        public async Task<IActionResult> Registrar([FromBody] RegistroDTO request)
         {
             try
             {
                 var usuario = await _authLogica.RegistrarUsuarioAsync(request.NombreUsuario, request.Mail, request.Password);
+
+                _partidaLogica.CrearPartida(usuario.Id);
+
                 return Ok(new { mensaje = "Usuario registrado correctamente!", usuario });
             }
-            catch (ArgumentException ex)
+            catch (ValidacionRegistroException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
@@ -39,12 +47,38 @@ namespace CivitaBack.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var resultado = await _authLogica.LoginAsync(request);
+            try
+            {
+                var resultado = await _authLogica.LoginAsync(request);
 
-            if (resultado == null)
-                return Unauthorized(new { mensaje = "Usuario o contraseña incorrecta" });
+                var partidaDTO = _partidaLogica.ObtenerPorUsuarioId(resultado.IdUsuario);
 
-            return Ok(resultado);
+                var response = new LoginResponse
+                {
+                    Token = resultado.Token,
+                    NombreUsuario = resultado.NombreUsuario,
+                    Mail = resultado.Mail,
+                    IdUsuario = resultado.IdUsuario,
+                    Partida = partidaDTO
+                };
+
+                return Ok(response);
+            } catch (AutenticacionException ex)
+            {
+                return Unauthorized(new { error = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { error = "Error interno del servidor." });
+            }
+          
+        }
+
+        [HttpGet("existeNombre")]
+        public async Task<IActionResult> ExisteNombre([FromQuery] string nombre)
+        {
+            var existe = await _usuarioLogica.ObtenerUsuarioPorNombre(nombre) != null;
+            return Ok(new { existe = true });
         }
     }
 
