@@ -24,7 +24,7 @@ namespace CivitaBack.Data.BO
         public List<Recurso>? Recursos { get; set; }
         public List<Evento>? Evento { get; set; }
         public List<Tienda>? Tienda { get; set; }
-        public List<EstructuraEnMapa>? EstructuraEnMapa { get; set; }
+        public List<EstructuraMapa>? EstructuraMapa { get; set; }
         public List<TipEnPartida>? TipEnPartida { get; set; }
         // Relación N:N
         public ICollection<LogroPartida> LogroPartidas { get; set; }

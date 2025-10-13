@@ -22,7 +22,7 @@ public interface IPartidaRepositorio
 
     // 🧠 Métodos asincrónicos (de tu rama)
     Task ActualizarMapaAsync(int partidaId, string jsonMapa);
-    Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraEnMapaDTO> estructuras);
+    Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapaDTO> estructuras);
     Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId);
     Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId);
 }
@@ -115,16 +115,16 @@ public interface IPartidaRepositorio
             await _context.SaveChangesAsync();
         }
 
-        public async Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraEnMapaDTO> estructuras)
+        public async Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapaDTO> estructuras)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var existentes = _context.EstructuraEnMapa.Where(e => e.PartidaId == partidaId);
-                _context.EstructuraEnMapa.RemoveRange(existentes);
+                var existentes = _context.EstructuraMapa.Where(e => e.PartidaId == partidaId);
+                _context.EstructuraMapa.RemoveRange(existentes);
                 await _context.SaveChangesAsync();
 
-                var nuevas = estructuras.Select(e => new EstructuraEnMapa
+                var nuevas = estructuras.Select(e => new EstructuraMapa
                 {
                     PartidaId = partidaId,
                     EstructuraId = e.EstructuraId,
@@ -134,7 +134,7 @@ public interface IPartidaRepositorio
                     Height = e.Height
                 });
 
-                await _context.EstructuraEnMapa.AddRangeAsync(nuevas);
+                await _context.EstructuraMapa.AddRangeAsync(nuevas);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
@@ -148,7 +148,7 @@ public interface IPartidaRepositorio
         public async Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId)
         {
             return await _context.Partida
-                .Include(p => p.EstructuraEnMapa)
+                .Include(p => p.EstructuraMapa)
                 .ThenInclude(em => em.Estructura)
                 .FirstOrDefaultAsync(p => p.Id == partidaId);
         }
@@ -156,7 +156,7 @@ public interface IPartidaRepositorio
         public async Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId)
         {
             var partida = await _context.Partida
-                .Include(p => p.EstructuraEnMapa)
+                .Include(p => p.EstructuraMapa)
                 .ThenInclude(em => em.Estructura)
                 .FirstOrDefaultAsync(p => p.Id == partidaId);
 
@@ -179,7 +179,7 @@ public interface IPartidaRepositorio
                 .ToList();
 
             // 🔹 Capas dinámicas a partir de estructuras en la BD
-            var estructuras = partida.EstructuraEnMapa ?? new List<EstructuraEnMapa>();
+            var estructuras = partida.EstructuraMapa ?? new List<EstructuraMapa>();
             var capasDinamicas = new Dictionary<string, List<object>>();
 
             foreach (var e in estructuras)

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251004142927_db_tablas")]
-    partial class db_tablas
+    [Migration("20251013030004_cambio_nombre_estructura_mapa6")]
+    partial class cambio_nombre_estructura_mapa6
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,32 @@ namespace CivitaBack.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("CivitaBack.Data.BO.Condicion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("EstructuraId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RecursoId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EstructuraId");
+
+                    b.HasIndex("RecursoId");
+
+                    b.ToTable("Condicion");
+                });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Estructura", b =>
                 {
@@ -64,7 +90,7 @@ namespace CivitaBack.Data.Migrations
                     b.ToTable("Estructura");
                 });
 
-            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraEnMapa", b =>
+            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraMapa", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -75,7 +101,19 @@ namespace CivitaBack.Data.Migrations
                     b.Property<int>("EstructuraId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Height")
+                        .HasColumnType("integer");
+
                     b.Property<int>("PartidaId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Width")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("X")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Y")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -84,7 +122,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("EstructuraEnMapa");
+                    b.ToTable("EstructuraMapa");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Evento", b =>
@@ -132,6 +170,52 @@ namespace CivitaBack.Data.Migrations
                     b.ToTable("EventoMaestro");
                 });
 
+            modelBuilder.Entity("CivitaBack.Data.BO.Logro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CondicionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TipoLogroId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CondicionId");
+
+                    b.HasIndex("TipoLogroId");
+
+                    b.ToTable("Logro");
+                });
+
+            modelBuilder.Entity("CivitaBack.Data.BO.LogroPartida", b =>
+                {
+                    b.Property<int>("LogroId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PartidaId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("LogroId", "PartidaId");
+
+                    b.HasIndex("PartidaId");
+
+                    b.ToTable("LogroPartida");
+                });
+
             modelBuilder.Entity("CivitaBack.Data.BO.Partida", b =>
                 {
                     b.Property<int>("Id")
@@ -151,7 +235,8 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UsuarioId");
+                    b.HasIndex("UsuarioId")
+                        .IsUnique();
 
                     b.ToTable("Partida");
                 });
@@ -167,12 +252,6 @@ namespace CivitaBack.Data.Migrations
                     b.Property<int>("Cantidad")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Contaminacion")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Felicidad")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Nombre")
                         .HasColumnType("text");
 
@@ -184,38 +263,6 @@ namespace CivitaBack.Data.Migrations
                     b.HasIndex("PartidaId");
 
                     b.ToTable("Recurso");
-                });
-
-            modelBuilder.Entity("CivitaBack.Data.BO.Test", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Correo")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Usuarios");
-                });
-
-            modelBuilder.Entity("CivitaBack.Data.BO.TestModelado", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Correo")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NombreTabla");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Tienda", b =>
@@ -314,6 +361,23 @@ namespace CivitaBack.Data.Migrations
                     b.ToTable("TipoEstructura");
                 });
 
+            modelBuilder.Entity("CivitaBack.Data.BO.TipoLogro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TipoLogro");
+                });
+
             modelBuilder.Entity("CivitaBack.Data.BO.TipoTip", b =>
                 {
                     b.Property<int>("Id")
@@ -352,6 +416,25 @@ namespace CivitaBack.Data.Migrations
                     b.ToTable("Usuario");
                 });
 
+            modelBuilder.Entity("CivitaBack.Data.BO.Condicion", b =>
+                {
+                    b.HasOne("CivitaBack.Data.BO.Estructura", "Estructura")
+                        .WithMany()
+                        .HasForeignKey("EstructuraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CivitaBack.Data.BO.Recurso", "Recurso")
+                        .WithMany()
+                        .HasForeignKey("RecursoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Estructura");
+
+                    b.Navigation("Recurso");
+                });
+
             modelBuilder.Entity("CivitaBack.Data.BO.Estructura", b =>
                 {
                     b.HasOne("CivitaBack.Data.BO.TipoEstructura", "TipoEstructura")
@@ -363,7 +446,7 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("TipoEstructura");
                 });
 
-            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraEnMapa", b =>
+            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraMapa", b =>
                 {
                     b.HasOne("CivitaBack.Data.BO.Estructura", "Estructura")
                         .WithMany("EstructurasEnMapa")
@@ -372,7 +455,7 @@ namespace CivitaBack.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("CivitaBack.Data.BO.Partida", "Partida")
-                        .WithMany("EstructuraEnMapa")
+                        .WithMany("EstructuraMapa")
                         .HasForeignKey("PartidaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -401,11 +484,47 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("Partida");
                 });
 
+            modelBuilder.Entity("CivitaBack.Data.BO.Logro", b =>
+                {
+                    b.HasOne("CivitaBack.Data.BO.Condicion", "Condicion")
+                        .WithMany()
+                        .HasForeignKey("CondicionId");
+
+                    b.HasOne("CivitaBack.Data.BO.TipoLogro", "TipoLogro")
+                        .WithMany()
+                        .HasForeignKey("TipoLogroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Condicion");
+
+                    b.Navigation("TipoLogro");
+                });
+
+            modelBuilder.Entity("CivitaBack.Data.BO.LogroPartida", b =>
+                {
+                    b.HasOne("CivitaBack.Data.BO.Logro", "Logro")
+                        .WithMany("LogroPartidas")
+                        .HasForeignKey("LogroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CivitaBack.Data.BO.Partida", "Partida")
+                        .WithMany("LogroPartidas")
+                        .HasForeignKey("PartidaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Logro");
+
+                    b.Navigation("Partida");
+                });
+
             modelBuilder.Entity("CivitaBack.Data.BO.Partida", b =>
                 {
                     b.HasOne("CivitaBack.Data.BO.Usuario", "Usuario")
-                        .WithMany("Partida")
-                        .HasForeignKey("UsuarioId")
+                        .WithOne("Partida")
+                        .HasForeignKey("CivitaBack.Data.BO.Partida", "UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -415,7 +534,7 @@ namespace CivitaBack.Data.Migrations
             modelBuilder.Entity("CivitaBack.Data.BO.Recurso", b =>
                 {
                     b.HasOne("CivitaBack.Data.BO.Partida", "Partida")
-                        .WithMany("Recurso")
+                        .WithMany("Recursos")
                         .HasForeignKey("PartidaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -474,13 +593,20 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("Evento");
                 });
 
+            modelBuilder.Entity("CivitaBack.Data.BO.Logro", b =>
+                {
+                    b.Navigation("LogroPartidas");
+                });
+
             modelBuilder.Entity("CivitaBack.Data.BO.Partida", b =>
                 {
-                    b.Navigation("EstructuraEnMapa");
+                    b.Navigation("EstructuraMapa");
 
                     b.Navigation("Evento");
 
-                    b.Navigation("Recurso");
+                    b.Navigation("LogroPartidas");
+
+                    b.Navigation("Recursos");
 
                     b.Navigation("Tienda");
 
@@ -504,7 +630,8 @@ namespace CivitaBack.Data.Migrations
 
             modelBuilder.Entity("CivitaBack.Data.BO.Usuario", b =>
                 {
-                    b.Navigation("Partida");
+                    b.Navigation("Partida")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

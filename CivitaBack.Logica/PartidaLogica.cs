@@ -14,6 +14,8 @@ namespace CivitaBack.Logica;
 public interface IPartidaLogica
 {
     PartidaDTO ObtenerPorUsuarioId(int IdUsuario);
+
+    Partida ObtenerCompletaPorUsuarioId(int IdUsuario);
     Partida CrearPartida(int idUsuario);
     void Actualizar(PartidaDTO partida, Usuario usuario);
     List<PartidaDTO> ObtenerPartidas();
@@ -24,7 +26,7 @@ public interface IPartidaLogica
     Task ActualizarMapaAsync(GuardarMapaDTO dto);
 }
 
-    public class PartidaLogica : IPartidaLogica
+public class PartidaLogica : IPartidaLogica
     {
         private readonly IPartidaRepositorio repositorioPartida;
 
@@ -154,5 +156,12 @@ public interface IPartidaLogica
             if (dto.Estructuras != null && dto.Estructuras.Any())
                 await repositorioPartida.ActualizarEstructurasMapaAsync(dto.PartidaId, dto.Estructuras);
         }
+
+    public Partida ObtenerCompletaPorUsuarioId(int IdUsuario)
+    {
+        var partida = this.repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
+        if (partida == null) throw new Exception("Partida no encontrada");
+        return partida;
     }
+}
 

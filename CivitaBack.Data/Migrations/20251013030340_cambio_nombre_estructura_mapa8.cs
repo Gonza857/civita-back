@@ -5,7 +5,7 @@
 namespace CivitaBack.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class cambiosmodelado1 : Migration
+    public partial class cambio_nombre_estructura_mapa8 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

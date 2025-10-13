@@ -1,6 +1,6 @@
 ﻿namespace CivitaBack.Data.DTO
 {
-    public class EstructuraEnMapaDTO
+    public class EstructuraMapaDTO
     {
         public int EstructuraId { get; set; }
         public int X { get; set; }

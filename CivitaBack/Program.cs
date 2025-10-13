@@ -61,6 +61,12 @@ builder.Services.AddScoped<IUsuarioLogica, UsuarioLogica>();
 builder.Services.AddScoped<ILogroPartidaRepositorio, LogroPartidaRepositorio>();
 builder.Services.AddScoped<ILogroPartidaLogica, LogroPartidaLogica>();
 
+builder.Services.AddScoped<IEstructuraMapaLogica, EstructuraMapaLogica>();
+builder.Services.AddScoped<IEstructuraMapaRepositorio, EstructuraMapaRepositorio>();
+
+builder.Services.AddScoped<IEstructuraLogica, EstructuraLogica>();
+builder.Services.AddScoped<IEstructuraRepositorio, EstructuraRepositorio>();
+
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 
 
