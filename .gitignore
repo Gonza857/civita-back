@@ -18,5 +18,5 @@ obj/
 *.nupkg
 packages/
 
-# Ignorar configuraciones locales de Visual Studio / .NET
 CivitaBack/Properties/launchSettings.json
+
