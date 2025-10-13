@@ -11,6 +11,5 @@ namespace CivitaBack.Data.BO
 
         public string? Descripcion { get; set; }
 
-        public List<Tip>? Tip { get; set; }
     }
 }

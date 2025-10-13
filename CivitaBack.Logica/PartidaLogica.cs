@@ -78,7 +78,7 @@ public interface IPartidaLogica
         var partida = this.repositorioPartida.CrearPartida(idUsuario);
 
         // 🔹 Inicializar recursos para esa partida
-        this.recursoLogica.ConfigurarInicial(partida);
+        //this.recursoLogica.ConfigurarInicial(partida);
 
         return partida;
     }

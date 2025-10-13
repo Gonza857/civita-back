@@ -14,7 +14,7 @@ namespace CivitaBack.Tests
             // Assert
             Assert.Equal(0, tipoTip.Id);
             Assert.Null(tipoTip.Descripcion);
-            Assert.Null(tipoTip.Tip);
+            
         }
 
         [Fact]
@@ -40,13 +40,13 @@ namespace CivitaBack.Tests
             {
                 Id = 1,
                 Descripcion = null,
-                Tip = null
+                
             };
 
             // Assert
             Assert.Equal(1, tipoTip.Id);
             Assert.Null(tipoTip.Descripcion);
-            Assert.Null(tipoTip.Tip);
+            
         }
     }
 }

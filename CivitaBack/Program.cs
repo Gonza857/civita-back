@@ -63,6 +63,9 @@ builder.Services.AddScoped<ILogroPartidaLogica, LogroPartidaLogica>();
 
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 
+builder.Services.AddScoped<ITipsLogica, TipsLogica>();
+builder.Services.AddScoped<ITipsRepositorio, TipsRepositorio>();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -88,9 +91,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseAuthentication();
 app.UseHttpsRedirection();
-app.UseAuthorization();
 app.UseCors("AllowViteDev");
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();

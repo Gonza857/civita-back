@@ -18,6 +18,7 @@ public class PartidaLogicaTest
     private readonly Mock<IPartidaRepositorio> _mockRepo;
     private readonly Mock<IRecursoLogica> _mockRecurso;
     private readonly IPartidaLogica _partidaLogica;
+    private readonly IRecursoLogica _recursoLogica;
 
     public PartidaLogicaTest()
     {
