@@ -8,13 +8,11 @@ namespace CivitaBack.Tests
         [Fact]
         public void Tip_Constructor_InitializesProperties()
         {
-            // Act
             var tip = new Tip();
 
-            // Assert
             Assert.Equal(0, tip.Id);
             Assert.Null(tip.Mensaje);
-            Assert.Equal(0, tip.TipoTipId);
+            Assert.Equal(0, tip.TipoId); 
             Assert.Null(tip.TipoTip);
             Assert.Null(tip.TipEnPartida);
         }
@@ -22,42 +20,38 @@ namespace CivitaBack.Tests
         [Fact]
         public void Tip_SetProperties_ValuesAreSet()
         {
-            // Arrange
             var tip = new Tip();
             var tipoTip = new TipoTip { Id = 1 };
 
-            // Act
             tip.Id = 1;
             tip.Mensaje = "Test Tip Message";
-            tip.TipoTipId = 1;
+            tip.TipoId = 1; 
             tip.TipoTip = tipoTip;
 
-            // Assert
             Assert.Equal(1, tip.Id);
             Assert.Equal("Test Tip Message", tip.Mensaje);
-            Assert.Equal(1, tip.TipoTipId);
+            Assert.Equal(1, tip.TipoId); 
             Assert.Equal(tipoTip, tip.TipoTip);
         }
 
         [Fact]
         public void Tip_WithNullValues_PropertiesCanBeNull()
         {
-            // Arrange
             var tip = new Tip
             {
                 Id = 1,
                 Mensaje = null,
-                TipoTipId = 0,
+                TipoId = 0, 
                 TipoTip = null,
                 TipEnPartida = null
             };
 
-            // Assert
             Assert.Equal(1, tip.Id);
             Assert.Null(tip.Mensaje);
-            Assert.Equal(0, tip.TipoTipId);
+            Assert.Equal(0, tip.TipoId); 
             Assert.Null(tip.TipoTip);
             Assert.Null(tip.TipEnPartida);
         }
+
     }
 }
