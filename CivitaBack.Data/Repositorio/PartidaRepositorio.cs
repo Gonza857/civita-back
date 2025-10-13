@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
-public interface IRepositorioPartida
+public interface IPartidaRepositorio
 {
     Partida ObtenerPorUsuarioId(int IdUsuario);
 
@@ -19,7 +19,7 @@ public interface IRepositorioPartida
     void Guardar(Partida partida);
     void Actualizar();
 }
-public class PartidaRepositorio : IRepositorioPartida
+public class PartidaRepositorio : IPartidaRepositorio
 {
 
     private readonly AppDbContext _context;

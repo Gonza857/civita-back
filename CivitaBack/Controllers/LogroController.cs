@@ -16,6 +16,7 @@ public class LogroController : ControllerBase
     {
         this._logroLogica = ill;
     }
+
     [HttpGet]
     public IActionResult Listado()
     {

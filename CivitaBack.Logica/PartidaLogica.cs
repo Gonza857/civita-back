@@ -24,9 +24,9 @@ public interface IPartidaLogica
 public class PartidaLogica : IPartidaLogica
 {
 
-    private readonly IRepositorioPartida repositorioPartida;
+    private readonly IPartidaRepositorio repositorioPartida;
     
-    public PartidaLogica(IRepositorioPartida repositoriopartida)
+    public PartidaLogica(IPartidaRepositorio repositoriopartida)
     {
         repositorioPartida = repositoriopartida;
     }
