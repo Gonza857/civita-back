@@ -52,15 +52,36 @@ namespace CivitaBack.Data.Repositorio
 
         public Partida CrearPartida(int idUsuario)
         {
-            var partida = new Partida
-            {
-                UsuarioId = idUsuario,
-                UltimaVez = DateTime.UtcNow
-            };
-            _context.Partida.Add(partida);
-            _context.SaveChanges();
-            return partida;
-        }
+         
+                var rutaMapa = Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory, 
+                    "..", "..", "..", "..",                
+                    "CivitaBack.Data", "DTO", "mapa_base.json"
+);
+
+                rutaMapa = Path.GetFullPath(rutaMapa);
+
+
+                if (!File.Exists(rutaMapa))
+                    throw new FileNotFoundException("No se encontró el archivo de mapa base.", rutaMapa);
+
+                var contenidoMapa = File.ReadAllText(rutaMapa);
+
+                var partida = new Partida
+                {
+                    UsuarioId = idUsuario,
+                    JsonMapa = contenidoMapa,
+                    UltimaVez = DateTime.UtcNow
+                };
+
+                _context.Partida.Add(partida);
+
+                _context.SaveChanges();
+
+                return partida;
+            }
+            
+        
 
         public List<Partida> ObtenerPartidas()
         {
