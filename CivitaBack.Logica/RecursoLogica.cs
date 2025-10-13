@@ -66,7 +66,7 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
     {
         return new();
     }
-}
+
 
 public void ModificarEnergia(int idPartida, int cantidad)
     {
