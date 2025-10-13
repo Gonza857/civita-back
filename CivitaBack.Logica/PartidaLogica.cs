@@ -27,10 +27,12 @@ public interface IPartidaLogica
     public class PartidaLogica : IPartidaLogica
     {
         private readonly IPartidaRepositorio repositorioPartida;
+        private readonly IRecursoLogica recursoLogica;
 
-        public PartidaLogica(IPartidaRepositorio repositoriopartida)
+        public PartidaLogica(IPartidaRepositorio repositorioPartida, IRecursoLogica recursoLogica)
         {
-            repositorioPartida = repositoriopartida;
+            this.repositorioPartida = repositorioPartida;
+            this.recursoLogica = recursoLogica;
         }
 
         // 🧩 ACTUALIZAR RECURSOS
@@ -62,21 +64,27 @@ public interface IPartidaLogica
             this.repositorioPartida.Actualizar();
         }
 
-        // 🧱 CREAR PARTIDA
-        public Partida CrearPartida(int idUsuario)
-        {
-            var partidaExistente = this.repositorioPartida.ObtenerPorUsuarioId(idUsuario);
-            if (partidaExistente != null)
-                throw new PartidaExcepcion("Ya tienes una partida empezada.");
+    // 🧱 CREAR PARTIDA
+    public Partida CrearPartida(int idUsuario)
+    {
+        var partidaExistente = this.repositorioPartida.ObtenerPorUsuarioId(idUsuario);
+        if (partidaExistente != null)
+            throw new PartidaExcepcion("Ya tienes una partida empezada.");
 
-            if (idUsuario <= 0)
-                throw new PartidaExcepcion("El Id del usuario es inválido.");
+        if (idUsuario <= 0)
+            throw new PartidaExcepcion("El Id del usuario es inválido.");
 
-            return this.repositorioPartida.CrearPartida(idUsuario);
-        }
+        // 🔹 Crear partida en la BD
+        var partida = this.repositorioPartida.CrearPartida(idUsuario);
 
-        // 📜 OBTENER TODAS LAS PARTIDAS
-        public List<PartidaDTO> ObtenerPartidas()
+        // 🔹 Inicializar recursos para esa partida
+        this.recursoLogica.ConfigurarInicial(partida);
+
+        return partida;
+    }
+
+    // 📜 OBTENER TODAS LAS PARTIDAS
+    public List<PartidaDTO> ObtenerPartidas()
         {
             var partidas = this.repositorioPartida.ObtenerPartidas();
             return partidas.Select(p => this.PartidaToDTO(p)).ToList();
@@ -101,10 +109,10 @@ public interface IPartidaLogica
                 Usuario = partida.Usuario?.NombreUsuario ?? string.Empty,
             };
 
-            partidaDTO.Energia = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Energia.GetDescription())?.Cantidad ?? 0;
-            partidaDTO.Felicidad = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Felicidad.GetDescription())?.Cantidad ?? 0;
-            partidaDTO.EcoCoins = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.EcoCoins.GetDescription())?.Cantidad ?? 0;
-            partidaDTO.Contaminacion = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Contaminacion.GetDescription())?.Cantidad ?? 0;
+            partidaDTO.Energia = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Energia.GetDescription())?.Cantidad ?? 100;
+            partidaDTO.Felicidad = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Felicidad.GetDescription())?.Cantidad ?? 50;
+            partidaDTO.EcoCoins = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.EcoCoins.GetDescription())?.Cantidad ?? 200;
+            partidaDTO.Contaminacion = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Contaminacion.GetDescription())?.Cantidad ?? 60;
 
             return partidaDTO;
         }

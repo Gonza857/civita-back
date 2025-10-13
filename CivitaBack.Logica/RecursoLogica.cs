@@ -34,10 +34,10 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
     {
         List<Recurso> recursos = new List<Recurso>
         {
-            new Recurso("Energía", 0, partida),
-            new Recurso("Felicidad", 0, partida),
-            new Recurso("EcoCoins", 0, partida),
-            new Recurso("Contaminación", 0, partida)
+            new Recurso("Energía", 100, partida),
+            new Recurso("Felicidad", 60, partida),
+            new Recurso("EcoCoins", 200, partida),
+            new Recurso("Contaminación", 60, partida)
         };
         this.repositorioRecurso.GuardarVarios(recursos);
     }

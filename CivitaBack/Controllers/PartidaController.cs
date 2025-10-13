@@ -43,6 +43,25 @@ namespace CivitaBack.Api.Controllers
             }
         }
 
+        // Obtener la partida de un usuario
+        [HttpGet("porUsuario/{idUsuario}")]
+        public IActionResult ObtenerPartidaPorUsuario(int idUsuario)
+        {
+            try
+            {
+                var partida = _partidaLogica.ObtenerPorUsuarioId(idUsuario);
+
+                if (partida == null)
+                    return NotFound(new { error = "No se encontró la partida para el usuario especificado." });
+
+                return Ok(partida);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = $"Error al obtener la partida: {ex.Message}" });
+            }
+        }
+
         // 📜 Obtener todas las partidas
         [HttpGet]
         public IActionResult GetPartidas()
