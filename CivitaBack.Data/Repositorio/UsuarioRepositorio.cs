@@ -33,12 +33,12 @@ namespace CivitaBack.Data.Repositorio
 
         public async Task<Usuario> ObtenerUsuarioPorMail(string mail)
         {
-            return await _context.Usuario.FirstOrDefaultAsync(u => u.Mail == mail);
+            return await _context.Usuario.AsNoTracking().FirstOrDefaultAsync(u => u.Mail == mail);
         }
 
         public async Task<Usuario> ObtenerUsuarioPorNombre(string nombreUsuario)
         {
-            return await _context.Usuario.FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
+            return await _context.Usuario.AsNoTracking().FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
         }
 
         public async Task<Usuario> CrearUsuario(Usuario usuario)
@@ -50,12 +50,12 @@ namespace CivitaBack.Data.Repositorio
 
         public Task<Usuario> ObtenerPorId(int id)
         {
-            return _context.Usuario.FirstOrDefaultAsync(u => u.Id == id);
+            return _context.Usuario.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
         }
         
         public async Task<List<Usuario>> ObtenerTodosLosUsuarios()
         {
-            return await _context.Usuario.ToListAsync();
+            return await _context.Usuario.AsNoTracking().ToListAsync();
         }
 
     }

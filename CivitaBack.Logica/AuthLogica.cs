@@ -19,10 +19,8 @@ namespace CivitaBack.Logica
 {
     public interface IAuthLogica
     {
-        Task<Usuario> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password);
+        Task<RegistroResponse> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password);
         Task<LoginResponse> LoginAsync(LoginRequest request);
-        Task<Usuario> ObtenerPorId(int id);
-        Task<Usuario> ObtenerUsuarioPorNombre(string nombre);
 
     }
     public class AuthLogica : IAuthLogica
@@ -37,21 +35,7 @@ namespace CivitaBack.Logica
 
         }
 
-        public Task<Usuario> ObtenerPorId(int id)
-        {
-            Task<Usuario> usuario = this._repositorioUsuario.ObtenerPorId(id);
-            if (usuario == null) throw new Exception("No se encontró el usuario");
-            return usuario;
-        }
-
-        public async Task<Usuario> ObtenerUsuarioPorNombre(string nombre)
-        {
-            Usuario usuario = await _repositorioUsuario.ObtenerUsuarioPorNombre(nombre);
-            if (usuario == null) throw new Exception("No se encontró el usuario");
-            return usuario;
-        }
-
-        public async Task<Usuario> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password)
+        public async Task<RegistroResponse> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password)
         {
             if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(mail) || string.IsNullOrWhiteSpace(password))
                 throw new ValidacionRegistroException("Todos los campos son obligatorios.");
@@ -74,7 +58,18 @@ namespace CivitaBack.Logica
                 HashDeContrasena = hash
             };
 
-            return await _repositorioUsuario.CrearUsuario(usuario);
+            var usuarioCreado = await _repositorioUsuario.CrearUsuario(usuario);
+            
+            if (usuarioCreado == null)
+                throw new ValidacionRegistroException("Error al crear el usuario.");
+
+            return new RegistroResponse
+            {
+                Id = usuarioCreado.Id,
+                NombreUsuario = usuarioCreado.NombreUsuario,
+                Mail = usuarioCreado.Mail
+            };
+
         }
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
@@ -102,9 +97,10 @@ namespace CivitaBack.Logica
 
             var claims = new[]
             {
-            new Claim(ClaimTypes.Name, usuario.NombreUsuario),
-            new Claim(ClaimTypes.Email, usuario.Mail)
-        };
+                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+                new Claim(ClaimTypes.Name, usuario.NombreUsuario),
+                new Claim(ClaimTypes.Email, usuario.Mail)
+            };
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
