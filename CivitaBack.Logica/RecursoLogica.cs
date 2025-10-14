@@ -18,7 +18,9 @@ public interface IRecursoLogica
 
     RecursoDTO ObtenerRecursos(int idPartida);
     void ModificarEnergia(int idPartida, int cantidad);
-
+    void ModificarFelicidad(int idPartida, int cantidad);
+    void ModificarContaminacion(int idPartida, int cantidad);
+    void ModificarEcocoins(int idPartida, int cantidad);
 
 }
 
@@ -73,6 +75,66 @@ public void ModificarEnergia(int idPartida, int cantidad)
         // Buscamos el recurso "Energía" de la partida
         var recurso = repositorioRecurso.ObtenerRecursosPartida(idPartida)
             .FirstOrDefault(r => r.Nombre == TipoRecurso.Energia.GetDescription());
+
+        if (recurso == null)
+            throw new PartidaExcepcion("No se encontró el recurso Energía para la partida.");
+
+        // Ajustamos el valor
+        recurso.Cantidad += cantidad;
+
+        // Controlamos los límites (0 - 100)
+        if (recurso.Cantidad > 100) recurso.Cantidad = 100;
+        if (recurso.Cantidad < 0) recurso.Cantidad = 0;
+
+        // Guardamos los cambios
+        repositorioRecurso.Actualizar(recurso);
+    }
+
+    public void ModificarFelicidad(int idPartida, int cantidad)
+    {
+        // Buscamos el recurso "Energía" de la partida
+        var recurso = repositorioRecurso.ObtenerRecursosPartida(idPartida)
+            .FirstOrDefault(r => r.Nombre == TipoRecurso.Felicidad.GetDescription());
+
+        if (recurso == null)
+            throw new PartidaExcepcion("No se encontró el recurso Energía para la partida.");
+
+        // Ajustamos el valor
+        recurso.Cantidad += cantidad;
+
+        // Controlamos los límites (0 - 100)
+        if (recurso.Cantidad > 100) recurso.Cantidad = 100;
+        if (recurso.Cantidad < 0) recurso.Cantidad = 0;
+
+        // Guardamos los cambios
+        repositorioRecurso.Actualizar(recurso);
+    }
+
+    public void ModificarContaminacion(int idPartida, int cantidad)
+    {
+        // Buscamos el recurso "Energía" de la partida
+        var recurso = repositorioRecurso.ObtenerRecursosPartida(idPartida)
+            .FirstOrDefault(r => r.Nombre == TipoRecurso.Contaminacion.GetDescription());
+
+        if (recurso == null)
+            throw new PartidaExcepcion("No se encontró el recurso Energía para la partida.");
+
+        // Ajustamos el valor
+        recurso.Cantidad += cantidad;
+
+        // Controlamos los límites (0 - 100)
+        if (recurso.Cantidad > 100) recurso.Cantidad = 100;
+        if (recurso.Cantidad < 0) recurso.Cantidad = 0;
+
+        // Guardamos los cambios
+        repositorioRecurso.Actualizar(recurso);
+    }
+
+    public void ModificarEcocoins(int idPartida, int cantidad)
+    {
+        // Buscamos el recurso "Energía" de la partida
+        var recurso = repositorioRecurso.ObtenerRecursosPartida(idPartida)
+            .FirstOrDefault(r => r.Nombre == TipoRecurso.EcoCoins.GetDescription());
 
         if (recurso == null)
             throw new PartidaExcepcion("No se encontró el recurso Energía para la partida.");

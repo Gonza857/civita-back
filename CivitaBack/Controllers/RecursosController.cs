@@ -72,5 +72,119 @@ namespace CivitaBack.Api.Controllers
                 return Problem("Ocurrió un error al modificar la energía.");
             }
         }
+
+        // Subir Felicidad
+        [HttpPost("subirFelicidad/{idPartida}")]
+        public IActionResult SubirFelicidad(int idPartida)
+        {
+            try
+            {
+                _recursoLogica.ModificarFelicidad(idPartida, 10);
+                return Ok(new { mensaje = "Felicidad aumentada correctamente." });
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return Problem("Ocurrió un error al modificar la energía.");
+            }
+        }
+
+        //  Reducir felicidad
+        [HttpPost("bajarFelicidad/{idPartida}")]
+        public IActionResult BajarFelicidad(int idPartida)
+        {
+            try
+            {
+                _recursoLogica.ModificarFelicidad(idPartida, -10);
+                return Ok(new { mensaje = "Felicidad reducida correctamente." });
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return Problem("Ocurrió un error al modificar la energía.");
+            }
+        }
+
+        // Subir Contaminacion
+        [HttpPost("subirContaminacion/{idPartida}")]
+        public IActionResult SubirContaminacion(int idPartida)
+        {
+            try
+            {
+                _recursoLogica.ModificarContaminacion(idPartida, 10);
+                return Ok(new { mensaje = "Contaminacion aumentada correctamente." });
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return Problem("Ocurrió un error al modificar la energía.");
+            }
+        }
+
+        //  Reducir Contaminacion
+        [HttpPost("bajarContaminacion/{idPartida}")]
+        public IActionResult BajarContaminacion(int idPartida)
+        {
+            try
+            {
+                _recursoLogica.ModificarContaminacion(idPartida, -10);
+                return Ok(new { mensaje = "Contaminacion reducida correctamente." });
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return Problem("Ocurrió un error al modificar la energía.");
+            }
+        }
+
+        // Subir Ecocoins
+        [HttpPost("subirEcocoins/{idPartida}")]
+        public IActionResult SubirEcocoins(int idPartida)
+        {
+            try
+            {
+                _recursoLogica.ModificarEcocoins(idPartida, 1);
+                return Ok(new { mensaje = "Ecocoins aumentada correctamente." });
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return Problem("Ocurrió un error al modificar la energía.");
+            }
+        }
+
+        //  Reducir Ecocoins
+        [HttpPost("bajarEcocoins/{idPartida}")]
+        public IActionResult BajarEcocoins(int idPartida)
+        {
+            try
+            {
+                _recursoLogica.ModificarEcocoins(idPartida, -10);
+                return Ok(new { mensaje = "Ecocoins reducida correctamente." });
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return Problem("Ocurrió un error al modificar la energía.");
+            }
+        }
     }
 }
