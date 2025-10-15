@@ -7,41 +7,38 @@ using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
+using CivitaBack.Logica.Excepciones;
 using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
 public interface IPartidaRepositorio
 {
-    // 🧱 Métodos básicos (de la rama desarrollo)
+    Task GuardarCambios();
+    
     Partida ObtenerPorUsuarioId(int IdUsuario);
     Partida CrearPartida(int idUsuario);
     List<Partida> ObtenerPartidas();
     void Guardar(Partida partida);
-    void Actualizar();
-
-    // 🧠 Métodos asincrónicos (de tu rama)
-    Task ActualizarMapaAsync(int partidaId, string jsonMapa);
+    
+    Task<bool> ActualizarMapaAsync(Partida partida);
+    
     Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapaDTO> estructuras);
     Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId);
     Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId);
+    Task<List<EstructuraMapa>> ObtenerEstructurasDeUnMapa(int partidaId);
 }
 
-    public class PartidaRepositorio : IPartidaRepositorio
+    public class PartidaRepositorio : GenericoRepositorio, IPartidaRepositorio
 {
-        private readonly AppDbContext _context;
-
-        public PartidaRepositorio(AppDbContext context)
-        {
-            _context = context;
-        }
-
+        public PartidaRepositorio(AppDbContext context) : base(context) { }
+        
         // --------------------------------------------------------------------
         // 🧱 Métodos básicos (compatibles con rama desarrollo)
         // --------------------------------------------------------------------
-        public void Actualizar()
+        public async Task GuardarCambios()
         {
-            _context.SaveChanges();
+            await base.GuardarCambiosAsync();
         }
 
         public void Guardar(Partida partida)
@@ -98,21 +95,12 @@ public interface IPartidaRepositorio
                 .Include(p => p.Usuario)
                 .FirstOrDefault(p => p.UsuarioId == IdUsuario);
         }
-
-        // --------------------------------------------------------------------
-        // 🧠 Métodos asincrónicos del mapa
-        // --------------------------------------------------------------------
-        public async Task ActualizarMapaAsync(int partidaId, string jsonMapa)
+        
+        public async Task<bool> ActualizarMapaAsync(Partida partida)
         {
-            var partida = await _context.Partida.FindAsync(partidaId);
-            if (partida == null)
-                throw new Exception("No se encontró la partida.");
-
-            partida.JsonMapa = jsonMapa;
-            partida.UltimaVez = DateTime.UtcNow;
-
             _context.Partida.Update(partida);
-            await _context.SaveChangesAsync();
+            var rowsAfectadas = await _context.SaveChangesAsync();
+            return rowsAfectadas > 0;
         }
 
         public async Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapaDTO> estructuras)
@@ -141,7 +129,7 @@ public interface IPartidaRepositorio
             catch
             {
                 await transaction.RollbackAsync();
-                throw;
+                throw new PersistenciaException("Ocurrió un error al actualizar.");
             }
         }
 
@@ -222,5 +210,12 @@ public interface IPartidaRepositorio
 
             return JsonSerializer.Serialize(mapaFinal, new JsonSerializerOptions { WriteIndented = true });
         }
+
+    public Task<List<EstructuraMapa>> ObtenerEstructurasDeUnMapa(int partidaId)
+    {
+        return _context.EstructuraMapa
+            .Where(e => e.PartidaId == partidaId)
+            .ToListAsync();    
     }
+}
 

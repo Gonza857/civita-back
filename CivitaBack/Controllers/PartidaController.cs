@@ -181,16 +181,20 @@ namespace CivitaBack.Api.Controllers
         public async Task<IActionResult> ActualizarMapa(int partidaId, [FromBody] GuardarMapaDTO dto)
         {
             if (dto == null || dto.PartidaId != partidaId)
-                return BadRequest(new { mensaje = "Datos inválidos o ID de partida no coincide." });
+                return BadRequest("Datos inválidos o ID de partida no coincide.");
 
             try
             {
                 await _partidaLogica.ActualizarMapaAsync(dto);
                 return Ok(new { mensaje = "Mapa actualizado correctamente." });
             }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest("Error al actualizar el mapa: " + ex.Message);
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, new { mensaje = "Error al actualizar el mapa.", detalle = ex.Message });
+                return Problem("Error al actualizar el mapa.");
             }
         }
 

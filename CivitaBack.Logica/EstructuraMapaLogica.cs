@@ -30,6 +30,6 @@ public class EstructuraMapaLogica : IEstructuraMapaLogica
            Estructura = e,
            Partida = p
         };
-        this.estructuraMapaRepositorio.Guardar(em);
+        this.estructuraMapaRepositorio.GuardarCambios();
     }
 }

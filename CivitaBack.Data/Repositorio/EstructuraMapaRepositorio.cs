@@ -10,21 +10,37 @@ namespace CivitaBack.Data.Repositorio;
 
 public interface IEstructuraMapaRepositorio
 {
-    void Guardar(EstructuraMapa em);
+    void AgregarUnica(EstructuraMapa em);
+    void RemoverEliminadas(List<EstructuraMapa> emList);
+    void AgregarNuevas(List<EstructuraMapa> emList);
+
+    void GuardarCambios();
 }
 
-public class EstructuraMapaRepositorio : IEstructuraMapaRepositorio
+public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRepositorio
 {
-    private readonly AppDbContext _context;
+    public EstructuraMapaRepositorio(AppDbContext context) : base(context) { }
+    
+    
 
-    public EstructuraMapaRepositorio(AppDbContext context)
+    public void AgregarUnica(EstructuraMapa em)
     {
-        _context = context;
+        _context.EstructuraMapa.Update(em);
     }
 
-    public void Guardar(EstructuraMapa em)
+    public void RemoverEliminadas(List<EstructuraMapa> emList)
     {
-        _context.EstructuraMapa.Add(em);
-        _context.SaveChanges();
+        _context.EstructuraMapa.RemoveRange(emList);
     }
+
+    public void AgregarNuevas(List<EstructuraMapa> emList)
+    {
+        _context.EstructuraMapa.AddRange(emList);
+    }
+    
+    public async Task GuardarCambios()
+    {
+        await base.GuardarCambiosAsync();
+    }
+
 }
