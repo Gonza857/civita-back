@@ -34,7 +34,7 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
     public void Actualizar(LogroDTO logroDTO, int id)
     {
         if (logroDTO == null || id == null) throw new Exception("Ocurrió un error al actualizar el Logro");
-        var logroBuscado = this.repositorioLogro.ObtenerPorId(id);
+        Logro logroBuscado = this.repositorioLogro.ObtenerPorId(id);
         var tipoLogroBuscado = this.repositorioTipoLogro.ObtenerPorId(logroDTO.TipoId);
         if (logroBuscado == null || tipoLogroBuscado == null) throw new Exception("Ocurrió un error al actualizar el Logro");
 

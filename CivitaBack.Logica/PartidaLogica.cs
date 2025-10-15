@@ -15,24 +15,27 @@ public interface IPartidaLogica
 {
     PartidaDTO ObtenerPorUsuarioId(int IdUsuario);
     Partida CrearPartida(int idUsuario);
-    void Actualizar(PartidaDTO partida, Usuario usuario);
+    Task Actualizar(PartidaDTO partida, Usuario usuario);
     List<PartidaDTO> ObtenerPartidas();
 
     // 🆕 Métodos de mapa
-    Task GuardarMapaAsync(GuardarMapaDTO dto);
+    Task ActualizarMapaDePartidaAsync(GuardarMapaDTO dto);
+    
+    
     Task<Partida?> ObtenerMapaAsync(int partidaId);
-    Task ActualizarMapaAsync(GuardarMapaDTO dto);
 }
 
 public class PartidaLogica : IPartidaLogica
 {
-    private readonly IPartidaRepositorio repositorioPartida;
-    private readonly IRecursoLogica recursoLogica;
+    private readonly IPartidaRepositorio _repositorioPartida;
+    private readonly IRecursoLogica _recursoLogica;
+    private readonly IEstructuraMapaRepositorio _estructuraMapaRepositorio;
 
-    public PartidaLogica(IPartidaRepositorio repositorioPartida, IRecursoLogica recursoLogica)
+    public PartidaLogica(IPartidaRepositorio rp, IRecursoLogica rl, IEstructuraMapaRepositorio em)
     {
-        this.repositorioPartida = repositorioPartida;
-        this.recursoLogica = recursoLogica;
+        this._repositorioPartida = rp;
+        this._recursoLogica = rl;
+        this._estructuraMapaRepositorio = em;
     }
 
     /// <summary>
@@ -40,18 +43,19 @@ public class PartidaLogica : IPartidaLogica
     /// </summary>
     /// <param name="partida">PartidaDTO</param>
     /// <param name="usuario">Usuario</param>
-    public void Actualizar(PartidaDTO partida, Usuario usuario)
+    public async Task Actualizar(PartidaDTO partida, Usuario usuario)
     {
         if (partida == null && usuario == null)
-            throw new ErrorInternoExcepction("Ocurrió un error al actualizar la Partida");
+            throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: Datos inválidos.");
 
         if (partida.Energia < 0 || partida.Felicidad < 0 ||
             partida.EcoCoins < 0 || partida.Contaminacion < 0)
             throw new PartidaExcepcion("Los valores de los recursos no pueden ser negativos");
 
-        var partidaBuscada = this.repositorioPartida.ObtenerPorUsuarioId(usuario.Id);
+        var partidaBuscada = this._repositorioPartida.ObtenerPorUsuarioId(usuario.Id);
+        
         if (partidaBuscada == null)
-            throw new ErrorInternoExcepction("Ocurrió un error al actualizar la Partida");
+            throw new ErrorInternoExcepction("Ocurrió un error al guardar el mapa: No encontrada.");
 
         var energia = partidaBuscada.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Energia.GetDescription());
         if (energia != null) energia.Cantidad = partida.Energia;
@@ -65,13 +69,13 @@ public class PartidaLogica : IPartidaLogica
         var contaminacion = partidaBuscada.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Contaminacion.GetDescription());
         if (contaminacion != null) contaminacion.Cantidad = partida.Contaminacion;
 
-        this.repositorioPartida.Actualizar();
+        await this._repositorioPartida.GuardarCambios();
     }
 
     // 🧱 CREAR PARTIDA
     public Partida CrearPartida(int idUsuario)
     {
-        var partidaExistente = this.repositorioPartida.ObtenerPorUsuarioId(idUsuario);
+        var partidaExistente = this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
         if (partidaExistente != null)
             throw new PartidaExcepcion("Ya tienes una partida empezada.");
 
@@ -79,7 +83,7 @@ public class PartidaLogica : IPartidaLogica
             throw new PartidaExcepcion("El Id del usuario es inválido.");
 
         // 🔹 Crear partida en la BD
-        var partida = this.repositorioPartida.CrearPartida(idUsuario);
+        var partida = this._repositorioPartida.CrearPartida(idUsuario);
 
         // 🔹 Inicializar recursos para esa partida
         //this.recursoLogica.ConfigurarInicial(partida);
@@ -90,14 +94,14 @@ public class PartidaLogica : IPartidaLogica
     // 📜 OBTENER TODAS LAS PARTIDAS
     public List<PartidaDTO> ObtenerPartidas()
     {
-        var partidas = this.repositorioPartida.ObtenerPartidas();
+        var partidas = this._repositorioPartida.ObtenerPartidas();
         return partidas.Select(p => this.PartidaToDTO(p)).ToList();
     }
 
     // 🔎 OBTENER PARTIDA POR USUARIO
     public PartidaDTO ObtenerPorUsuarioId(int IdUsuario)
     {
-        var partida = this.repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
+        var partida = this._repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
         if (partida == null) throw new Exception("Partida no encontrada");
         return this.PartidaToDTO(partida);
     }
@@ -125,48 +129,109 @@ public class PartidaLogica : IPartidaLogica
     /// Guarda el mapa de la partida. Si tiene estructuras, las actualiza.
     /// </summary>
     /// <param name="dto">GuardarMapaDTO</param>
-    public async Task GuardarMapaAsync(GuardarMapaDTO dto)
+    public async Task ActualizarMapaDePartidaAsync(GuardarMapaDTO dto)
     {
         if (dto == null || dto.PartidaId <= 0)
-            throw new ArgumentException("Datos de mapa inválidos");
+            throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: Datos inválidos.");
 
-        await repositorioPartida.ActualizarMapaAsync(dto.PartidaId, dto.JsonMapa);
+        var hayEstructurasParaActualizar = dto.Estructuras != null && dto.Estructuras.Any();
 
-        if (dto.Estructuras != null && dto.Estructuras.Any())
-            await repositorioPartida.ActualizarEstructurasMapaAsync(dto.PartidaId, dto.Estructuras);
+        Partida partida = await this._repositorioPartida.ObtenerPartidaConMapaAsync(dto.PartidaId);
+        if (partida == null) throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No existe.");
+
+        partida.JsonMapa = dto.JsonMapa;
+        partida.UltimaVez = DateTime.UtcNow;
+
+        await this._repositorioPartida.ActualizarMapaAsync(partida);
+        
+        if (hayEstructurasParaActualizar)
+        {
+            List<EstructuraMapa> estructurasDePartida =
+                await this._repositorioPartida.ObtenerEstructurasDeUnMapa(dto.PartidaId);
+
+            var nuevas = dto.Estructuras!
+                .Where(emDto => emDto.EstructuraId == 0 ||
+                                !estructurasDePartida.Any(em => em.EstructuraId == emDto.EstructuraId))
+                .ToList();
+
+            var modificadas = dto.Estructuras!
+                .Where(emDto => estructurasDePartida.Any(em => em.EstructuraId == emDto.EstructuraId))
+                .ToList();
+
+            var eliminadas = estructurasDePartida
+                .Where(em => !dto.Estructuras!.Any(emDto => emDto.EstructuraId == em.EstructuraId))
+                .ToList();
+        
+            this._estructuraMapaRepositorio.AgregarNuevas(this.ListaDtoToListaEntidad(nuevas, partida.Id));
+
+            foreach (EstructuraMapaDTO mod in modificadas)
+            {
+                var original = estructurasDePartida.First(em => em.EstructuraId == mod.EstructuraId);
+                this.ActualizarEstructuraMapa(original, mod);
+                this._estructuraMapaRepositorio.AgregarUnica(original);
+            }
+
+            this._estructuraMapaRepositorio.RemoverEliminadas(eliminadas);
+
+            try
+            {
+                await this._repositorioPartida.GuardarCambios();
+            }
+            catch (Exception e)
+            {
+                throw new ErrorInternoExcepction("Ocurrió un error al actualizar el mapa y las estructuras");
+            }
+        }
+
+        
+    }
+
+    private void ActualizarEstructuraMapa(EstructuraMapa original, EstructuraMapaDTO mod)
+    {
+        original.EstructuraId = mod.EstructuraId;
+        original.X = mod.X;
+        original.Y = mod.Y;
+        original.Width = mod.Width;
+        original.Height = mod.Height;
+    }
+
+    private List<EstructuraMapa> ListaDtoToListaEntidad(List<EstructuraMapaDTO> emDtoList, int idPartida)
+    {
+        var lista = new List<EstructuraMapa>();
+        foreach (var emDto in emDtoList)
+        {
+            lista.Add(new EstructuraMapa
+            {
+                EstructuraId = emDto.EstructuraId,
+                X = emDto.X,
+                Y = emDto.Y,
+                Width = emDto.Width,
+                Height = emDto.Height,
+                PartidaId = idPartida,
+            });
+        }
+        return lista;
     }
 
     /// <summary>
     /// Obtiene el mapa de una partida.
-    /// </summary>
+    /// </summary>  
     /// <param name="partidaId">ID de partida</param>
     public async Task<Partida?> ObtenerMapaAsync(int partidaId)
     {
-        var partida = await repositorioPartida.ObtenerPartidaConMapaAsync(partidaId);
+        var partida = await _repositorioPartida.ObtenerPartidaConMapaAsync(partidaId);
         if (partida == null)
             return null;
 
         if (!string.IsNullOrWhiteSpace(partida.JsonMapa))
             return partida;
 
-        var mapaReconstruido = await repositorioPartida.ObtenerMapaJsonPorPartidaIdAsync(partidaId);
+        var mapaReconstruido = await _repositorioPartida.ObtenerMapaJsonPorPartidaIdAsync(partidaId);
         partida.JsonMapa = mapaReconstruido;
 
-        await repositorioPartida.ActualizarMapaAsync(partidaId, mapaReconstruido);
+        await _repositorioPartida.ActualizarMapaAsync(partida);
 
         return partida;
-    }
-
-    // 🔄 Actualizar mapa existente
-    public async Task ActualizarMapaAsync(GuardarMapaDTO dto)
-    {
-        if (dto == null || dto.PartidaId <= 0)
-            throw new ArgumentException("Datos inválidos para actualizar mapa");
-
-        await repositorioPartida.ActualizarMapaAsync(dto.PartidaId, dto.JsonMapa);
-
-        if (dto.Estructuras != null && dto.Estructuras.Any())
-            await repositorioPartida.ActualizarEstructurasMapaAsync(dto.PartidaId, dto.Estructuras);
     }
 }
 

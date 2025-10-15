@@ -35,8 +35,8 @@ namespace CivitaBack.Logica
         private void ProcesarPartida(Partida partida)
         {
             int nuevaPoblacion = 0;
-
-            foreach (var estructuraEnMapa in partida.EstructuraEnMapa)
+                
+            foreach (var estructuraEnMapa in partida.EstructuraMapa)
             {
 
                 if (estructuraEnMapa.Estructura == null || estructuraEnMapa.Estructura.TipoEstructura == null)

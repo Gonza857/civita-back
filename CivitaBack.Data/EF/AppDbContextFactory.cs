@@ -9,33 +9,28 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 {
     public AppDbContext CreateDbContext(string[] args)
     {
-        // Variables de entorno
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-        var devProfile = Environment.GetEnvironmentVariable("DEV_PROFILE");
+        // Perfil dev, opcional
+        var devProfile = Environment.GetEnvironmentVariable("DEV_PROFILE") ?? "DevGonza";
 
-        // Ajustar ruta al proyecto principal que tiene appsettings.json
-        var basePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "CivitaBack");
+        // Tomar la ruta absoluta del proyecto API
+        var solutionDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "CivitaBack"));
 
-        // Configuración igual que Program.cs
         var configuration = new ConfigurationBuilder()
-            .SetBasePath(basePath)
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{environment}.json", optional: true)
+            .SetBasePath(solutionDir)
+            .AddJsonFile("appsettings.json", optional: false)
             .AddJsonFile($"appsettings.{devProfile}.json", optional: true)
             .AddEnvironmentVariables()
             .Build();
 
-        // Obtener connection string
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            throw new InvalidOperationException("No se pudo obtener el connection string para el DbContext.");
-        }
 
-        // Crear options
+        if (string.IsNullOrEmpty(connectionString))
+            throw new InvalidOperationException("No se encontró la cadena de conexión para este perfil.");
+
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
         optionsBuilder.UseNpgsql(connectionString);
 
         return new AppDbContext(optionsBuilder.Options);
     }
 }
+

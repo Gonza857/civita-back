@@ -24,7 +24,8 @@ namespace CivitaBack.Data.Repositorio
 
         public async Task<List<Partida>> ObtenerPartidasConEstructuras()
         {
-            return await _context.Partida.Include(p => p.Recursos).Include(p => p.EstructuraEnMapa)
+            return await _context.Partida.Include(p => p.Recursos)
+                .Include(p => p.EstructuraMapa)
                 .ThenInclude(em => em.Estructura)
                 .ThenInclude(e => e.TipoEstructura)
                 .ToListAsync();

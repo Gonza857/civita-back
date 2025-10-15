@@ -27,20 +27,22 @@ builder.Services.AddCors(options =>
     });
 });
 
+var devProfile = Environment.GetEnvironmentVariable("DEV_PROFILE");
+Console.WriteLine($"Perfil DEV_PROFILE: {devProfile ?? "no definido"}");
+
 // Cargar configuración con perfiles
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("DEV_PROFILE")}.json", optional: true)
+    //.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddJsonFile($"appsettings.{devProfile}.json", optional: true)
     .AddEnvironmentVariables();
-
-Console.WriteLine("Perfil DEV_PROFILE: " + Environment.GetEnvironmentVariable("DEV_PROFILE"));
 
 // Configurar DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    Console.WriteLine($"Cadena de conexión usada: {connectionString}");
     options.UseNpgsql(connectionString);
 });
 
@@ -61,6 +63,12 @@ builder.Services.AddScoped<IUsuarioLogica, UsuarioLogica>();
 
 builder.Services.AddScoped<ILogroPartidaRepositorio, LogroPartidaRepositorio>();
 builder.Services.AddScoped<ILogroPartidaLogica, LogroPartidaLogica>();
+
+builder.Services.AddScoped<IEstructuraMapaLogica, EstructuraMapaLogica>();
+builder.Services.AddScoped<IEstructuraMapaRepositorio, EstructuraMapaRepositorio>();
+
+builder.Services.AddScoped<IEstructuraLogica, EstructuraLogica>();
+builder.Services.AddScoped<IEstructuraRepositorio, EstructuraRepositorio>();
 
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 

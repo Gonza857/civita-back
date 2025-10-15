@@ -13,7 +13,7 @@ public partial class AppDbContext : DbContext
     public DbSet<Evento> Evento { get; set; }
     public DbSet<EventoMaestro> EventoMaestro { get; set; }
     public DbSet<Tienda> Tienda { get; set; }
-    public DbSet<EstructuraEnMapa> EstructuraEnMapa { get; set; }
+    public DbSet<EstructuraMapa> EstructuraMapa { get; set; }
     public DbSet<Tip> Tip { get; set; }
     public DbSet<TipEnPartida> TipEnPartida { get; set; }
     public DbSet<TipoTip> TipoTip { get; set; }
