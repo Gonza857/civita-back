@@ -15,20 +15,27 @@ namespace CivitaBack.Tests;
 
 public class PartidaLogicaTest
 {
-    private readonly Mock<IPartidaRepositorio> _mockRepo;
+    private readonly Mock<IPartidaRepositorio> _mockPartidaRepositorio;
+    private readonly Mock<IRecursoLogica> _mockRecurso;
+
     private readonly IPartidaLogica _partidaLogica;
+    private readonly IRecursoLogica _recursoLogica;
 
     public PartidaLogicaTest()
     {
-        _mockRepo = new Mock<IPartidaRepositorio>();
-        _partidaLogica = new PartidaLogica(_mockRepo.Object);
+        // Creamos los mocks de las dependencias
+        _mockPartidaRepositorio = new Mock<IPartidaRepositorio>();
+        _mockRecurso = new Mock<IRecursoLogica>();
+
+        // Inyectamos los mocks en el constructor de PartidaLogica
+        _partidaLogica = new PartidaLogica(_mockPartidaRepositorio.Object, _mockRecurso.Object);
     }
 
     [Fact]
-    public void CrearPartida_ThrowError_Existente ()
+    public void CrearPartida_ThrowError_Existente()
     {
         // Arrange
-        _mockRepo.Setup(r => r.ObtenerPorUsuarioId(7))
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
          .Returns(new Partida
          {
              Id = 0,
@@ -43,9 +50,9 @@ public class PartidaLogicaTest
     public void CrearPartida_RetornaPartida_OK()
     {
         // Arrange
-        _mockRepo.Setup(r => r.ObtenerPorUsuarioId(7))
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
          .Returns((Partida)null);
-        _mockRepo.Setup(r => r.CrearPartida(It.IsAny<int>()))
+        _mockPartidaRepositorio.Setup(r => r.CrearPartida(It.IsAny<int>()))
          .Returns(new Partida
          {
              Id = 1,
@@ -56,7 +63,7 @@ public class PartidaLogicaTest
         Partida partida = _partidaLogica.CrearPartida(7);
 
         // Assert
-        Assert.NotNull(partida); 
+        Assert.NotNull(partida);
     }
 
     [Fact]
@@ -89,7 +96,7 @@ public class PartidaLogicaTest
             UsuarioId = 7,
         };
 
-        _mockRepo.Setup(r => r.ObtenerPorUsuarioId(7))
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
          .Returns(partidaMock);
 
         // Act
@@ -132,7 +139,7 @@ public class PartidaLogicaTest
         Usuario usuarioMock = null;
         PartidaDTO partidaDTOMock = null;
 
-        _mockRepo.Setup(r => r.ObtenerPorUsuarioId(7))
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
          .Returns(partidaMock);
 
         // Act & Assert
@@ -169,7 +176,7 @@ public class PartidaLogicaTest
             UsuarioId = 7,
         };
 
-        _mockRepo.Setup(r => r.ObtenerPorUsuarioId(7))
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
          .Returns((Partida)null);
 
         // Act & Assert
@@ -206,11 +213,113 @@ public class PartidaLogicaTest
             UsuarioId = 7,
         };
 
-        _mockRepo.Setup(r => r.ObtenerPorUsuarioId(7))
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
          .Returns(partidaMock);
 
         // Act & Assert
         var ex = Assert.Throws<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
+    }
+
+    [Fact]
+    public async Task GuardarMapa_SinEstructuras_OK()
+    {
+        // Arrange
+        Partida partidaMock = new Partida
+        {
+            Id = 1,
+            UsuarioId = 7
+        };
+        GuardarMapaDTO gmdto = new GuardarMapaDTO
+        {
+            Estructuras = new List<EstructuraEnMapaDTO>(),
+            JsonMapa = "{}",
+            PartidaId = partidaMock.Id
+        };
+
+        // Act
+        await _partidaLogica.GuardarMapaAsync(gmdto);
+
+        // Assert
+        _mockPartidaRepositorio.Verify(r => r.ActualizarMapaAsync(gmdto.PartidaId, gmdto.JsonMapa), Times.Once);
+    }
+
+    [Fact]
+    public async Task GuardarMapa_ConEstructuras_OK()
+    {
+        // Arrange
+        Partida partidaMock = new Partida
+        {
+            Id = 1,
+            UsuarioId = 7
+        };
+        EstructuraEnMapaDTO e1 = new EstructuraEnMapaDTO
+        {
+            EstructuraId = 1,
+        };
+        List<EstructuraEnMapaDTO> estructuras = new List<EstructuraEnMapaDTO>();
+        estructuras.Add(e1);
+        GuardarMapaDTO gmdto = new GuardarMapaDTO
+        {
+            Estructuras = estructuras,
+            JsonMapa = "{}",
+            PartidaId = partidaMock.Id
+        };
+
+        // Act
+        await _partidaLogica.GuardarMapaAsync(gmdto);
+
+        // Assert
+        _mockPartidaRepositorio.Verify(r => r.ActualizarMapaAsync(gmdto.PartidaId, gmdto.JsonMapa), Times.Once);
+        _mockPartidaRepositorio.Verify(r => r.ActualizarEstructurasMapaAsync(gmdto.PartidaId, gmdto.Estructuras), Times.Once);
+    }
+
+    [Fact]
+    public async Task GuardarMapa_ConPartidaNull_Falla()
+    {
+        // Arrange
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => _partidaLogica.GuardarMapaAsync(null));
+    }
+
+    [Fact]
+    public async Task ObtenerMapa_OK()
+    {
+        // Arrange
+        Partida partidaMock = new Partida
+        {
+            Id = 1,
+            UsuarioId = 7
+        };
+        _mockPartidaRepositorio
+            .Setup(r => r.ObtenerPartidaConMapaAsync(partidaMock.Id))
+            .ReturnsAsync(partidaMock);
+
+        // Act 
+        Partida p = await _partidaLogica.ObtenerMapaAsync(partidaMock.Id);
+
+        // Assert
+        Assert.NotNull(p);
+    }
+
+    [Fact]
+    public async Task ObtenerMapa_ConIdInexistente_RetornaNull()
+    {
+        // Arrange
+        Partida partidaMock = new Partida
+        {
+            Id = 1,
+            UsuarioId = 7
+        };
+        _mockPartidaRepositorio
+            .Setup(r => r.ObtenerPartidaConMapaAsync(partidaMock.Id))
+            .ReturnsAsync((Partida?)null);
+
+        // Act 
+        Partida? p = await _partidaLogica.ObtenerMapaAsync(partidaMock.Id);
+
+        // Assert
+        Assert.Null(p);
     }
 }
 

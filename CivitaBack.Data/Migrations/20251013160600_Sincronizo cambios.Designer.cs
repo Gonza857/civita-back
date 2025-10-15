@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251013160600_Sincronizo cambios")]
+    partial class Sincronizocambios
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,7 +90,7 @@ namespace CivitaBack.Data.Migrations
                     b.ToTable("Estructura");
                 });
 
-            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraMapa", b =>
+            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraEnMapa", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -119,7 +122,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("EstructuraMapa");
+                    b.ToTable("EstructuraEnMapa");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Evento", b =>
@@ -294,23 +297,10 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("EfectoFiltro")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("ElementoAdicional")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Expresion")
-                        .HasColumnType("text");
-
                     b.Property<string>("Mensaje")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("TipoId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("TipoTipId")
+                    b.Property<int>("TipoTipId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -456,7 +446,7 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("TipoEstructura");
                 });
 
-            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraMapa", b =>
+            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraEnMapa", b =>
                 {
                     b.HasOne("CivitaBack.Data.BO.Estructura", "Estructura")
                         .WithMany("EstructurasEnMapa")
@@ -465,7 +455,7 @@ namespace CivitaBack.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("CivitaBack.Data.BO.Partida", "Partida")
-                        .WithMany("EstructuraMapa")
+                        .WithMany("EstructuraEnMapa")
                         .HasForeignKey("PartidaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -566,8 +556,10 @@ namespace CivitaBack.Data.Migrations
             modelBuilder.Entity("CivitaBack.Data.BO.Tip", b =>
                 {
                     b.HasOne("CivitaBack.Data.BO.TipoTip", "TipoTip")
-                        .WithMany()
-                        .HasForeignKey("TipoTipId");
+                        .WithMany("Tip")
+                        .HasForeignKey("TipoTipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("TipoTip");
                 });
@@ -608,7 +600,7 @@ namespace CivitaBack.Data.Migrations
 
             modelBuilder.Entity("CivitaBack.Data.BO.Partida", b =>
                 {
-                    b.Navigation("EstructuraMapa");
+                    b.Navigation("EstructuraEnMapa");
 
                     b.Navigation("Evento");
 
@@ -629,6 +621,11 @@ namespace CivitaBack.Data.Migrations
             modelBuilder.Entity("CivitaBack.Data.BO.TipoEstructura", b =>
                 {
                     b.Navigation("Estructura");
+                });
+
+            modelBuilder.Entity("CivitaBack.Data.BO.TipoTip", b =>
+                {
+                    b.Navigation("Tip");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Usuario", b =>

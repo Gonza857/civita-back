@@ -17,7 +17,9 @@ public interface IRecursoLogica
     void ConfigurarInicial(Partida partida);
 
     RecursoDTO ObtenerRecursos(int idPartida);
-    
+    void ModificarEnergia(int idPartida, int cantidad);
+
+
 }
 
 public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
@@ -34,10 +36,10 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
     {
         List<Recurso> recursos = new List<Recurso>
         {
-            new Recurso("Energía", 0, partida),
-            new Recurso("Felicidad", 0, partida),
-            new Recurso("EcoCoins", 0, partida),
-            new Recurso("Contaminación", 0, partida)
+            new Recurso("Energía", 100, partida),
+            new Recurso("Felicidad", 60, partida),
+            new Recurso("EcoCoins", 200, partida),
+            new Recurso("Contaminación", 60, partida)
         };
         this.repositorioRecurso.GuardarVarios(recursos);
     }
@@ -63,5 +65,26 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
     public RecursoDTO ToDto(Recurso entidad)
     {
         return new();
+    }
+
+
+public void ModificarEnergia(int idPartida, int cantidad)
+    {
+        // Buscamos el recurso "Energía" de la partida
+        var recurso = repositorioRecurso.ObtenerRecursosPartida(idPartida)
+            .FirstOrDefault(r => r.Nombre == TipoRecurso.Energia.GetDescription());
+
+        if (recurso == null)
+            throw new PartidaExcepcion("No se encontró el recurso Energía para la partida.");
+
+        // Ajustamos el valor
+        recurso.Cantidad += cantidad;
+
+        // Controlamos los límites (0 - 100)
+        if (recurso.Cantidad > 100) recurso.Cantidad = 100;
+        if (recurso.Cantidad < 0) recurso.Cantidad = 0;
+
+        // Guardamos los cambios
+        repositorioRecurso.Actualizar(recurso);
     }
 }
