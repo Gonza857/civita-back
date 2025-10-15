@@ -67,7 +67,7 @@ namespace CivitaBack.Logica
 
             if (recursoPartida == null) return;
 
-            if (recursoPartida.Nombre.Equals("Contaminacion") && recursoPartida.Cantidad > 90)
+            if (recursoPartida.Nombre.Equals("Contaminación") && recursoPartida.Cantidad > 90)
             {
                 var felicidad = partida.Recursos.FirstOrDefault(r => r.Nombre == "Felicidad");
              
