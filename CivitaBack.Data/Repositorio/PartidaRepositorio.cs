@@ -7,41 +7,38 @@ using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
+using CivitaBack.Logica.Excepciones;
 using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
 public interface IPartidaRepositorio
 {
-    // 🧱 Métodos básicos (de la rama desarrollo)
+    Task GuardarCambios();
+    
     Partida ObtenerPorUsuarioId(int IdUsuario);
     Partida CrearPartida(int idUsuario);
     List<Partida> ObtenerPartidas();
     void Guardar(Partida partida);
-    void Actualizar();
-
-    // 🧠 Métodos asincrónicos (de tu rama)
-    Task ActualizarMapaAsync(int partidaId, string jsonMapa);
-    Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraEnMapaDTO> estructuras);
+    
+    Task<bool> ActualizarMapaAsync(Partida partida);
+    
+    Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapaDTO> estructuras);
     Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId);
     Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId);
+    Task<List<EstructuraMapa>> ObtenerEstructurasDeUnMapa(int partidaId);
 }
 
-    public class PartidaRepositorio : IPartidaRepositorio
+    public class PartidaRepositorio : GenericoRepositorio, IPartidaRepositorio
 {
-        private readonly AppDbContext _context;
-
-        public PartidaRepositorio(AppDbContext context)
-        {
-            _context = context;
-        }
-
+        public PartidaRepositorio(AppDbContext context) : base(context) { }
+        
         // --------------------------------------------------------------------
         // 🧱 Métodos básicos (compatibles con rama desarrollo)
         // --------------------------------------------------------------------
-        public void Actualizar()
+        public async Task GuardarCambios()
         {
-            _context.SaveChanges();
+            await base.GuardarCambiosAsync();
         }
 
         public void Guardar(Partida partida)
@@ -98,33 +95,24 @@ public interface IPartidaRepositorio
                 .Include(p => p.Usuario)
                 .FirstOrDefault(p => p.UsuarioId == IdUsuario);
         }
-
-        // --------------------------------------------------------------------
-        // 🧠 Métodos asincrónicos del mapa
-        // --------------------------------------------------------------------
-        public async Task ActualizarMapaAsync(int partidaId, string jsonMapa)
+        
+        public async Task<bool> ActualizarMapaAsync(Partida partida)
         {
-            var partida = await _context.Partida.FindAsync(partidaId);
-            if (partida == null)
-                throw new Exception("No se encontró la partida.");
-
-            partida.JsonMapa = jsonMapa;
-            partida.UltimaVez = DateTime.UtcNow;
-
             _context.Partida.Update(partida);
-            await _context.SaveChangesAsync();
+            var rowsAfectadas = await _context.SaveChangesAsync();
+            return rowsAfectadas > 0;
         }
 
-        public async Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraEnMapaDTO> estructuras)
+        public async Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapaDTO> estructuras)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var existentes = _context.EstructuraEnMapa.Where(e => e.PartidaId == partidaId);
-                _context.EstructuraEnMapa.RemoveRange(existentes);
+                var existentes = _context.EstructuraMapa.Where(e => e.PartidaId == partidaId);
+                _context.EstructuraMapa.RemoveRange(existentes);
                 await _context.SaveChangesAsync();
 
-                var nuevas = estructuras.Select(e => new EstructuraEnMapa
+                var nuevas = estructuras.Select(e => new EstructuraMapa
                 {
                     PartidaId = partidaId,
                     EstructuraId = e.EstructuraId,
@@ -134,21 +122,21 @@ public interface IPartidaRepositorio
                     Height = e.Height
                 });
 
-                await _context.EstructuraEnMapa.AddRangeAsync(nuevas);
+                await _context.EstructuraMapa.AddRangeAsync(nuevas);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
             catch
             {
                 await transaction.RollbackAsync();
-                throw;
+                throw new PersistenciaException("Ocurrió un error al actualizar.");
             }
         }
 
         public async Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId)
         {
             return await _context.Partida
-                .Include(p => p.EstructuraEnMapa)
+                .Include(p => p.EstructuraMapa)
                 .ThenInclude(em => em.Estructura)
                 .FirstOrDefaultAsync(p => p.Id == partidaId);
         }
@@ -156,7 +144,7 @@ public interface IPartidaRepositorio
         public async Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId)
         {
             var partida = await _context.Partida
-                .Include(p => p.EstructuraEnMapa)
+                .Include(p => p.EstructuraMapa)
                 .ThenInclude(em => em.Estructura)
                 .FirstOrDefaultAsync(p => p.Id == partidaId);
 
@@ -179,7 +167,7 @@ public interface IPartidaRepositorio
                 .ToList();
 
             // 🔹 Capas dinámicas a partir de estructuras en la BD
-            var estructuras = partida.EstructuraEnMapa ?? new List<EstructuraEnMapa>();
+            var estructuras = partida.EstructuraMapa ?? new List<EstructuraMapa>();
             var capasDinamicas = new Dictionary<string, List<object>>();
 
             foreach (var e in estructuras)
@@ -222,5 +210,12 @@ public interface IPartidaRepositorio
 
             return JsonSerializer.Serialize(mapaFinal, new JsonSerializerOptions { WriteIndented = true });
         }
+
+    public Task<List<EstructuraMapa>> ObtenerEstructurasDeUnMapa(int partidaId)
+    {
+        return _context.EstructuraMapa
+            .Where(e => e.PartidaId == partidaId)
+            .ToListAsync();    
     }
+}
 

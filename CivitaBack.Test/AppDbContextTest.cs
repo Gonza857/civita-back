@@ -47,7 +47,7 @@ namespace CivitaBack.Tests
             Assert.NotNull(context.Evento);
             Assert.NotNull(context.EventoMaestro);
             Assert.NotNull(context.Tienda);
-            Assert.NotNull(context.EstructuraEnMapa);
+            Assert.NotNull(context.EstructuraMapa);
             Assert.NotNull(context.Tip);
             Assert.NotNull(context.TipEnPartida);
             Assert.NotNull(context.TipoTip);

@@ -20,6 +20,6 @@ namespace CivitaBack.Data.BO
         public int TipoEstructuraId { get; set; }
         public TipoEstructura? TipoEstructura { get; set; }
 
-        public List<EstructuraEnMapa>? EstructurasEnMapa { get; set; }
+        public List<EstructuraMapa>? EstructurasEnMapa { get; set; }
     }
 }

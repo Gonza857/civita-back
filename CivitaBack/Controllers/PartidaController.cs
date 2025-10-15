@@ -14,17 +14,23 @@ namespace CivitaBack.Api.Controllers
         private readonly IRecursoLogica _recursoLogica;
         private readonly IAuthLogica _authLogica;
         private readonly IUsuarioLogica _usuarioLogica;
+        private readonly IEstructuraLogica _estructuraLogica;
+        private readonly IEstructuraMapaLogica _estructuraMapaLogica;
 
         public PartidaController(
             IPartidaLogica partidaLogica,
             IRecursoLogica recursoLogica,
             IAuthLogica authLogica,
-            IUsuarioLogica usuarioLogica)
+            IUsuarioLogica usuarioLogica,
+            IEstructuraLogica el,
+            IEstructuraMapaLogica estructuraMapaLogica)
         {
             _partidaLogica = partidaLogica;
             _recursoLogica = recursoLogica;
             _authLogica = authLogica;
             _usuarioLogica = usuarioLogica;
+            _estructuraLogica = el;
+            _estructuraMapaLogica = estructuraMapaLogica;
         }
 
         // 🧱 Crear partida inicial y configurar recursos
@@ -107,7 +113,7 @@ namespace CivitaBack.Api.Controllers
 
             try
             {
-                await _partidaLogica.GuardarMapaAsync(dto);
+                await _partidaLogica.ActualizarMapaDePartidaAsync(dto);
                 return Ok(new { mensaje = "Mapa guardado correctamente." });
             }
             catch (Exception ex)
@@ -132,7 +138,7 @@ namespace CivitaBack.Api.Controllers
                     partida.UsuarioId,
                     partida.UltimaVez,
                     json = partida.JsonMapa,
-                    estructuras = partida.EstructuraEnMapa?.Select(e => new
+                    estructuras = partida.EstructuraMapa?.Select(e => new
                     {
                         e.Id,
                         e.EstructuraId,
@@ -175,17 +181,37 @@ namespace CivitaBack.Api.Controllers
         public async Task<IActionResult> ActualizarMapa(int partidaId, [FromBody] GuardarMapaDTO dto)
         {
             if (dto == null || dto.PartidaId != partidaId)
-                return BadRequest(new { mensaje = "Datos inválidos o ID de partida no coincide." });
+                return BadRequest("Datos inválidos o ID de partida no coincide.");
 
             try
             {
-                await _partidaLogica.ActualizarMapaAsync(dto);
+                await _partidaLogica.ActualizarMapaDePartidaAsync(dto);
                 return Ok(new { mensaje = "Mapa actualizado correctamente." });
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest("Error al actualizar el mapa: " + ex.Message);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { mensaje = "Error al actualizar el mapa.", detalle = ex.Message });
+                return Problem("Error al actualizar el mapa.");
             }
         }
+
+        // [HttpPost("Colocar/{partidaId}/{estructuraId}/usuario/{idUsuario}")]
+        // public async Task<IActionResult> ColocarEstructura(int partidaId, int estructuraId, int idUsuario)
+        // {
+        //     try
+        //     {
+        //         Partida partida = _partidaLogica.ObtenerCompletaPorUsuarioId(idUsuario);
+        //         Estructura estructura = _estructuraLogica.ObtenerPorId(estructuraId);
+        //         _estructuraMapaLogica.Colocar(estructura, partida);
+        //         return Ok();
+        //     } catch (Exception ex)
+        //     {
+        //         return Problem(ex.Message);
+        //     }
+        //
+        // }
     }
 }

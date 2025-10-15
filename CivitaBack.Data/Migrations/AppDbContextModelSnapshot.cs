@@ -87,7 +87,7 @@ namespace CivitaBack.Data.Migrations
                     b.ToTable("Estructura");
                 });
 
-            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraEnMapa", b =>
+            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraMapa", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -119,7 +119,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("EstructuraEnMapa");
+                    b.ToTable("EstructuraMapa");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Evento", b =>
@@ -456,7 +456,7 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("TipoEstructura");
                 });
 
-            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraEnMapa", b =>
+            modelBuilder.Entity("CivitaBack.Data.BO.EstructuraMapa", b =>
                 {
                     b.HasOne("CivitaBack.Data.BO.Estructura", "Estructura")
                         .WithMany("EstructurasEnMapa")
@@ -465,7 +465,7 @@ namespace CivitaBack.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("CivitaBack.Data.BO.Partida", "Partida")
-                        .WithMany("EstructuraEnMapa")
+                        .WithMany("EstructuraMapa")
                         .HasForeignKey("PartidaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -608,7 +608,7 @@ namespace CivitaBack.Data.Migrations
 
             modelBuilder.Entity("CivitaBack.Data.BO.Partida", b =>
                 {
-                    b.Navigation("EstructuraEnMapa");
+                    b.Navigation("EstructuraMapa");
 
                     b.Navigation("Evento");
 

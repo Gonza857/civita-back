@@ -5,7 +5,7 @@
 namespace CivitaBack.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class TipoTip : Migration
+    public partial class actualizacion151025 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

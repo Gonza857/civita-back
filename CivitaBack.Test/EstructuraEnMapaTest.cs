@@ -9,7 +9,7 @@ namespace CivitaBack.Tests
         public void EstructuraEnMapa_Constructor_InitializesProperties()
         {
             // Act
-            var estructuraEnMapa = new EstructuraEnMapa();
+            var estructuraEnMapa = new EstructuraMapa();
 
             // Assert
             Assert.Equal(0, estructuraEnMapa.Id);
@@ -23,7 +23,7 @@ namespace CivitaBack.Tests
         public void EstructuraEnMapa_SetProperties_ValuesAreSet()
         {
             // Arrange
-            var estructuraEnMapa = new EstructuraEnMapa();
+            var estructuraEnMapa = new EstructuraMapa();
             var partida = new Partida { Id = 1 };
             var estructura = new Estructura { Id = 1 };
 
@@ -46,7 +46,7 @@ namespace CivitaBack.Tests
         public void EstructuraEnMapa_WithNullValues_PropertiesCanBeNull()
         {
             // Arrange
-            var estructuraEnMapa = new EstructuraEnMapa
+            var estructuraEnMapa = new EstructuraMapa
             {
                 Id = 1,
                 PartidaId = 0,
