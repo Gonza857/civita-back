@@ -21,6 +21,9 @@ namespace CivitaBack.Logica
         {
             var partidas = await _cicloRepositorio.ObtenerPartidasConEstructuras();
 
+            if (partidas == null || partidas.Count == 0)
+                return;
+
             foreach (var partida in partidas)
             {
                 ProcesarPartida(partida);
@@ -35,6 +38,10 @@ namespace CivitaBack.Logica
                 
             foreach (var estructuraEnMapa in partida.EstructuraMapa)
             {
+
+                if (estructuraEnMapa.Estructura == null || estructuraEnMapa.Estructura.TipoEstructura == null)
+                    continue;
+
                 var estructura = estructuraEnMapa.Estructura;
                 var tipoEstructura = estructura.TipoEstructura;
 
@@ -45,14 +52,13 @@ namespace CivitaBack.Logica
 
                 if (tipoEstructura.Capacidad > 0)
                     nuevaPoblacion += tipoEstructura.Capacidad;
-
             }
-
-            var poblacionFinal = partida.Recursos.FirstOrDefault(r => r.Nombre == "Poblacion");
-            if (poblacionFinal != null)
-            {
-                poblacionFinal.Cantidad = nuevaPoblacion;
-            }
+                var poblacionFinal = partida.Recursos.FirstOrDefault(r => r.Nombre == "Poblacion");
+                if (poblacionFinal != null)
+                {
+                    poblacionFinal.Cantidad = nuevaPoblacion;
+                }
+            
         }
 
         private void ActualizarRecurso(Partida partida, string recurso, int cambio)
@@ -60,6 +66,14 @@ namespace CivitaBack.Logica
             var recursoPartida = partida.Recursos.FirstOrDefault(r => r.Nombre == recurso);
 
             if (recursoPartida == null) return;
+
+            if (recursoPartida.Nombre.Equals("Contaminacion") && recursoPartida.Cantidad > 90)
+            {
+                var felicidad = partida.Recursos.FirstOrDefault(r => r.Nombre == "Felicidad");
+             
+                if (felicidad != null && felicidad.Cantidad >= 5)
+                    felicidad.Cantidad -= 5;
+            }
 
             recursoPartida.Cantidad += cambio;
 

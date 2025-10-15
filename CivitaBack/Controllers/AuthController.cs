@@ -15,12 +15,14 @@ namespace CivitaBack.Api.Controllers
         private readonly IAuthLogica _authLogica;
         private readonly IPartidaLogica _partidaLogica;
         private readonly IUsuarioLogica _usuarioLogica;
+        private readonly IRecursoLogica _recursoLogica;
 
-        public AuthController(IAuthLogica authLogica , IPartidaLogica partidaLogica, IUsuarioLogica usuarioLogica)
+        public AuthController(IAuthLogica authLogica , IPartidaLogica partidaLogica, IUsuarioLogica usuarioLogica, IRecursoLogica recursoLogica)
         {
             _authLogica = authLogica;
             _partidaLogica = partidaLogica;
             _usuarioLogica = usuarioLogica;
+            _recursoLogica = recursoLogica;
         }
 
         [HttpPost("registro")]
@@ -30,7 +32,9 @@ namespace CivitaBack.Api.Controllers
             {
                 var usuario = await _authLogica.RegistrarUsuarioAsync(request.NombreUsuario, request.Mail, request.Password);
 
-                _partidaLogica.CrearPartida(usuario.Id);
+                var partida = _partidaLogica.CrearPartida(usuario.Id);
+                
+                _recursoLogica.ConfigurarInicial(partida);
 
                 return Ok(new { mensaje = "Usuario registrado correctamente!", usuario });
             }
