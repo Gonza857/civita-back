@@ -194,20 +194,20 @@ namespace CivitaBack.Api.Controllers
             }
         }
 
-        [HttpPost("Colocar/{partidaId}/{estructuraId}/usuario/{idUsuario}")]
-        public async Task<IActionResult> ColocarEstructura(int partidaId, int estructuraId, int idUsuario)
-        {
-            try
-            {
-                Partida partida = _partidaLogica.ObtenerCompletaPorUsuarioId(idUsuario);
-                Estructura estructura = _estructuraLogica.ObtenerPorId(estructuraId);
-                _estructuraMapaLogica.Colocar(estructura, partida);
-                return Ok();
-            } catch (Exception ex)
-            {
-                return Problem(ex.Message);
-            }
-
-        }
+        // [HttpPost("Colocar/{partidaId}/{estructuraId}/usuario/{idUsuario}")]
+        // public async Task<IActionResult> ColocarEstructura(int partidaId, int estructuraId, int idUsuario)
+        // {
+        //     try
+        //     {
+        //         Partida partida = _partidaLogica.ObtenerCompletaPorUsuarioId(idUsuario);
+        //         Estructura estructura = _estructuraLogica.ObtenerPorId(estructuraId);
+        //         _estructuraMapaLogica.Colocar(estructura, partida);
+        //         return Ok();
+        //     } catch (Exception ex)
+        //     {
+        //         return Problem(ex.Message);
+        //     }
+        //
+        // }
     }
 }

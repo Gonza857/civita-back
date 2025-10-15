@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251013030340_cambio_nombre_estructura_mapa8")]
-    partial class cambio_nombre_estructura_mapa8
+    [Migration("20251015142557_actualizacion-151025")]
+    partial class actualizacion151025
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -297,10 +297,23 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Mensaje")
+                    b.Property<bool>("EfectoFiltro")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ElementoAdicional")
                         .HasColumnType("text");
 
-                    b.Property<int>("TipoTipId")
+                    b.Property<string>("Expresion")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Mensaje")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TipoId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TipoTipId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -556,10 +569,8 @@ namespace CivitaBack.Data.Migrations
             modelBuilder.Entity("CivitaBack.Data.BO.Tip", b =>
                 {
                     b.HasOne("CivitaBack.Data.BO.TipoTip", "TipoTip")
-                        .WithMany("Tip")
-                        .HasForeignKey("TipoTipId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("TipoTipId");
 
                     b.Navigation("TipoTip");
                 });
@@ -621,11 +632,6 @@ namespace CivitaBack.Data.Migrations
             modelBuilder.Entity("CivitaBack.Data.BO.TipoEstructura", b =>
                 {
                     b.Navigation("Estructura");
-                });
-
-            modelBuilder.Entity("CivitaBack.Data.BO.TipoTip", b =>
-                {
-                    b.Navigation("Tip");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Usuario", b =>

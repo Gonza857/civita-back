@@ -231,7 +231,7 @@ public class PartidaLogicaTest
         };
         GuardarMapaDTO gmdto = new GuardarMapaDTO
         {
-            Estructuras = new List<EstructuraEnMapaDTO>(),
+            Estructuras = new List<EstructuraMapaDTO>(),
             JsonMapa = "{}",
             PartidaId = partidaMock.Id
         };
@@ -252,11 +252,11 @@ public class PartidaLogicaTest
             Id = 1,
             UsuarioId = 7
         };
-        EstructuraEnMapaDTO e1 = new EstructuraEnMapaDTO
+        EstructuraMapaDTO e1 = new EstructuraMapaDTO
         {
             EstructuraId = 1,
         };
-        List<EstructuraEnMapaDTO> estructuras = new List<EstructuraEnMapaDTO>();
+        List<EstructuraMapaDTO> estructuras = new List<EstructuraMapaDTO>();
         estructuras.Add(e1);
         GuardarMapaDTO gmdto = new GuardarMapaDTO
         {

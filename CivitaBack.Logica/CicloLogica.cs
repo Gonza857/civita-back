@@ -33,7 +33,7 @@ namespace CivitaBack.Logica
         {
             int nuevaPoblacion = 0;
                 
-            foreach (var estructuraEnMapa in partida.EstructuraEnMapa)
+            foreach (var estructuraEnMapa in partida.EstructuraMapa)
             {
                 var estructura = estructuraEnMapa.Estructura;
                 var tipoEstructura = estructura.TipoEstructura;
