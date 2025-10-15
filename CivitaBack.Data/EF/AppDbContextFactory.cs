@@ -9,22 +9,19 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 {
     public AppDbContext CreateDbContext(string[] args)
     {
-        // Leer el perfil actual (por ejemplo: Gonza)
-        var devProfile = Environment.GetEnvironmentVariable("DEV_PROFILE");
-        Console.WriteLine($"Perfil DEV_PROFILE detectado: {devProfile ?? "no definido"}");
+        // Perfil dev, opcional
+        var devProfile = Environment.GetEnvironmentVariable("DEV_PROFILE") ?? "DevGonza";
 
-        // Buscar el directorio donde está el proyecto .API
-        var basePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "CivitaBack.API");
+        // Tomar la ruta absoluta del proyecto API
+        var solutionDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "CivitaBack"));
 
-        // Construir configuración desde el .API
         var configuration = new ConfigurationBuilder()
-            .SetBasePath(basePath)
+            .SetBasePath(solutionDir)
             .AddJsonFile("appsettings.json", optional: false)
             .AddJsonFile($"appsettings.{devProfile}.json", optional: true)
             .AddEnvironmentVariables()
             .Build();
 
-        // Obtener la cadena de conexión
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         if (string.IsNullOrEmpty(connectionString))
@@ -33,7 +30,7 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
         optionsBuilder.UseNpgsql(connectionString);
 
-        Console.WriteLine($"Conectando a: {connectionString}");
         return new AppDbContext(optionsBuilder.Options);
     }
 }
+
