@@ -113,7 +113,7 @@ namespace CivitaBack.Api.Controllers
 
             try
             {
-                await _partidaLogica.GuardarMapaAsync(dto);
+                await _partidaLogica.ActualizarMapaDePartidaAsync(dto);
                 return Ok(new { mensaje = "Mapa guardado correctamente." });
             }
             catch (Exception ex)
@@ -185,7 +185,7 @@ namespace CivitaBack.Api.Controllers
 
             try
             {
-                await _partidaLogica.ActualizarMapaAsync(dto);
+                await _partidaLogica.ActualizarMapaDePartidaAsync(dto);
                 return Ok(new { mensaje = "Mapa actualizado correctamente." });
             }
             catch (PartidaExcepcion ex)

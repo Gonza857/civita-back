@@ -13,8 +13,7 @@ public interface IEstructuraMapaRepositorio
     void AgregarUnica(EstructuraMapa em);
     void RemoverEliminadas(List<EstructuraMapa> emList);
     void AgregarNuevas(List<EstructuraMapa> emList);
-
-    void GuardarCambios();
+    Task GuardarCambios();
 }
 
 public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRepositorio

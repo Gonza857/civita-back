@@ -17,6 +17,7 @@ public class PartidaLogicaTest
 {
     private readonly Mock<IPartidaRepositorio> _mockPartidaRepositorio;
     private readonly Mock<IRecursoLogica> _mockRecurso;
+    private readonly Mock<IEstructuraMapaRepositorio> _mockRepoEstructuraMapa;
 
     private readonly IPartidaLogica _partidaLogica;
     private readonly IRecursoLogica _recursoLogica;
@@ -26,9 +27,14 @@ public class PartidaLogicaTest
         // Creamos los mocks de las dependencias
         _mockPartidaRepositorio = new Mock<IPartidaRepositorio>();
         _mockRecurso = new Mock<IRecursoLogica>();
+        _mockRepoEstructuraMapa = new Mock<IEstructuraMapaRepositorio>();
 
         // Inyectamos los mocks en el constructor de PartidaLogica
-        _partidaLogica = new PartidaLogica(_mockPartidaRepositorio.Object, _mockRecurso.Object);
+        _partidaLogica = new PartidaLogica(
+            _mockPartidaRepositorio.Object, 
+            _mockRecurso.Object,
+            _mockRepoEstructuraMapa.Object
+        );
     }
 
     [Fact]
@@ -143,7 +149,7 @@ public class PartidaLogicaTest
          .Returns(partidaMock);
 
         // Act & Assert
-        var ex = Assert.Throws<ErrorInternoExcepction>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
+        Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
     }
 
     [Fact]
@@ -180,7 +186,7 @@ public class PartidaLogicaTest
          .Returns((Partida)null);
 
         // Act & Assert
-        var ex = Assert.Throws<ErrorInternoExcepction>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
+        Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
     }
 
     [Fact]
@@ -217,7 +223,7 @@ public class PartidaLogicaTest
          .Returns(partidaMock);
 
         // Act & Assert
-        var ex = Assert.Throws<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
+        Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
     }
 
     [Fact]
@@ -235,12 +241,17 @@ public class PartidaLogicaTest
             JsonMapa = "{}",
             PartidaId = partidaMock.Id
         };
+        
+        _mockPartidaRepositorio
+            .Setup(r => r.ObtenerPartidaConMapaAsync(partidaMock.Id))
+            .ReturnsAsync(partidaMock);
 
         // Act
-        await _partidaLogica.GuardarMapaAsync(gmdto);
+        await _partidaLogica.ActualizarMapaDePartidaAsync(gmdto);
 
         // Assert
-        _mockPartidaRepositorio.Verify(r => r.ActualizarMapaAsync(gmdto.PartidaId, gmdto.JsonMapa), Times.Once);
+        _mockPartidaRepositorio.Verify(r => r.ObtenerPartidaConMapaAsync(partidaMock.Id), Times.Once);
+        _mockPartidaRepositorio.Verify(r => r.ActualizarMapaAsync(partidaMock), Times.Once);
     }
 
     [Fact]
@@ -264,13 +275,28 @@ public class PartidaLogicaTest
             JsonMapa = "{}",
             PartidaId = partidaMock.Id
         };
+        List<EstructuraMapa> estructurasMock = new List<EstructuraMapa>()
+        {
+            new EstructuraMapa{PartidaId = partidaMock.Id},
+            new EstructuraMapa{PartidaId = partidaMock.Id},
+            new EstructuraMapa{PartidaId = partidaMock.Id},
+            new EstructuraMapa { PartidaId = partidaMock.Id }
+        };
+        
+        _mockPartidaRepositorio
+            .Setup(r => r.ObtenerPartidaConMapaAsync(partidaMock.Id))
+            .ReturnsAsync(partidaMock);
+        _mockPartidaRepositorio
+            .Setup(r => r.ObtenerEstructurasDeUnMapa(partidaMock.Id))
+            .ReturnsAsync(estructurasMock);
 
         // Act
-        await _partidaLogica.GuardarMapaAsync(gmdto);
+        await _partidaLogica.ActualizarMapaDePartidaAsync(gmdto);
 
         // Assert
-        _mockPartidaRepositorio.Verify(r => r.ActualizarMapaAsync(gmdto.PartidaId, gmdto.JsonMapa), Times.Once);
-        _mockPartidaRepositorio.Verify(r => r.ActualizarEstructurasMapaAsync(gmdto.PartidaId, gmdto.Estructuras), Times.Once);
+        _mockPartidaRepositorio.Verify(r => r.ObtenerPartidaConMapaAsync(partidaMock.Id), Times.Once);
+        _mockPartidaRepositorio.Verify(r => r.ObtenerEstructurasDeUnMapa(partidaMock.Id), Times.Once);
+        _mockPartidaRepositorio.Verify(r => r.GuardarCambios(), Times.Once);
     }
 
     [Fact]
@@ -279,7 +305,7 @@ public class PartidaLogicaTest
         // Arrange
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => _partidaLogica.GuardarMapaAsync(null));
+        await Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.ActualizarMapaDePartidaAsync(null));
     }
 
     [Fact]
