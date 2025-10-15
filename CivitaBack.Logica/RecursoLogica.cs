@@ -36,8 +36,8 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
     {
         List<Recurso> recursos = new List<Recurso>
         {
-            new Recurso("Energía", 100, partida),
-            new Recurso("Felicidad", 60, partida),
+            new Recurso("Energia", 100, partida),
+            new Recurso("Felicidad", 50, partida),
             new Recurso("EcoCoins", 200, partida),
             new Recurso("Contaminación", 60, partida)
         };
