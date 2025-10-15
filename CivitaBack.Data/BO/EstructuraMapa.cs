@@ -12,7 +12,6 @@ public class EstructuraMapa
     // Relaciones
     public int PartidaId { get; set; }
     public Partida? Partida { get; set; }
-
     public int EstructuraId { get; set; }
     public Estructura? Estructura { get; set; }
 

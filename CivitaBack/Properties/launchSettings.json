@@ -20,7 +20,7 @@
         "DEV_PROFILE": "DevGonza"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:5289;http://localhost:7116"
+      "applicationUrl": "https://localhost:7116"
     },
     "IIS Express": {
       "commandName": "IISExpress",

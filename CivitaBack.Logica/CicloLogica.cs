@@ -45,10 +45,10 @@ namespace CivitaBack.Logica
                 var estructura = estructuraEnMapa.Estructura;
                 var tipoEstructura = estructura.TipoEstructura;
 
-                ActualizarRecurso(partida, "Energia", tipoEstructura.EnergiaPorCiclo);
+                ActualizarRecurso(partida, "Energía", tipoEstructura.EnergiaPorCiclo);
                 ActualizarRecurso(partida, "EcoCoins", tipoEstructura.DineroPorCiclo);
                 ActualizarRecurso(partida, "Felicidad", estructura.FelicidadCiclo);
-                ActualizarRecurso(partida, "Contaminacion", estructura.ContaminacionCiclo);
+                ActualizarRecurso(partida, "Contaminación", estructura.ContaminacionCiclo);
 
                 if (tipoEstructura.Capacidad > 0)
                     nuevaPoblacion += tipoEstructura.Capacidad;

@@ -97,6 +97,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
+// Aquí, después de construir la app, aseguramos que la DB exista
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.Migrate(); // Aplica solo las migraciones pendientes
+}
+
 // Pipeline
 if (app.Environment.IsDevelopment())
 {
