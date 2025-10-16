@@ -42,7 +42,6 @@ builder.Configuration
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    Console.WriteLine($"Cadena de conexión usada: {connectionString}");
     options.UseNpgsql(connectionString);
 });
 
