@@ -8,22 +8,29 @@ public class Recurso
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
-
-    public string? Nombre { get; set; }
-    public int Cantidad { get; set; }
-
+    public int Energia { get; set; }
+    public int Contaminacion { get; set; }
+    public int Felicidad { get; set; }
+    public int EcoCoins { get; set; }
+    public int Poblacion { get; set; }
     public int PartidaId { get; set; }
     public Partida? Partida { get; set; }
 
-    // Constructor
-    public Recurso(string nombre, int cantidad, Partida partida)
+    public Recurso() { }
+
+    public Recurso(
+        int energia, 
+        int contaminacion, 
+        int felicidad, 
+        int ecoCoins, 
+        Partida partida)
     {
-        Nombre = nombre;
-        Cantidad = cantidad;
-        Partida = partida;
+        Energia = energia;
+        Contaminacion = contaminacion;
+        Felicidad = felicidad;
+        EcoCoins = ecoCoins;
         PartidaId = partida.Id;
     }
 
-    // Constructor vacío requerido por EF
-    public Recurso() { }
+    
 }

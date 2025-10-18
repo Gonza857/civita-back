@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CivitaBack.Logica.Excepciones;
 
 namespace CivitaBack.Logica
 {
@@ -13,7 +14,7 @@ namespace CivitaBack.Logica
     public interface IUsuarioLogica
     {
         Task<Usuario> ObtenerPorId(int id);
-        Task<Usuario> ObtenerUsuarioPorNombre(string nombre);
+        Task<Usuario?> ObtenerUsuarioPorNombre(string nombre);
 
     }
     public class UsuarioLogica : IUsuarioLogica
@@ -32,10 +33,10 @@ namespace CivitaBack.Logica
             return usuario;
         }
 
-        public async Task<Usuario> ObtenerUsuarioPorNombre(string nombre)
+        public async Task<Usuario?> ObtenerUsuarioPorNombre(string nombre)
         {
             Usuario usuario = await _repositorioUsuario.ObtenerUsuarioPorNombre(nombre);
-            if (usuario == null) throw new Exception("No se encontró el usuario");
+            // if (usuario == null) throw new UsuarioExcepcion("No se encontró el usuario");
             return usuario;
         }
 

@@ -38,42 +38,42 @@ public class PartidaLogicaTest
     }
 
     [Fact]
-    public void CrearPartida_ThrowError_Existente()
+    public async void CrearPartida_ThrowError_Existente()
     {
         // Arrange
         _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
-         .Returns(new Partida
+         .ReturnsAsync(new Partida
          {
              Id = 0,
              UsuarioId = 7,
          });
 
         // Act & Assert
-        var ex = Assert.Throws<PartidaExcepcion>(() => _partidaLogica.CrearPartida(7));
+        var ex = await Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.CrearPartida(7));
     }
 
     [Fact]
-    public void CrearPartida_RetornaPartida_OK()
+    public async void CrearPartida_RetornaPartida_OK()
     {
         // Arrange
         _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
-         .Returns((Partida)null);
+         .ReturnsAsync((Partida)null);
         _mockPartidaRepositorio.Setup(r => r.CrearPartida(It.IsAny<int>()))
-         .Returns(new Partida
+         .ReturnsAsync(new Partida
          {
              Id = 1,
              UsuarioId = 7
          });
 
         // Act
-        Partida partida = _partidaLogica.CrearPartida(7);
+        Partida partida = await _partidaLogica.CrearPartida(7);
 
         // Assert
         Assert.NotNull(partida);
     }
 
     [Fact]
-    public void Actualizar_SaleOK()
+    public async void Actualizar_SaleOK()
     {
         // Arrange
         Partida partidaMock = new Partida
@@ -81,12 +81,14 @@ public class PartidaLogicaTest
             Id = 1,
             UsuarioId = 7
         };
-        List<Recurso> recursosMock = new List<Recurso>
+        Recurso recursosMock = new Recurso
         {
-            new Recurso("Energía", 0, partidaMock),
-            new Recurso("Felicidad", 0, partidaMock),
-            new Recurso("EcoCoins", 0, partidaMock),
-            new Recurso("Contaminación", 0, partidaMock)
+            Partida = partidaMock,
+            EcoCoins = 0,
+            Contaminacion = 0,
+            Energia = 0,
+            Felicidad = 0,
+            Poblacion = 0,
         };
         partidaMock.Recursos = recursosMock;
         Usuario usuarioMock = new Usuario
@@ -103,30 +105,20 @@ public class PartidaLogicaTest
         };
 
         _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
-         .Returns(partidaMock);
+         .ReturnsAsync(partidaMock);
 
         // Act
-        _partidaLogica.Actualizar(partidaDTOMock, usuarioMock);
-
-        var energia = partidaMock.Recursos
-           .FirstOrDefault(r => r.Nombre == TipoRecurso.Energia.GetDescription());
-        var felicidad = partidaMock.Recursos
-            .FirstOrDefault(r => r.Nombre == TipoRecurso.Felicidad.GetDescription());
-        var ecoCoins = partidaMock.Recursos
-            .FirstOrDefault(r => r.Nombre == TipoRecurso.EcoCoins.GetDescription());
-        var contaminacion = partidaMock.Recursos
-            .FirstOrDefault(r => r.Nombre == TipoRecurso.Contaminacion.GetDescription());
-
-
+        await _partidaLogica.Actualizar(partidaDTOMock, usuarioMock);
+        
         // Assert
-        Assert.Equal(energia.Cantidad, partidaDTOMock.Energia);
-        Assert.Equal(felicidad.Cantidad, partidaDTOMock.Felicidad);
-        Assert.Equal(ecoCoins.Cantidad, partidaDTOMock.EcoCoins);
-        Assert.Equal(contaminacion.Cantidad, partidaDTOMock.Contaminacion);
+        Assert.Equal(partidaMock.Recursos.Energia, partidaDTOMock.Energia);
+        Assert.Equal(partidaMock.Recursos.Felicidad, partidaDTOMock.Felicidad);
+        Assert.Equal(partidaMock.Recursos.EcoCoins, partidaDTOMock.EcoCoins);
+        Assert.Equal(partidaMock.Recursos.Contaminacion, partidaDTOMock.Contaminacion);
     }
 
     [Fact]
-    public void Actualizar_CuandoPartidaYUsuarioSonNull_LanzaError()
+    public async void Actualizar_CuandoPartidaYUsuarioSonNull_LanzaError()
     {
         // Arrange
         Partida partidaMock = new Partida
@@ -134,26 +126,28 @@ public class PartidaLogicaTest
             Id = 1,
             UsuarioId = 7
         };
-        List<Recurso> recursosMock = new List<Recurso>
+        Recurso recursosMock = new Recurso
         {
-            new Recurso("Energía", 0, partidaMock),
-            new Recurso("Felicidad", 0, partidaMock),
-            new Recurso("EcoCoins", 0, partidaMock),
-            new Recurso("Contaminación", 0, partidaMock)
+            Partida = partidaMock,
+            EcoCoins = 0,
+            Contaminacion = 0,
+            Energia = 0,
+            Felicidad = 0,
+            Poblacion = 0,
         };
         partidaMock.Recursos = recursosMock;
         Usuario usuarioMock = null;
         PartidaDTO partidaDTOMock = null;
 
         _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
-         .Returns(partidaMock);
+         .ReturnsAsync(partidaMock);
 
         // Act & Assert
-        Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
+        await Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
     }
 
     [Fact]
-    public void Actualizar_CuandoNoSeEncuentraPartida_LanzaError()
+    public async void Actualizar_CuandoNoSeEncuentraPartida_LanzaError()
     {
         // Arrange
         Partida partidaMock = new Partida
@@ -161,12 +155,14 @@ public class PartidaLogicaTest
             Id = 1,
             UsuarioId = 7
         };
-        List<Recurso> recursosMock = new List<Recurso>
+        Recurso recursosMock = new Recurso
         {
-            new Recurso("Energía", 0, partidaMock),
-            new Recurso("Felicidad", 0, partidaMock),
-            new Recurso("EcoCoins", 0, partidaMock),
-            new Recurso("Contaminación", 0, partidaMock)
+            Partida = partidaMock,
+            EcoCoins = 0,
+            Contaminacion = 0,
+            Energia = 0,
+            Felicidad = 0,
+            Poblacion = 0,
         };
         partidaMock.Recursos = recursosMock;
         Usuario usuarioMock = new Usuario
@@ -183,14 +179,14 @@ public class PartidaLogicaTest
         };
 
         _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
-         .Returns((Partida)null);
+         .ReturnsAsync((Partida)null);
 
         // Act & Assert
-        Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
+        await Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
     }
 
     [Fact]
-    public void Actualizar_CuandoRecursosNegativos_LanzaError()
+    public async void Actualizar_CuandoRecursosNegativos_LanzaError()
     {
         // Arrange
         Partida partidaMock = new Partida
@@ -198,12 +194,14 @@ public class PartidaLogicaTest
             Id = 1,
             UsuarioId = 7
         };
-        List<Recurso> recursosMock = new List<Recurso>
+        Recurso recursosMock = new Recurso
         {
-            new Recurso("Energía", 0, partidaMock),
-            new Recurso("Felicidad", 0, partidaMock),
-            new Recurso("EcoCoins", 0, partidaMock),
-            new Recurso("Contaminación", 0, partidaMock)
+            Partida = partidaMock,
+            EcoCoins = 0,
+            Contaminacion = 0,
+            Energia = 0,
+            Felicidad = 0,
+            Poblacion = 0,
         };
         partidaMock.Recursos = recursosMock;
         Usuario usuarioMock = new Usuario
@@ -220,10 +218,10 @@ public class PartidaLogicaTest
         };
 
         _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
-         .Returns(partidaMock);
+         .ReturnsAsync(partidaMock);
 
         // Act & Assert
-        Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
+        await Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDTOMock, usuarioMock));
     }
 
     [Fact]

@@ -12,17 +12,19 @@ namespace CivitaBack.Api.Controllers
     {
 
         private readonly IRecursoLogica _recursoLogica;
-        public RecursosController(IRecursoLogica rl)
+        private readonly ILogger<RecursosController> _logger;
+        public RecursosController(IRecursoLogica rl, ILogger<RecursosController> logger)
         {
             this._recursoLogica = rl;
+            this._logger = logger;
         }
 
         [HttpGet("{idPartida}")]
-        public IActionResult GetRecursosPartida(int idPartida)
+        public async Task<IActionResult> GetRecursosPartida(int idPartida)
         {
             try
             {
-                RecursoDTO recursos = this._recursoLogica.ObtenerRecursos(idPartida);
+                RecursoDTO recursos = await this._recursoLogica.ObtenerRecursos(idPartida);
                 return Ok(recursos);
             }
             catch (PartidaExcepcion ex)
@@ -31,44 +33,47 @@ namespace CivitaBack.Api.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return Problem("Ocurrió un error");
             }
         }
 
         //  Aumentar energía
         [HttpPost("subirEnergia/{idPartida}")]
-        public IActionResult SubirEnergia(int idPartida)
+        public async Task<IActionResult> SubirEnergia(int idPartida)
         {
             try
             {
-                _recursoLogica.ModificarEnergia(idPartida, 10);
+                await _recursoLogica.ModificarEnergia(idPartida, 10);
                 return Ok(new { mensaje = "Energía aumentada correctamente." });
             }
             catch (PartidaExcepcion ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return Problem("Ocurrió un error al modificar la energía.");
             }
         }
 
         //  Reducir energía
         [HttpPost("bajarEnergia/{idPartida}")]
-        public IActionResult BajarEnergia(int idPartida)
+        public async Task<IActionResult> BajarEnergia(int idPartida)
         {
             try
             {
-                _recursoLogica.ModificarEnergia(idPartida, -10);
+                await _recursoLogica.ModificarEnergia(idPartida, -10);
                 return Ok(new { mensaje = "Energía reducida correctamente." });
             }
             catch (PartidaExcepcion ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return Problem("Ocurrió un error al modificar la energía.");
             }
         }

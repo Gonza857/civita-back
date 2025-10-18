@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Logging;
 
 namespace CivitaBack.Data.BO
 {
@@ -21,7 +20,7 @@ namespace CivitaBack.Data.BO
 
         // Relaciones
         [JsonIgnore]
-        public List<Recurso>? Recursos { get; set; }
+        public Recurso? Recursos { get; set; }
         public List<Evento>? Evento { get; set; }
         public List<Tienda>? Tienda { get; set; }
         public List<EstructuraMapa>? EstructuraMapa { get; set; }

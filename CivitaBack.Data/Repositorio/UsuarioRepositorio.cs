@@ -13,7 +13,7 @@ namespace CivitaBack.Data.Repositorio
     public interface IUsuarioRepositorio
     {
         Task<Usuario> ObtenerUsuarioPorMail(string mail);
-        Task<Usuario> ObtenerUsuarioPorNombre(string nombreUsuario);
+        Task<Usuario?> ObtenerUsuarioPorNombre(string nombreUsuario);
         Task<Usuario> CrearUsuario(Usuario usuario);
 
         Task<Usuario> ObtenerPorId(int id);
@@ -36,9 +36,11 @@ namespace CivitaBack.Data.Repositorio
             return await _context.Usuario.AsNoTracking().FirstOrDefaultAsync(u => u.Mail == mail);
         }
 
-        public async Task<Usuario> ObtenerUsuarioPorNombre(string nombreUsuario)
+        public async Task<Usuario?> ObtenerUsuarioPorNombre(string nombreUsuario)
         {
-            return await _context.Usuario.AsNoTracking().FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
+            return await _context.Usuario
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
         }
 
         public async Task<Usuario> CrearUsuario(Usuario usuario)

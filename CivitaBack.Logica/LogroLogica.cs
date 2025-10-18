@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Logica.Excepciones;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
 
 public interface ILogroLogica
 {
-    LogroDTO ObtenerPorId(int Id);
-    LogroDTO Guardar(LogroDTO entidad);
-    List<LogroDTO> ObtenerListado();
-    void Eliminar(int Id);
+    Task<LogroDTO> ObtenerPorId(int Id);
+    Task<LogroDTO> Guardar(LogroDTO entidad);
+    Task<List<LogroDTO>> ObtenerListado();
+    Task Eliminar(int Id);
 
-    void Actualizar(LogroDTO logroDTO, int id);
+    Task Actualizar(LogroDTO logroDTO, int id);
 }
 
 public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
@@ -31,32 +32,59 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
         repositorioTipoLogro = itlr;
     }
 
-    public void Actualizar(LogroDTO logroDTO, int id)
+    /// <summary>
+    /// Valida los datos entrantes del DTO
+    /// </summary>
+    /// <param name="logroDTO">LogroDTO</param>
+    private void ValidarLogro(LogroDTO logroDTO)
     {
-        if (logroDTO == null || id == null) throw new Exception("Ocurrió un error al actualizar el Logro");
-        Logro logroBuscado = this.repositorioLogro.ObtenerPorId(id);
-        var tipoLogroBuscado = this.repositorioTipoLogro.ObtenerPorId(logroDTO.TipoId);
-        if (logroBuscado == null || tipoLogroBuscado == null) throw new Exception("Ocurrió un error al actualizar el Logro");
+        if (logroDTO == null) 
+            throw new LogroExcepcion("Ocurrió un error al actualizar el Logro");
+    }
+
+    /// <summary>
+    /// Actualiza un logro
+    /// </summary>
+    /// <param name="logroDTO">LogroDTO</param>
+    /// /// <param name="id">Id Logro</param>
+    public async Task Actualizar(LogroDTO logroDTO, int id)
+    {
+        this.ValidarLogro(logroDTO);
+        Logro logroBuscado = await this.repositorioLogro.ObtenerPorId(id);
+        var tipoLogroBuscado = await this.repositorioTipoLogro.ObtenerPorId(logroDTO.TipoId);
+        
+        if (logroBuscado == null || tipoLogroBuscado == null) 
+            throw new LogroExcepcion("Ocurrió un error al actualizar el Logro");
 
         logroBuscado.Titulo = logroDTO.Titulo;
         logroBuscado.Descripcion = logroDTO.Descripcion;
         logroBuscado.Titulo = logroDTO.Titulo;
         logroBuscado.TipoLogro = tipoLogroBuscado;
 
-        this.repositorioLogro.Actualizar();
+        await this.repositorioLogro.Actualizar(logroBuscado);
     }
 
-    public void Eliminar(int Id)
+    /// <summary>
+    /// Elimina un logro
+    /// </summary>
+    /// <param name="id">Id Logro</param>
+    public async Task Eliminar(int id)
     {
-        if (Id == null) throw new Exception("No se pudo borrar el Logro");
-        this.repositorioLogro.Eliminar(Id);
+        if (id <= 0) 
+            throw new LogroExcepcion("No se pudo borrar el Logro");
+        await this.repositorioLogro.Eliminar(id);
     }
 
-    public LogroDTO Guardar(LogroDTO entidad)
+    /// <summary>
+    /// Guarda un logro
+    /// </summary>
+    /// <param name="logroDTO">LogroDTO</param>
+    public async Task<LogroDTO> Guardar(LogroDTO entidad)
     {
-        if (entidad == null) throw new Exception("No se pudo guardar el Logro");
-        TipoLogro tipoLogro = this.repositorioTipoLogro.ObtenerPorId(entidad.TipoId);
-        if (tipoLogro == null) throw new Exception("No se pudo guardar el Logro");
+        this.ValidarLogro(entidad);
+        TipoLogro? tipoLogro = await this.repositorioTipoLogro.ObtenerPorId(entidad.TipoId);
+        if (tipoLogro == null) 
+            throw new LogroExcepcion("No se pudo guardar el Logro");
 
         var logro = new Logro
         {
@@ -65,25 +93,38 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
             TipoLogro = tipoLogro
             
         };
-        this.repositorioLogro.Guardar(logro);
+        
+        await this.repositorioLogro.Guardar(logro);
         return this.ToDto(logro);
     }
 
-    public List<LogroDTO> ObtenerListado()
+    /// <summary>
+    /// Obtener listado
+    /// </summary>
+    public async Task<List<LogroDTO>> ObtenerListado()
     {
-        var logros = this.repositorioLogro.ObtenerTodos();
+        var logros = await this.repositorioLogro.ObtenerTodos();
         return logros
           .Select(p => this.ToDto(p))
           .ToList();
     }
 
-    public LogroDTO ObtenerPorId(int Id)
+    /// <summary>
+    /// Obtener logro por Id
+    /// </summary>
+    /// <param name="id">Id de Logro</param>
+    public async Task<LogroDTO> ObtenerPorId(int id)
     {
-        var logro = this.repositorioLogro.ObtenerPorId(Id);
-        if (logro == null) return null;
+        var logro = await this.repositorioLogro.ObtenerPorId(id);
+        if (logro == null) 
+            throw new LogroExcepcion("No se pudo obtener el logro");
         return this.ToDto(logro);
     }
 
+    /// <summary>
+    /// Convierte entidad de dominio a DTO
+    /// </summary>
+    /// <param name="entidad">Logro</param>
     public LogroDTO ToDto(Logro entidad)
     {
         return new LogroDTO

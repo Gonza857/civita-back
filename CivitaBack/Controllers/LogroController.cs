@@ -18,43 +18,77 @@ public class LogroController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult Listado()
+    public async Task<IActionResult> Listado()
     {
-        var logros = _logroLogica.ObtenerListado();
-        return Ok(logros);
+        try
+        {
+            var logros = await _logroLogica.ObtenerListado();
+            return Ok(logros);
+        }
+        catch (Exception)
+        {
+            return Problem("Ocurrió un error al obtener el listado de Logros.");
+        }
     }
 
     [HttpPost]
-    public IActionResult Guardar([FromBody] LogroDTO nuevoLogro)
+    public async Task<IActionResult> Guardar([FromBody] LogroDTO? nuevoLogro)
     {
         if (nuevoLogro == null)
             return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
 
-        var logroGuardado = _logroLogica.Guardar(nuevoLogro);
-        return Ok(logroGuardado);
+        try
+        {
+            var logroGuardado = await _logroLogica.Guardar(nuevoLogro);
+            return Ok(logroGuardado);
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al guardar el Logro");
+        }
+
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Eliminar(int id)
+    public async Task<IActionResult> Eliminar(int id)
     {
-        _logroLogica.Eliminar(id);
-        return Ok();
+        try
+        {
+            await _logroLogica.Eliminar(id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al eliminar el logro.");
+        }
+
 
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetLogroPorId(int id)
-    {
-        var logro = this._logroLogica.ObtenerPorId(id);
-        return Ok(logro);
-    }
-
-    [HttpPatch("{id}")]
-    public IActionResult PatchLogro([FromBody] LogroDTO logroDTO, int id)
+    public async Task<IActionResult> GetLogroPorId(int id)
     {
         try
         {
-            this._logroLogica.Actualizar(logroDTO, id);
+            var logro = await this._logroLogica.ObtenerPorId(id);
+            return Ok(logro);
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al obtener el logro.");
+        }
+        
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchLogro([FromBody] LogroDTO? logroDTO, int id)
+    {
+        if (logroDTO == null)
+            return BadRequest("Los datos recibidos son inválidos");
+        
+        try
+        {
+            await this._logroLogica.Actualizar(logroDTO, id);
             return Ok();
         }
         catch (Exception ex)

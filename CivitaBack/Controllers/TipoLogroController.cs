@@ -19,48 +19,81 @@ public class TipoLogroController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult Listado()
+    public async Task<IActionResult> Listado()
     {
-        var tiposLogros = this._tipoLogroLogica.ObtenerTiposLogro();
-        return Ok(tiposLogros);
+        try
+        {
+            var tiposLogros = await this._tipoLogroLogica.ObtenerTiposLogro();
+            return Ok(tiposLogros);
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al obtener el listado de Tipos de Logros");
+        }
+
     }
 
     [HttpPost]
-    public IActionResult Guardar([FromBody] TipoLogroDTO nuevoTipoLogro)
+    public async Task<IActionResult> Guardar([FromBody] TipoLogroDTO? nuevoTipoLogro)
     {
         if (nuevoTipoLogro == null)
             return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
 
-        var tipoLogroGuardado = _tipoLogroLogica.Guardar(nuevoTipoLogro);
-        return Ok(tipoLogroGuardado);
+        try
+        {
+            var tipoLogroGuardado = await _tipoLogroLogica.Guardar(nuevoTipoLogro);
+            return Ok(tipoLogroGuardado);
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al guardar el Tipo de Logro");
+
+        }
+        
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Eliminar(int id) 
-    {
-        this._tipoLogroLogica.Eliminar(id);
-        return Ok();
-
-    }
-
-    [HttpGet("{id}")]
-    public IActionResult getTipoLogroPorId(int id)
-    {
-        var tipoLogro = this._tipoLogroLogica.ObtenerPorId(id);
-        return Ok(tipoLogro);
-    }
-
-    [HttpPatch("{id}")]
-    public IActionResult PatchTipoLogro([FromBody] TipoLogroDTO tipoLogroDTO, int id)
+    public async Task<IActionResult> Eliminar(int id) 
     {
         try
         {
-            this._tipoLogroLogica.Actualizar(tipoLogroDTO, id);
+            await this._tipoLogroLogica.Eliminar(id);
             return Ok();
         }
         catch (Exception ex)
         {
-            return Problem(ex.Message);
+            return Problem("Ocurrió un error al eliminar el Tipo de Logro");
+        }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetTipoLogroPorId(int id)
+    {
+        try
+        {
+            var tipoLogro = await this._tipoLogroLogica.ObtenerPorId(id);
+            return Ok(tipoLogro);
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al obtener el Tipo de Logro");
+        }
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchTipoLogro([FromBody] TipoLogroDTO? tipoLogroDTO, int id)
+    {
+        if (tipoLogroDTO == null)
+            return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
+        
+        try
+        {
+            await this._tipoLogroLogica.Actualizar(tipoLogroDTO, id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al actualizar el Tipo de Logro");
         }
 
     }

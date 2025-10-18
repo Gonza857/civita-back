@@ -19,10 +19,9 @@ namespace CivitaBack.Logica
 
         public async Task EjecutarCicloAsync()
         {
-            var partidas = await _cicloRepositorio.ObtenerPartidasConEstructuras();
+            List<Partida> partidas = await _cicloRepositorio.ObtenerPartidasConEstructuras();
 
-            if (partidas == null || partidas.Count == 0)
-                return;
+            if (partidas.Count == 0) return;
 
             foreach (var partida in partidas)
             {
@@ -34,6 +33,10 @@ namespace CivitaBack.Logica
 
         private void ProcesarPartida(Partida partida)
         {
+            if (partida == null || partida.Recursos == null)
+                throw new Exception();
+            
+            Recurso recursosPartida = partida.Recursos;
             int nuevaPoblacion = 0;
                 
             foreach (var estructuraEnMapa in partida.EstructuraMapa)
@@ -45,42 +48,38 @@ namespace CivitaBack.Logica
                 var estructura = estructuraEnMapa.Estructura;
                 var tipoEstructura = estructura.TipoEstructura;
 
-                ActualizarRecurso(partida, "Energía", tipoEstructura.EnergiaPorCiclo);
-                ActualizarRecurso(partida, "EcoCoins", tipoEstructura.DineroPorCiclo);
-                ActualizarRecurso(partida, "Felicidad", estructura.FelicidadCiclo);
-                ActualizarRecurso(partida, "Contaminación", estructura.ContaminacionCiclo);
+                recursosPartida.Energia = 
+                    ActualizarRecurso(recursosPartida.Energia, tipoEstructura.EnergiaPorCiclo);
+                recursosPartida.EcoCoins = 
+                    ActualizarRecurso(recursosPartida.EcoCoins, tipoEstructura.DineroPorCiclo);
+                recursosPartida.Felicidad = 
+                    ActualizarRecurso(recursosPartida.Felicidad, estructura.FelicidadCiclo);
+                recursosPartida.Contaminacion = 
+                    ActualizarRecurso(recursosPartida.Contaminacion, estructura.ContaminacionCiclo);
 
                 if (tipoEstructura.Capacidad > 0)
                     nuevaPoblacion += tipoEstructura.Capacidad;
             }
-                var poblacionFinal = partida.Recursos.FirstOrDefault(r => r.Nombre == "Poblacion");
-                if (poblacionFinal != null)
-                {
-                    poblacionFinal.Cantidad = nuevaPoblacion;
-                }
-            
+
+            partida.Recursos.Poblacion = nuevaPoblacion;
         }
 
-        private void ActualizarRecurso(Partida partida, string recurso, int cambio)
+        private int ActualizarRecurso(int cantidadInicial, int cambio)
         {
-            var recursoPartida = partida.Recursos.FirstOrDefault(r => r.Nombre == recurso);
+            // if (recursoPartida.Nombre.Equals("Contaminación") && recursoPartida.Cantidad > 90)
+            // {
+            //     var felicidad = partida.Recursos.FirstOrDefault(r => r.Nombre == "Felicidad");
+            //  
+            //     if (felicidad != null && felicidad.Cantidad >= 5)
+            //         felicidad.Cantidad -= 5;
+            // }
 
-            if (recursoPartida == null) return;
+            cantidadInicial += cambio;
 
-            if (recursoPartida.Nombre.Equals("Contaminación") && recursoPartida.Cantidad > 90)
-            {
-                var felicidad = partida.Recursos.FirstOrDefault(r => r.Nombre == "Felicidad");
-             
-                if (felicidad != null && felicidad.Cantidad >= 5)
-                    felicidad.Cantidad -= 5;
-            }
-
-            recursoPartida.Cantidad += cambio;
-
-            if (recursoPartida.Cantidad < 0)
-            {
-                recursoPartida.Cantidad = 0; // Por ahora voy a evitar que los recursos sean negativos
-            }
+            if (cantidadInicial < 0)
+                cantidadInicial = 0;
+            
+            return cantidadInicial;
 
         }
     }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
@@ -21,27 +22,27 @@ public class EstructuraRepositorio : IEstructuraRepositorio
         _context = context;
     }
 
-    public void Actualizar(Estructura entidad)
+    public async Task Actualizar(Estructura entidad)
     {
         throw new NotImplementedException();
     }
 
-    public void Eliminar(int id)
+    public async Task Eliminar(int id)
     {
         throw new NotImplementedException();
     }
 
-    public void Guardar(Estructura entidad)
+    public async Task Guardar(Estructura entidad)
     {
         throw new NotImplementedException();
     }
 
-    public Estructura ObtenerPorId(int id)
+    public async Task<Estructura> ObtenerPorId(int id)
     {
-        return _context.Estructura.FirstOrDefault(e => e.Id == id);
+        return await _context.Estructura.FirstOrDefaultAsync(e => e.Id == id);
     }
 
-    public List<Estructura> ObtenerTodos()
+    public async Task<List<Estructura>> ObtenerTodos()
     {
         throw new NotImplementedException();
     }
