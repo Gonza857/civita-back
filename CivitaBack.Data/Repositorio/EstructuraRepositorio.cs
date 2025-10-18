@@ -24,6 +24,7 @@ public class EstructuraRepositorio : IEstructuraRepositorio
 
     public async Task Actualizar(Estructura entidad)
     {
+        entidad.Editado = DateTime.UtcNow;
         throw new NotImplementedException();
     }
 

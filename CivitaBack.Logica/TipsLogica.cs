@@ -1,65 +1,98 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CivitaBack.Data.BO;
+﻿using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Utils;
 
 namespace CivitaBack.Logica
 {
 
     public interface ITipsLogica
     {
-        List<TipsDTO> ObtenerMsjPorIdTipo(int id);
+        Task<List<TipDTO>> ObtenerMsjPorIdTipo(int id);
+        Task<List<TipDTO>> Listado();
+        Task Crear(TipDTO tip);
+        Task Actualizar (TipDTO tip, int id);
         
-        List<TipoTipDTO> GetTiposTips();
+        Task<TipDTO?> ObtenerPorIdTipo(int id);
     }
-    public class TipsLogica : ITipsLogica
+    public class TipsLogica : ITipsLogica, IParser<Tip, TipDTO>
     {
-        private readonly ITipsRepositorio tipsRepositorio;
-        public TipsLogica(ITipsRepositorio itr)
+        private readonly ITipsRepositorio _tipsRepositorio;
+        private readonly ITipoTipRepositorio _tiposTipRepositorio;
+        public TipsLogica(ITipsRepositorio itr, ITipoTipRepositorio ittr)
         {
-            tipsRepositorio = itr;
+            _tipsRepositorio = itr;
+            _tiposTipRepositorio = ittr;
         }
 
-        public List<TipsDTO> ObtenerMsjPorIdTipo(int id)
+        public async Task<List<TipDTO>> ObtenerMsjPorIdTipo(int id)
         {
-                List<TipsDTO> listaDto = new List<TipsDTO>();
-                var entity = tipsRepositorio.ObtenerMsjPorIdTipo(id);
-                listaDto = entity.Select(t=> TipsToDTO(t)).ToList();
-                return listaDto;
+                List<Tip> listadoTipsSegunTipo = await _tipsRepositorio.ObtenerMsjPorIdTipo(id);
+                return listadoTipsSegunTipo
+                    .Select(t=> this.ToDto(t)).ToList();
         }
 
-        public List<TipoTipDTO> GetTiposTips()
+        public async Task<List<TipDTO>> Listado()
         {
-            List<TipoTipDTO> listaDto = new List<TipoTipDTO>();
-            var entity = tipsRepositorio.GetTiposTips(); 
-            listaDto= entity.Select(t=>TipoTipsToDTO(t)).ToList();
-            return listaDto;
+            var listado = await _tipsRepositorio.ObtenerTodos();
+            return listado.Select(l => this.ToDto(l)).ToList();
         }
 
-
-        private TipsDTO TipsToDTO(Tip E)
+        public async Task Crear(TipDTO tip)
         {
-            TipsDTO tipsDTO = new TipsDTO();
-            tipsDTO.Id = E.Id;
-            tipsDTO.Mensaje = E.Mensaje;
-            tipsDTO.TipoId = E.TipoId;
-            tipsDTO.ElementoAdicional = E.ElementoAdicional;
-            tipsDTO.Expresion =  E.Expresion;
-            tipsDTO.EfectoFiltro = E.EfectoFiltro; 
-            return tipsDTO;
+            var tipoTip = await this._tiposTipRepositorio.ObtenerPorId(tip.TipoId);
+            if (tipoTip == null)
+                throw new Exception("No se pudo guardar el tip.");
+
+            var nuevoTip = new Tip
+            {
+                TipoTip = tipoTip,
+                Expresion = tip.Expresion,
+                ElementoAdicional = tip.ElementoAdicional,
+                Mensaje = tip.Mensaje,
+                EfectoFiltro = tip.EfectoFiltro,
+            };
+            
+            await this._tipsRepositorio.Guardar(nuevoTip);
         }
 
-        private TipoTipDTO TipoTipsToDTO(TipoTip E)
+        public async Task Actualizar(TipDTO tip, int id)
         {
-            TipoTipDTO tipoDto = new TipoTipDTO();
-            tipoDto.Id = E.Id;
-            tipoDto.Descripcion  = E.Descripcion;
-            return tipoDto;
+            var tipoTip = await this._tiposTipRepositorio.ObtenerPorId(tip.TipoId);
+            if (tipoTip == null)
+                throw new Exception("No se pudo guardar el tip.");
+
+            var tipDb = await this._tipsRepositorio.ObtenerPorId(id);
+            if (tipDb == null)
+                throw new Exception("No se pudo guardar el tip.");
+
+            tipDb.TipoTip = tipoTip;
+            tipDb.Expresion = tip.Expresion;
+            tipDb.ElementoAdicional = tip.ElementoAdicional;
+            tipDb.Mensaje = tip.Mensaje;
+            tipDb.EfectoFiltro = tip.EfectoFiltro;
+            
+            await this._tipsRepositorio.Actualizar(tipDb);
         }
 
+        public async Task<TipDTO?> ObtenerPorIdTipo(int id)
+        {
+            var tipoTip = await this._tipsRepositorio.ObtenerPorId(id);
+            if (tipoTip == null) return null;
+            return this.ToDto(tipoTip);
+        }
+
+        public TipDTO ToDto(Tip entidad)
+        {
+            TipDTO tipDTO = new TipDTO();
+            tipDTO.Id = entidad.Id;
+            tipDTO.Mensaje = entidad.Mensaje;
+            tipDTO.TipoId = entidad.TipoId;
+            tipDTO.TipoTipDescripcion = entidad.TipoTip.Descripcion;
+            tipDTO.ElementoAdicional = entidad.ElementoAdicional;
+            tipDTO.Expresion =  entidad.Expresion;
+            tipDTO.EfectoFiltro = entidad.EfectoFiltro; 
+            return tipDTO;
+        }
     }
 }

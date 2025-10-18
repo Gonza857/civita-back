@@ -25,6 +25,7 @@ public class TipoLogroRepositorio : ITipoLogroRepositorio
     
     public async Task Actualizar(TipoLogro entidad)
     {
+        entidad.Editado = DateTime.UtcNow;
         await _context.TipoLogro.AddAsync(entidad);
         await _context.SaveChangesAsync();
     }

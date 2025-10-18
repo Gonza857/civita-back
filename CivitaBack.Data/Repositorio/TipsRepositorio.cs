@@ -1,38 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CivitaBack.Data.BO;
+﻿using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio
 {
-    public interface ITipsRepositorio
+    public interface ITipsRepositorio : IRepositorioBase<Tip>
     {
-        List<Tip> ObtenerMsjPorIdTipo(int idTipo);
-        IEnumerable<TipoTip> GetTiposTips();
+        Task<List<Tip>> ObtenerMsjPorIdTipo(int idTipo);
     }
-    public class TipsRepositorio : ITipsRepositorio
+    public class TipsRepositorio : GenericoRepositorio, ITipsRepositorio
     {
-
-        private readonly AppDbContext _context;
-
+        public TipsRepositorio(AppDbContext context) : base(context) { }
         
-        public TipsRepositorio(AppDbContext context)
+        public async Task<List<Tip>> ObtenerMsjPorIdTipo(int idTipo)
         {
-            _context = context;
+            return await _context.Tip
+                .Where(x => x.TipoId == idTipo)
+                .ToListAsync();
+        }
+        
+        public async Task<Tip?> ObtenerPorId(int id)
+        {
+            return await _context.Tip
+                .Where(t => t.Id == id)
+                .Include(t => t.TipoTip)
+                .FirstOrDefaultAsync();
         }
 
-        public List<Tip> ObtenerMsjPorIdTipo(int idTipo)
+        public async Task<List<Tip>> ObtenerTodos()
         {
-            return  _context.Tip.Where(x => x.TipoId == idTipo).ToList();
+            return await _context.Tip
+                .Include(t => t.TipoTip)
+                .ToListAsync();
         }
 
-        public IEnumerable<TipoTip> GetTiposTips()
+        public async Task Actualizar(Tip entidad)
         {
-            return _context.TipoTip.ToList();
+            entidad.Editado = DateTime.UtcNow;
+            _context.Tip.Update(entidad);
+            await base.GuardarCambiosAsync();
+        }
+
+        public async Task Eliminar(int id)
+        {
+            var t = await _context.TipoTip.FindAsync(id);
+            if (t != null)
+            {
+                _context.TipoTip.Remove(t);
+                await base.GuardarCambiosAsync();
+            }
+        }
+
+        public async Task Guardar(Tip entidad)
+        {
+            await _context.Tip.AddAsync(entidad);
+            await base.GuardarCambiosAsync();
         }
     }
 }
