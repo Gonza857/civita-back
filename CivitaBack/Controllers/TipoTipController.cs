@@ -1,21 +1,19 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
+﻿using CivitaBack.Data.DTO;
 using CivitaBack.Logica;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-public class TipoLogroController : ControllerBase
+[ApiController]
+public class TipoTipController : ControllerBase
 {
-
-    private readonly ITipoLogroLogica _tipoLogroLogica;
-
-    public TipoLogroController(ITipoLogroLogica itll)
+    private readonly ITipoTipLogica _tipoTipLogica;
+    
+    public TipoTipController(ITipoTipLogica ttl)
     {
-        this._tipoLogroLogica = itll;
+        this._tipoTipLogica = ttl;
     }
 
     [HttpGet]
@@ -23,31 +21,30 @@ public class TipoLogroController : ControllerBase
     {
         try
         {
-            var tiposLogros = await this._tipoLogroLogica.ObtenerTiposLogro();
-            return Ok(tiposLogros);
+            var tiposTip = await this._tipoTipLogica.Listado();
+            return Ok(tiposTip);
         }
         catch (Exception ex)
         {
-            return Problem("Ocurrió un error al obtener el listado de Tipos de Logros");
+            return Problem("Ocurrió un error al obtener el listado de Tipos de Tips");
         }
 
     }
-
+    
     [HttpPost]
-    public async Task<IActionResult> Guardar([FromBody] TipoLogroDTO? nuevoTipoLogro)
+    public async Task<IActionResult> Guardar([FromBody] TipoTipDTO? nuevoTipTipDto)
     {
-        if (nuevoTipoLogro == null)
+        if (nuevoTipTipDto == null)
             return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
 
         try
         {
-            var tipoLogroGuardado = await _tipoLogroLogica.Guardar(nuevoTipoLogro);
-            return Ok(tipoLogroGuardado);
+            await _tipoTipLogica.Guardar(nuevoTipTipDto);
+            return Ok();
         }
         catch (Exception ex)
         {
-            return Problem("Ocurrió un error al guardar el Tipo de Logro");
-
+            return Problem("Ocurrió un error al guardar el Tipo de Tip");
         }
         
     }
@@ -57,7 +54,7 @@ public class TipoLogroController : ControllerBase
     {
         try
         {
-            await this._tipoLogroLogica.Eliminar(id);
+            await this._tipoTipLogica.Eliminar(id);
             return Ok();
         }
         catch (Exception ex)
@@ -71,7 +68,7 @@ public class TipoLogroController : ControllerBase
     {
         try
         {
-            var tipoLogro = await this._tipoLogroLogica.ObtenerPorId(id);
+            var tipoLogro = await this._tipoTipLogica.ObtenerPorId(id);
             return Ok(tipoLogro);
         }
         catch (Exception ex)
@@ -81,14 +78,14 @@ public class TipoLogroController : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchTipoLogro([FromBody] TipoLogroDTO? tipoLogroDTO, int id)
+    public async Task<IActionResult> PatchTipoTip([FromBody] TipoTipDTO? tipoTipDto, int id)
     {
-        if (tipoLogroDTO == null)
+        if (tipoTipDto == null)
             return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
         
         try
         {
-            await this._tipoLogroLogica.Actualizar(tipoLogroDTO, id);
+            await this._tipoTipLogica.Actualizar(tipoTipDto, id);
             return Ok();
         }
         catch (Exception ex)
@@ -97,3 +94,5 @@ public class TipoLogroController : ControllerBase
         }
     }
 }
+    
+

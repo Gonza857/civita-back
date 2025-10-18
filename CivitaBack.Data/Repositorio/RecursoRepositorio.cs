@@ -24,6 +24,7 @@ public class RecursoRepositorio : IRecursoRepositorio
 
     public async Task Actualizar(Recurso entidad)
     {
+        entidad.Editado = DateTime.UtcNow;
         _context.Recurso.Update(entidad);
         await _context.SaveChangesAsync();
     }

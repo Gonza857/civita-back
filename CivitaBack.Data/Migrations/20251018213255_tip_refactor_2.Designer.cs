@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251018213255_tip_refactor_2")]
+    partial class tip_refactor_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,12 +35,6 @@ namespace CivitaBack.Data.Migrations
 
                     b.Property<int>("Cantidad")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EstructuraId")
                         .HasColumnType("integer");
@@ -71,12 +68,6 @@ namespace CivitaBack.Data.Migrations
                     b.Property<int>("CostoEnergia")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<bool>("EsMejorable")
                         .HasColumnType("boolean");
 
@@ -106,12 +97,6 @@ namespace CivitaBack.Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EstructuraId")
                         .HasColumnType("integer");
@@ -148,14 +133,8 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("DescripcionEvento")
                         .HasColumnType("text");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EventoMaestroId")
                         .HasColumnType("integer");
@@ -183,14 +162,8 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Descripcion")
                         .HasColumnType("text");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -208,15 +181,9 @@ namespace CivitaBack.Data.Migrations
                     b.Property<int?>("CondicionId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TipoLogroId")
                         .HasColumnType("integer");
@@ -242,12 +209,6 @@ namespace CivitaBack.Data.Migrations
                     b.Property<int>("PartidaId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
-
                     b.HasKey("LogroId", "PartidaId");
 
                     b.HasIndex("PartidaId");
@@ -262,12 +223,6 @@ namespace CivitaBack.Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("JsonMapa")
                         .HasColumnType("text");
@@ -297,14 +252,8 @@ namespace CivitaBack.Data.Migrations
                     b.Property<int>("Contaminacion")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("EcoCoins")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Energia")
                         .HasColumnType("integer");
@@ -337,12 +286,6 @@ namespace CivitaBack.Data.Migrations
                     b.Property<string>("CodigoArticulo")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("NombreArticulo")
                         .HasColumnType("text");
 
@@ -363,12 +306,6 @@ namespace CivitaBack.Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("EfectoFiltro")
                         .HasColumnType("boolean");
@@ -404,12 +341,6 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("PartidaId")
                         .HasColumnType("integer");
 
@@ -436,14 +367,8 @@ namespace CivitaBack.Data.Migrations
                     b.Property<int>("Capacidad")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("DineroPorCiclo")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EnergiaPorCiclo")
                         .HasColumnType("integer");
@@ -466,12 +391,6 @@ namespace CivitaBack.Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Nombre")
                         .IsRequired()

@@ -77,9 +77,7 @@ public interface IPartidaRepositorio
 
             return partida;
         }
-            
         
-
         public async Task<List<Partida>> ObtenerPartidas()
         {
             return await _context.Partida
@@ -98,6 +96,7 @@ public interface IPartidaRepositorio
         
         public async Task<bool> ActualizarMapaAsync(Partida partida)
         {
+            partida.Editado = DateTime.UtcNow;
             _context.Partida.Update(partida);
             var rowsAfectadas = await _context.SaveChangesAsync();
             return rowsAfectadas > 0;
@@ -119,7 +118,8 @@ public interface IPartidaRepositorio
                     X = e.X,
                     Y = e.Y,
                     Width = e.Width,
-                    Height = e.Height
+                    Height = e.Height,
+                    Editado = DateTime.UtcNow
                 });
 
                 await _context.EstructuraMapa.AddRangeAsync(nuevas);
