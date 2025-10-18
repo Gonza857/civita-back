@@ -422,6 +422,12 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("Creado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Editado")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("HashDeContrasena")
                         .HasColumnType("text");
 

@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20251018141843_test.cs" />
+    <Compile Remove="Migrations\20251018141843_test.Designer.cs" />
+    <Compile Remove="Migrations\20251018153035_test.cs" />
+    <Compile Remove="Migrations\20251018153035_test.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="DTO\mapa_base.json" />
   </ItemGroup>
 

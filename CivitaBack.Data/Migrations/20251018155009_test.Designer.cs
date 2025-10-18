@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251018141843_test")]
+    [Migration("20251018155009_test")]
     partial class test
     {
         /// <inheritdoc />
