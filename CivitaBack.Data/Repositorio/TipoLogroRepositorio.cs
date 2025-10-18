@@ -5,17 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
-public interface ITipoLogroRepositorio
+public interface ITipoLogroRepositorio : IRepositorioBase<TipoLogro>
 {
-    void Guardar(TipoLogro TipoLogro);
-    List<TipoLogro> ObtenerTodos();
-    TipoLogro ObtenerPorId(int Id);
-    void Eliminar(int Id);
 
-    void Actualizar();
 }
 
 public class TipoLogroRepositorio : ITipoLogroRepositorio
@@ -26,35 +22,39 @@ public class TipoLogroRepositorio : ITipoLogroRepositorio
     {
         _context = context;
     }
-
-    public void Actualizar()
+    
+    public async Task Actualizar(TipoLogro entidad)
     {
-        _context.SaveChanges();
+        await _context.TipoLogro.AddAsync(entidad);
+        await _context.SaveChangesAsync();
     }
 
-    public void Eliminar(int Id)
+    public async Task Eliminar(int id)
     {
-        var tipoLogro = _context.TipoLogro.FirstOrDefault(tl => tl.Id == Id);
+        var tipoLogro = await _context.TipoLogro
+            .FirstOrDefaultAsync(tl => tl.Id == id);
+        
         if (tipoLogro != null)
-        {
+        { 
             _context.TipoLogro.Remove(tipoLogro);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
-
-    public void Guardar(TipoLogro TipoLogro)
+    
+    public async Task Guardar(TipoLogro tipoLogro)
     {
-        _context.TipoLogro.Add(TipoLogro);
-        _context.SaveChanges();
+        await _context.TipoLogro.AddAsync(tipoLogro);
+        await _context.SaveChangesAsync();
     }
 
-    public TipoLogro ObtenerPorId(int Id)
+    public async Task<TipoLogro?> ObtenerPorId(int Id)
     {
-        return _context.TipoLogro.FirstOrDefault(tl => tl.Id == Id);
+        return await _context.TipoLogro
+            .FirstOrDefaultAsync(tl => tl.Id == Id);
     }
-
-    public List<TipoLogro> ObtenerTodos()
+    
+    public async Task<List<TipoLogro>> ObtenerTodos()
     {
-        return _context.TipoLogro.ToList();
+        return await _context.TipoLogro.ToListAsync();
     }
 }

@@ -14,10 +14,10 @@ namespace CivitaBack.Logica;
 
 public interface IRecursoLogica
 {
-    void ConfigurarInicial(Partida partida);
+    Task ConfigurarInicial(Partida partida);
 
-    RecursoDTO ObtenerRecursos(int idPartida);
-    void ModificarEnergia(int idPartida, int cantidad);
+    Task<RecursoDTO> ObtenerRecursos(int idPartida);
+    Task ModificarEnergia(int idPartida, int cantidad);
 
 
 }
@@ -32,33 +32,34 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
         repositorioRecurso = rr;
     }
 
-    public void ConfigurarInicial(Partida partida)
+    public async Task ConfigurarInicial(Partida partida)
     {
-        List<Recurso> recursos = new List<Recurso>
+        if (partida == null) throw new PartidaExcepcion("No se proporcionó Partida");
+        Recurso recurso = new Recurso
         {
-            new Recurso("Energia", 100, partida),
-            new Recurso("Felicidad", 50, partida),
-            new Recurso("EcoCoins", 200, partida),
-            new Recurso("Contaminación", 60, partida)
+            PartidaId = partida.Id,
+            EcoCoins = 0,
+            Felicidad = 0,
+            Energia = 0,
+            Contaminacion = 0,
         };
-        this.repositorioRecurso.GuardarVarios(recursos);
+        await this.repositorioRecurso.GuardarRecurso(recurso);
     }
 
-    public RecursoDTO ObtenerRecursos(int idPartida)
+    public async Task<RecursoDTO> ObtenerRecursos(int idPartida)
     {
-        List<Recurso> recursosDePartida = this.repositorioRecurso.ObtenerRecursosPartida(idPartida);
+        Recurso recursoPartida = await this.repositorioRecurso.ObtenerRecursosPartida(idPartida);
 
         // Si no hay recursos o son menos de 4, error
-        if (recursosDePartida == null || recursosDePartida.Count < 4)
+        if (recursoPartida == null)
             throw new PartidaExcepcion("No se encontraron recursos para la partida especificada.");
-
-
+        
         return new RecursoDTO
         {
-            Energia = recursosDePartida.First(r => r.Nombre == TipoRecurso.Energia.GetDescription()).Cantidad,
-            Felicidad = recursosDePartida.First(r => r.Nombre == TipoRecurso.Felicidad.GetDescription()).Cantidad,
-            EcoCoins = recursosDePartida.First(r => r.Nombre == TipoRecurso.EcoCoins.GetDescription()).Cantidad,
-            Contaminacion = recursosDePartida.First(r => r.Nombre == TipoRecurso.Contaminacion.GetDescription()).Cantidad,
+            Energia = recursoPartida.Energia,
+            Felicidad = recursoPartida.Felicidad,
+            EcoCoins = recursoPartida.EcoCoins,
+            Contaminacion = recursoPartida.Contaminacion,
         };
     }
 
@@ -68,23 +69,22 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
     }
 
 
-public void ModificarEnergia(int idPartida, int cantidad)
+public async Task ModificarEnergia(int idPartida, int cantidad)
     {
         // Buscamos el recurso "Energía" de la partida
-        var recurso = repositorioRecurso.ObtenerRecursosPartida(idPartida)
-            .FirstOrDefault(r => r.Nombre == TipoRecurso.Energia.GetDescription());
+        Recurso recurso = await repositorioRecurso.ObtenerRecursosPartida(idPartida);
 
         if (recurso == null)
             throw new PartidaExcepcion("No se encontró el recurso Energía para la partida.");
 
         // Ajustamos el valor
-        recurso.Cantidad += cantidad;
+        recurso.Energia += cantidad;
 
         // Controlamos los límites (0 - 100)
-        if (recurso.Cantidad > 100) recurso.Cantidad = 100;
-        if (recurso.Cantidad < 0) recurso.Cantidad = 0;
+        if (recurso.Energia > 100) recurso.Energia = 100;
+        if (recurso.Energia < 0) recurso.Energia = 0;
 
         // Guardamos los cambios
-        repositorioRecurso.Actualizar(recurso);
+        await repositorioRecurso.Actualizar(recurso);
     }
 }

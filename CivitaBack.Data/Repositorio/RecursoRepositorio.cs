@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 public interface IRecursoRepositorio : IRepositorioBase<Recurso>
 {
-    void GuardarVarios(List<Recurso> recursos);
-    List<Recurso> ObtenerRecursosPartida(int idPartida);
+    Task GuardarRecurso(Recurso recurso);
+    Task<Recurso> ObtenerRecursosPartida(int idPartida);
 }
 public class RecursoRepositorio : IRecursoRepositorio
 {
@@ -21,40 +22,39 @@ public class RecursoRepositorio : IRecursoRepositorio
         _context = context;
     }
 
-    public void Actualizar(Recurso entidad)
+    public async Task Actualizar(Recurso entidad)
     {
         _context.Recurso.Update(entidad);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
-    public void Eliminar(int id)
+    public Task Eliminar(int id)
     {
         throw new NotImplementedException();
     }
 
-    public void Guardar(Recurso entidad)
+    public Task Guardar(Recurso entidad)
     {
         throw new NotImplementedException();
     }
 
-    public void GuardarVarios(List<Recurso> recursos)
+    public async Task GuardarRecurso(Recurso recurso)
     {
-        _context.Recurso.AddRange(recursos);
-        _context.SaveChanges();
+        await _context.Recurso.AddAsync(recurso);
+        await _context.SaveChangesAsync();
     }
 
-    public Recurso ObtenerPorId(int id)
+    public Task<Recurso> ObtenerPorId(int id)
     {
         throw new NotImplementedException();
     }
 
-    public List<Recurso> ObtenerRecursosPartida(int idPartida)
+    public async Task<Recurso> ObtenerRecursosPartida(int idPartida)
     {
-        return _context.Recurso
-           .Where(r => r.PartidaId == idPartida)
-           .ToList();
+        return await _context.Recurso
+            .FirstOrDefaultAsync(r => r.PartidaId == idPartida);
     }
 
-    public List<Recurso> ObtenerTodos()
+    public Task<List<Recurso>> ObtenerTodos()
     {
         throw new NotImplementedException();
     }

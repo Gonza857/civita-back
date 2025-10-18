@@ -16,6 +16,7 @@ namespace CivitaBack.Api.Controllers
         private readonly IUsuarioLogica _usuarioLogica;
         private readonly IEstructuraLogica _estructuraLogica;
         private readonly IEstructuraMapaLogica _estructuraMapaLogica;
+        private readonly ILogger<PartidaController> _logger;
 
         public PartidaController(
             IPartidaLogica partidaLogica,
@@ -23,7 +24,8 @@ namespace CivitaBack.Api.Controllers
             IAuthLogica authLogica,
             IUsuarioLogica usuarioLogica,
             IEstructuraLogica el,
-            IEstructuraMapaLogica estructuraMapaLogica)
+            IEstructuraMapaLogica estructuraMapaLogica,
+            ILogger<PartidaController> logger)
         {
             _partidaLogica = partidaLogica;
             _recursoLogica = recursoLogica;
@@ -31,59 +33,76 @@ namespace CivitaBack.Api.Controllers
             _usuarioLogica = usuarioLogica;
             _estructuraLogica = el;
             _estructuraMapaLogica = estructuraMapaLogica;
+            _logger = logger;
         }
 
         // 🧱 Crear partida inicial y configurar recursos
         [HttpPost("Iniciar/{idUsuario}")]
-        public IActionResult Iniciar(int idUsuario)
+        public async Task<IActionResult> Iniciar(int idUsuario)
         {
             try
             {
-                var partida = _partidaLogica.CrearPartida(idUsuario);
-                _recursoLogica.ConfigurarInicial(partida);
+                var partida = await _partidaLogica.CrearPartida(idUsuario);
+                await _recursoLogica.ConfigurarInicial(partida);
                 return Ok(partida);
             }
-            catch (ErrorInternoExcepction)
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ErrorInternoExcepction ex)
             {
                 return Problem("Ocurrió un error al guardar la partida.");
             }
         }
 
         // Obtener la partida de un usuario
-        [HttpGet("porUsuario/{idUsuario}")]
-        public IActionResult ObtenerPartidaPorUsuario(int idUsuario)
+        [HttpGet("porUsuario/{idUsuario}")] // -> PascalCase -> PorUsuario/{idUsuario}
+        public async Task<IActionResult> ObtenerPartidaPorUsuario(int idUsuario)
         {
             try
             {
-                var partida = _partidaLogica.ObtenerPorUsuarioId(idUsuario);
-
-                if (partida == null)
-                    return NotFound(new { error = "No se encontró la partida para el usuario especificado." });
-
+                PartidaDTO partida = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
                 return Ok(partida);
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = $"Error al obtener la partida: {ex.Message}" });
+                _logger.LogError(ex.Message);
+                return Problem("Error al obtener la partida");
             }
         }
 
         // 📜 Obtener todas las partidas
         [HttpGet]
-        public IActionResult GetPartidas()
+        public async Task<IActionResult> GetPartidas()
         {
-            var partidas = _partidaLogica.ObtenerPartidas();
-            return Ok(partidas);
+            try
+            {
+                var partidas = await _partidaLogica.ObtenerPartidas();
+                return Ok(partidas);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Problem("Ocurrió un error al obtener las partidas");
+            }
         }
 
         // ✏️ Actualizar datos de una partida (no mapa)
         [HttpPatch("{id}")]
-        public async Task<IActionResult> PatchPartida([FromBody] PartidaDTO partidaDTO, int id)
+        public async Task<IActionResult> PatchPartida([FromBody] PartidaDTO? partidaDTO, int id)
         {
+            if (partidaDTO == null)
+                return BadRequest("No se encontró la partida.");
+            
             try
             {
                 var usuario = await _usuarioLogica.ObtenerPorId(partidaDTO.UsuarioId);
-                _partidaLogica.Actualizar(partidaDTO, usuario);
+                await _partidaLogica.Actualizar(partidaDTO, usuario);
                 return Ok();
             }
             catch (PartidaExcepcion ex)
@@ -98,10 +117,22 @@ namespace CivitaBack.Api.Controllers
 
         // 🔎 Obtener partida por ID de usuario
         [HttpGet("{id}")]
-        public IActionResult GetPartidaPorId(int id)
+        public async Task<IActionResult> GetPartidaPorId(int id)
         {
-            var partida = _partidaLogica.ObtenerPorUsuarioId(id);
-            return Ok(partida);
+            try
+            {
+                var partida = await _partidaLogica.ObtenerPorUsuarioId(id);
+                return Ok(partida);
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return NotFound("No se encontró la partida");
+            }
+            catch (Exception ex)
+            {
+                return Problem("Ocurrió unerror al obtener la partida");
+            }
+  
         }
 
         // 💾 Guardar mapa (JSON + estructuras)
@@ -178,7 +209,7 @@ namespace CivitaBack.Api.Controllers
 
         // 🔄 Actualizar mapa existente (JSON + estructuras)
         [HttpPut("{partidaId}/actualizar-mapa")]
-        public async Task<IActionResult> ActualizarMapa(int partidaId, [FromBody] GuardarMapaDTO dto)
+        public async Task<IActionResult> ActualizarMapa(int partidaId, [FromBody] GuardarMapaDTO? dto)
         {
             if (dto == null || dto.PartidaId != partidaId)
                 return BadRequest("Datos inválidos o ID de partida no coincide.");

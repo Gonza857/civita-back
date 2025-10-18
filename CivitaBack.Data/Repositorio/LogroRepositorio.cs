@@ -11,7 +11,7 @@ namespace CivitaBack.Data.Repositorio;
 
 public interface ILogroRepositorio : IRepositorioBase<Logro>
 {
-    void Actualizar();
+    
 }
 public class LogroRepositorio : ILogroRepositorio
 {
@@ -22,43 +22,38 @@ public class LogroRepositorio : ILogroRepositorio
         _context = context;
     }
 
-    public void Actualizar(Logro entidad)
+    public async Task Actualizar(Logro logro)
     {
-        throw new NotImplementedException();
+        await _context.SaveChangesAsync();
     }
 
-    public void Actualizar()
+    public async Task Eliminar(int id)
     {
-        _context.SaveChanges();
-    }
-
-    public void Eliminar(int id)
-    {
-        var logro = _context.Logro.FirstOrDefault(tl => tl.Id == id);
+        var logro = await _context.Logro.FirstOrDefaultAsync(tl => tl.Id == id);
         if (logro != null)
         {
             _context.Logro.Remove(logro);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 
-    public void Guardar(Logro entidad)
+    public async Task Guardar(Logro entidad)
     {
-        _context.Logro.Add(entidad);
-        _context.SaveChanges();
+        await _context.Logro.AddAsync(entidad);
+        await _context.SaveChangesAsync();
     }
 
-    public Logro ObtenerPorId(int id)
+    public async Task<Logro> ObtenerPorId(int id)
     {
-        return _context.Logro
+        return await _context.Logro
             .Include(tl => tl.TipoLogro)
-            .FirstOrDefault(tl => tl.Id == id);
+            .FirstOrDefaultAsync(tl => tl.Id == id);
     }
 
-    public List<Logro> ObtenerTodos()
+    public async Task<List<Logro>> ObtenerTodos()
     {
-        return _context.Logro
+        return await _context.Logro
             .Include (tl => tl.TipoLogro)
-            .ToList();
+            .ToListAsync();
     }
 }
