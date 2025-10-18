@@ -11,20 +11,15 @@ namespace CivitaBack.Data.Repositorio;
 
 public interface ILogroPartidaRepositorio
 {
-    List<Logro> ObtenerLogrosIncompletos(int partidaId);
-    List<Logro> ObtenerLogrosCompletos(int partidaId);
+    Task<List<Logro>> ObtenerLogrosIncompletos(int partidaId);
+    Task<List<Logro>> ObtenerLogrosCompletos(int partidaId);
 }
 
-public class LogroPartidaRepositorio : ILogroPartidaRepositorio
+public class LogroPartidaRepositorio : GenericoRepositorio, ILogroPartidaRepositorio
 {
-    private readonly AppDbContext _context;
-
-    public LogroPartidaRepositorio(AppDbContext context)
-    {
-        _context = context;
-    }
-
-    public List<Logro> ObtenerLogrosCompletos(int partidaId)
+    public LogroPartidaRepositorio(AppDbContext context) : base(context) { }
+    
+    public async Task<List<Logro>> ObtenerLogrosCompletos(int partidaId)
     {
         //SELECT*
         //FROM Logros l
@@ -34,13 +29,13 @@ public class LogroPartidaRepositorio : ILogroPartidaRepositorio
         //    WHERE lp.LogroId = l.Id
         //      AND lp.PartidaId = @partidaId
         //);
-        return _context.Logro
+        return await _context.Logro
             .Include(l => l.TipoLogro)
             .Where(l => l.LogroPartidas.Any(lp => lp.PartidaId == partidaId))
-            .ToList();
+            .ToListAsync();
     }
 
-    public List<Logro> ObtenerLogrosIncompletos(int partidaId)
+    public async Task<List<Logro>> ObtenerLogrosIncompletos(int partidaId)
     {
         //SELECT*
         //FROM Logros l
@@ -50,10 +45,10 @@ public class LogroPartidaRepositorio : ILogroPartidaRepositorio
         //    WHERE lp.LogroId = l.Id
         //      AND lp.PartidaId = @partidaId
         //);
-        return _context.Logro
+        return await _context.Logro
             .Include(l => l.TipoLogro)
             .Where(l => !l.LogroPartidas.Any(lp => lp.PartidaId == partidaId))
-            .ToList();
+            .ToListAsync();
 
     }
 }

@@ -8,9 +8,9 @@ namespace CivitaBack.Data.Repositorio;
 
 public interface IRepositorioBase<T> where T : class
 {
-    T ObtenerPorId(int id);
-    List<T> ObtenerTodos();
-    void Actualizar(T entidad);
-    void Eliminar(int id);
-    void Guardar(T entidad);
+    Task<T> ObtenerPorId(int id);
+    Task<List<T>> ObtenerTodos();
+    Task Actualizar(T entidad);
+    Task Eliminar(int id);
+    Task Guardar(T entidad);
 }

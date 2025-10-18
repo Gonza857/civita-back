@@ -13,10 +13,10 @@ namespace CivitaBack.Logica;
 
 public interface IPartidaLogica
 {
-    PartidaDTO ObtenerPorUsuarioId(int IdUsuario);
-    Partida CrearPartida(int idUsuario);
+    Task<PartidaDTO> ObtenerPorUsuarioId(int IdUsuario);
+    Task<Partida> CrearPartida(int idUsuario);
     Task Actualizar(PartidaDTO partida, Usuario usuario);
-    List<PartidaDTO> ObtenerPartidas();
+    Task<List<PartidaDTO>> ObtenerPartidas();
 
     // 🆕 Métodos de mapa
     Task ActualizarMapaDePartidaAsync(GuardarMapaDTO dto);
@@ -39,51 +39,56 @@ public class PartidaLogica : IPartidaLogica
     }
 
     /// <summary>
+    /// Valida los recursos entrantes de una partida para luego ser actualizados.
+    /// </summary>
+    /// <param name="partida">PartidaDTO</param>
+    private void ValidarRecursosPartida(PartidaDTO? partida)
+    {
+        if (partida == null)
+            throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: Datos inválidos.");
+        
+        if (partida.Energia < 0 || partida.Felicidad < 0 ||
+            partida.EcoCoins < 0 || partida.Contaminacion < 0)
+            throw new PartidaExcepcion("Los valores de los recursos no pueden ser negativos");
+    }
+
+    /// <summary>
     /// Actualizar la partida y los recursos
     /// </summary>
     /// <param name="partida">PartidaDTO</param>
     /// <param name="usuario">Usuario</param>
     public async Task Actualizar(PartidaDTO partida, Usuario usuario)
     {
-        if (partida == null && usuario == null)
+        this.ValidarRecursosPartida(partida);
+        if (usuario == null)
             throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: Datos inválidos.");
-
-        if (partida.Energia < 0 || partida.Felicidad < 0 ||
-            partida.EcoCoins < 0 || partida.Contaminacion < 0)
-            throw new PartidaExcepcion("Los valores de los recursos no pueden ser negativos");
-
-        var partidaBuscada = this._repositorioPartida.ObtenerPorUsuarioId(usuario.Id);
         
-        if (partidaBuscada == null)
-            throw new ErrorInternoExcepction("Ocurrió un error al guardar el mapa: No encontrada.");
-
-        var energia = partidaBuscada.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Energia.GetDescription());
-        if (energia != null) energia.Cantidad = partida.Energia;
-
-        var felicidad = partidaBuscada.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Felicidad.GetDescription());
-        if (felicidad != null) felicidad.Cantidad = partida.Felicidad;
-
-        var ecoCoins = partidaBuscada.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.EcoCoins.GetDescription());
-        if (ecoCoins != null) ecoCoins.Cantidad = partida.EcoCoins;
-
-        var contaminacion = partidaBuscada.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Contaminacion.GetDescription());
-        if (contaminacion != null) contaminacion.Cantidad = partida.Contaminacion;
-
+        Partida? partidaBuscada = await this._repositorioPartida.ObtenerPorUsuarioId(usuario.Id);
+        
+        if (partidaBuscada == null || partidaBuscada.Recursos == null)
+            throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No encontrada.");
+        
+        partidaBuscada!.Recursos.Contaminacion = partida.Contaminacion;
+        partidaBuscada.Recursos.Energia = partida.Energia;
+        partidaBuscada.Recursos.Felicidad = partida.Felicidad;
+        partidaBuscada.Recursos.EcoCoins = partida.EcoCoins;
+        
         await this._repositorioPartida.GuardarCambios();
     }
 
-    // 🧱 CREAR PARTIDA
-    public Partida CrearPartida(int idUsuario)
+    /// <summary>
+    /// Crea una partida nueva para un usuario
+    /// </summary>
+    /// <param name="idUsuario">Id de usuario</param>
+    public async Task<Partida> CrearPartida(int idUsuario)
     {
-        var partidaExistente = this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
+        var partidaExistente = await this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
         if (partidaExistente != null)
             throw new PartidaExcepcion("Ya tienes una partida empezada.");
-
         if (idUsuario <= 0)
             throw new PartidaExcepcion("El Id del usuario es inválido.");
-
-        // 🔹 Crear partida en la BD
-        var partida = this._repositorioPartida.CrearPartida(idUsuario);
+        
+        var partida = await this._repositorioPartida.CrearPartida(idUsuario);
 
         // 🔹 Inicializar recursos para esa partida
         //this.recursoLogica.ConfigurarInicial(partida);
@@ -92,37 +97,40 @@ public class PartidaLogica : IPartidaLogica
     }
 
     // 📜 OBTENER TODAS LAS PARTIDAS
-    public List<PartidaDTO> ObtenerPartidas()
+    public async Task<List<PartidaDTO>> ObtenerPartidas()
     {
-        var partidas = this._repositorioPartida.ObtenerPartidas();
+        var partidas = await this._repositorioPartida.ObtenerPartidas();
         return partidas.Select(p => this.PartidaToDTO(p)).ToList();
     }
 
-    // 🔎 OBTENER PARTIDA POR USUARIO
-    public PartidaDTO ObtenerPorUsuarioId(int IdUsuario)
+    /// <summary>
+    /// Devuelve la partida de un usuario
+    /// </summary>
+    /// <param name="idUsuario">ID del Usuario</param>
+    public async Task<PartidaDTO> ObtenerPorUsuarioId(int IdUsuario)
     {
-        var partida = this._repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
-        if (partida == null) throw new Exception("Partida no encontrada");
+        var partida = await this._repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
+        if (partida == null) throw new PartidaExcepcion("Partida no encontrada");
         return this.PartidaToDTO(partida);
     }
 
-    // 🔄 CONVERSOR
+    /// <summary>
+    /// Convierte la entidad de dominio (BO) en un DTO para devolver como respuesta.
+    /// </summary>
+    /// <param name="partida">Partida con recursos</param>
     private PartidaDTO PartidaToDTO(Partida partida)
     {
-        var partidaDTO = new PartidaDTO
+        return new PartidaDTO
         {
             Id = partida.Id,
             Partida = partida,
             UsuarioId = partida.Usuario?.Id ?? 0,
             Usuario = partida.Usuario?.NombreUsuario ?? string.Empty,
+            Contaminacion = partida.Recursos.Contaminacion,
+            Felicidad = partida.Recursos.Felicidad,
+            EcoCoins = partida.Recursos.EcoCoins,
+            Energia = partida.Recursos.Energia,
         };
-
-        partidaDTO.Energia = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Energia.GetDescription())?.Cantidad ?? 100;
-        partidaDTO.Felicidad = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Felicidad.GetDescription())?.Cantidad ?? 50;
-        partidaDTO.EcoCoins = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.EcoCoins.GetDescription())?.Cantidad ?? 200;
-        partidaDTO.Contaminacion = partida.Recursos.FirstOrDefault(r => r.Nombre == TipoRecurso.Contaminacion.GetDescription())?.Cantidad ?? 60;
-
-        return partidaDTO;
     }
 
     /// <summary>
@@ -136,7 +144,7 @@ public class PartidaLogica : IPartidaLogica
 
         var hayEstructurasParaActualizar = dto.Estructuras != null && dto.Estructuras.Any();
 
-        Partida partida = await this._repositorioPartida.ObtenerPartidaConMapaAsync(dto.PartidaId);
+        Partida? partida = await this._repositorioPartida.ObtenerPartidaConMapaAsync(dto.PartidaId);
         if (partida == null) throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No existe.");
 
         partida.JsonMapa = dto.JsonMapa;

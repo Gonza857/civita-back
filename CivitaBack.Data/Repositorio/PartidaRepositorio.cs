@@ -16,9 +16,9 @@ public interface IPartidaRepositorio
 {
     Task GuardarCambios();
     
-    Partida ObtenerPorUsuarioId(int IdUsuario);
-    Partida CrearPartida(int idUsuario);
-    List<Partida> ObtenerPartidas();
+    Task<Partida?> ObtenerPorUsuarioId(int IdUsuario);
+    Task<Partida> CrearPartida(int idUsuario);
+    Task<List<Partida>> ObtenerPartidas();
     void Guardar(Partida partida);
     
     Task<bool> ActualizarMapaAsync(Partida partida);
@@ -47,53 +47,53 @@ public interface IPartidaRepositorio
             _context.SaveChanges();
         }
 
-        public Partida CrearPartida(int idUsuario)
+        public async Task<Partida> CrearPartida(int idUsuario)
         {
          
-                var rutaMapa = Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory, 
-                    "..", "..", "..", "..",                
-                    "CivitaBack.Data", "DTO", "mapa_base.json"
-);
+            var rutaMapa = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory, 
+                "..", "..", "..", "..",                
+                "CivitaBack.Data", "DTO", "mapa_base.json"
+            );
 
-                rutaMapa = Path.GetFullPath(rutaMapa);
+            rutaMapa = Path.GetFullPath(rutaMapa);
+            
+            if (!File.Exists(rutaMapa))
+                throw new FileNotFoundException("No se encontró el archivo de mapa base.", rutaMapa);
 
+            var contenidoMapa = File.ReadAllText(rutaMapa);
 
-                if (!File.Exists(rutaMapa))
-                    throw new FileNotFoundException("No se encontró el archivo de mapa base.", rutaMapa);
+            var partida = new Partida
+            {
+                UsuarioId = idUsuario,
+                JsonMapa = contenidoMapa,
+                UltimaVez = DateTime.UtcNow
+            };
 
-                var contenidoMapa = File.ReadAllText(rutaMapa);
+            await _context.Partida.AddAsync(partida);
 
-                var partida = new Partida
-                {
-                    UsuarioId = idUsuario,
-                    JsonMapa = contenidoMapa,
-                    UltimaVez = DateTime.UtcNow
-                };
+            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-                _context.Partida.Add(partida);
-
-                _context.SaveChanges();
-
-                return partida;
-            }
+            return partida;
+        }
             
         
 
-        public List<Partida> ObtenerPartidas()
+        public async Task<List<Partida>> ObtenerPartidas()
         {
-            return _context.Partida
+            return await _context.Partida
                 .Include(p => p.Usuario)
                 .Include(p => p.Recursos)
-                .ToList();
+                .ToListAsync();
         }
 
-        public Partida ObtenerPorUsuarioId(int IdUsuario)
+        public async Task<Partida?> ObtenerPorUsuarioId(int IdUsuario)
         {
-            return _context.Partida
+            return await _context.Partida
                 .Include(p => p.Recursos)
                 .Include(p => p.Usuario)
-                .FirstOrDefault(p => p.UsuarioId == IdUsuario);
+                .FirstOrDefaultAsync(p => p.UsuarioId == IdUsuario);
         }
         
         public async Task<bool> ActualizarMapaAsync(Partida partida)

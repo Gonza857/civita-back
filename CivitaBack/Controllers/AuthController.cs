@@ -32,9 +32,9 @@ namespace CivitaBack.Api.Controllers
             {
                 var usuario = await _authLogica.RegistrarUsuarioAsync(request.NombreUsuario, request.Mail, request.Password);
 
-                var partida = _partidaLogica.CrearPartida(usuario.Id);
+                var partida = await _partidaLogica.CrearPartida(usuario.Id);
                 
-                _recursoLogica.ConfigurarInicial(partida);
+               await _recursoLogica.ConfigurarInicial(partida);
 
                 return Ok(new { mensaje = "Usuario registrado correctamente!", usuario });
             }
@@ -79,10 +79,11 @@ namespace CivitaBack.Api.Controllers
         }
 
         [HttpGet("existeNombre")]
-        public async Task<IActionResult> ExisteNombre([FromQuery] string nombre)
+        public async Task<IActionResult> ExisteNombre([FromQuery] string? nombre)
         {
+            if (nombre == null) return BadRequest("El nombre del usuario no puede ser nulo.");
             var existe = await _usuarioLogica.ObtenerUsuarioPorNombre(nombre) != null;
-            return Ok(new { existe = true });
+            return Ok(new { existe });
         }
     }
 

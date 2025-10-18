@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Logica.Excepciones;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
 
 public interface IEstructuraLogica
 {
-    Estructura ObtenerPorId(int idEstructura);
+    Task<Estructura> ObtenerPorId(int idEstructura);
 }
 public class EstructuraLogica : IEstructuraLogica, IParser<Estructura, EstructuraDTO>
 {
@@ -23,10 +24,10 @@ public class EstructuraLogica : IEstructuraLogica, IParser<Estructura, Estructur
         repositorioEstructura = re;
     }
 
-    public Estructura ObtenerPorId(int idEstructura)
+    public async Task<Estructura> ObtenerPorId(int idEstructura)
     {
-        if (idEstructura == null) throw new Exception("No se pudo obtener la estructura"); // Pasar a personalizada
-        return this.repositorioEstructura.ObtenerPorId(idEstructura);
+        if (idEstructura == null) throw new EstructuraExcepcion("No se pudo obtener la estructura"); 
+        return await this.repositorioEstructura.ObtenerPorId(idEstructura);
     }
 
     public EstructuraDTO ToDto(Estructura entidad)

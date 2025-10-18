@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Logica.Excepciones;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
 
 public interface ILogroPartidaLogica
 {
-    List<LogroDTO> ObtenerLogrosIncompletos(int usuarioId);
-    List<LogroDTO> ObtenerLogrosCompletados(int usuarioId);
+    Task<List<LogroDTO>> ObtenerLogrosIncompletos(int usuarioId);
+    Task<List<LogroDTO>> ObtenerLogrosCompletados(int usuarioId);
 
 }
 
@@ -28,21 +29,31 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
         repositorioPartida = pr;
     }
 
-    public List<LogroDTO> ObtenerLogrosIncompletos(int usuarioId)
+    public async Task<List<LogroDTO>> ObtenerLogrosIncompletos(int usuarioId)
     {
-        Partida partida = repositorioPartida.ObtenerPorUsuarioId(usuarioId);
-        if (partida == null) throw new Exception("No se encontró la partida del usuario");
-        List<Logro> logrosNoCompletos = repositorioLogroPartida.ObtenerLogrosIncompletos(partida.Id);
+        if (usuarioId <= 0)
+            throw new LogroPartidaExcepcion("Ocurrió un error al obtener los logros del usuario.");
+        Partida partida = await this.ObtenerPartidaUsuarioPorId(usuarioId);
+        List<Logro> logrosNoCompletos = await repositorioLogroPartida.ObtenerLogrosIncompletos(partida.Id);
         return logrosNoCompletos.Select(l => this.ToDto(l)).ToList();
     }
 
-    public List<LogroDTO> ObtenerLogrosCompletados(int usuarioId)
+    public async Task<List<LogroDTO>> ObtenerLogrosCompletados(int usuarioId)
     {
-        Partida partida = repositorioPartida.ObtenerPorUsuarioId(usuarioId);
-        if (partida == null) throw new Exception("No se encontró la partida del usuario");
-        List<Logro> logrosNoCompletos = repositorioLogroPartida.ObtenerLogrosCompletos(partida.Id);
+        if (usuarioId <= 0)
+            throw new LogroPartidaExcepcion("Ocurrió un error al obtener los logros del usuario.");
+        Partida partida = await this.ObtenerPartidaUsuarioPorId(usuarioId);
+        List<Logro> logrosNoCompletos = await repositorioLogroPartida.ObtenerLogrosCompletos(partida.Id);
         return logrosNoCompletos.Select(l => this.ToDto(l)).ToList();
 
+    }
+
+    private async Task<Partida> ObtenerPartidaUsuarioPorId(int usuarioId)
+    {
+        Partida? partida = await repositorioPartida.ObtenerPorUsuarioId(usuarioId);
+        if (partida == null) 
+            throw new LogroExcepcion("No se encontró la partida del usuario");
+        return partida;
     }
 
     public LogroDTO ToDto(Logro entidad)
