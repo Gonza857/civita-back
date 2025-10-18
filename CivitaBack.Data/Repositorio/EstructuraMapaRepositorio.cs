@@ -14,6 +14,11 @@ public interface IEstructuraMapaRepositorio
     void RemoverEliminadas(List<EstructuraMapa> emList);
     void AgregarNuevas(List<EstructuraMapa> emList);
     Task GuardarCambios();
+
+
+    Task EliminarPorPartidaIdAsync(int partidaId);
+    Task AgregarVariasAsync(List<EstructuraMapa> estructuras);
+
 }
 
 public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRepositorio
@@ -41,5 +46,19 @@ public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRep
     {
         await base.GuardarCambiosAsync();
     }
+
+    public async Task EliminarPorPartidaIdAsync(int partidaId)
+    {
+        var existentes = _context.EstructuraMapa.Where(e => e.PartidaId == partidaId);
+        _context.EstructuraMapa.RemoveRange(existentes);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task AgregarVariasAsync(List<EstructuraMapa> estructuras)
+    {
+        await _context.EstructuraMapa.AddRangeAsync(estructuras);
+        await _context.SaveChangesAsync();
+    }
+
 
 }

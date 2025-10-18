@@ -17,7 +17,7 @@ public class PartidaLogicaTest
 {
     private readonly Mock<IPartidaRepositorio> _mockPartidaRepositorio;
     private readonly Mock<IRecursoLogica> _mockRecurso;
-    private readonly Mock<IEstructuraMapaRepositorio> _mockRepoEstructuraMapa;
+    private readonly Mock<IEstructuraMapaRepositorio> _mockEstructuraMapaRepositorio;
 
     private readonly IPartidaLogica _partidaLogica;
     private readonly IRecursoLogica _recursoLogica;
@@ -27,13 +27,13 @@ public class PartidaLogicaTest
         // Creamos los mocks de las dependencias
         _mockPartidaRepositorio = new Mock<IPartidaRepositorio>();
         _mockRecurso = new Mock<IRecursoLogica>();
-        _mockRepoEstructuraMapa = new Mock<IEstructuraMapaRepositorio>();
+        _mockEstructuraMapaRepositorio = new Mock<IEstructuraMapaRepositorio>();
 
         // Inyectamos los mocks en el constructor de PartidaLogica
         _partidaLogica = new PartidaLogica(
             _mockPartidaRepositorio.Object, 
             _mockRecurso.Object,
-            _mockRepoEstructuraMapa.Object
+            _mockEstructuraMapaRepositorio.Object
         );
     }
 
@@ -293,8 +293,10 @@ public class PartidaLogicaTest
 
         // Assert
         _mockPartidaRepositorio.Verify(r => r.ObtenerPartidaConMapaAsync(partidaMock.Id), Times.Once);
-        _mockPartidaRepositorio.Verify(r => r.ObtenerEstructurasDeUnMapa(partidaMock.Id), Times.Once);
-        _mockPartidaRepositorio.Verify(r => r.GuardarCambios(), Times.Once);
+        _mockPartidaRepositorio.Verify(r => r.ActualizarMapaAsync(partidaMock), Times.Once);
+        _mockEstructuraMapaRepositorio.Verify(r => r.EliminarPorPartidaIdAsync(partidaMock.Id), Times.Once);
+        _mockEstructuraMapaRepositorio.Verify(r => r.AgregarNuevas(It.IsAny<List<EstructuraMapa>>()), Times.Once);
+        _mockEstructuraMapaRepositorio.Verify(r => r.GuardarCambios(), Times.Once);
     }
 
     [Fact]

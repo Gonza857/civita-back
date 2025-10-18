@@ -7,6 +7,7 @@ using CivitaBack.Data.DTO;
 using CivitaBack.Data.Enum;
 using CivitaBack.Data.Repositorio;
 using CivitaBack.Logica.Excepciones;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Logica;
 
@@ -142,57 +143,37 @@ public class PartidaLogica : IPartidaLogica
         if (dto == null || dto.PartidaId <= 0)
             throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: Datos inválidos.");
 
-        var hayEstructurasParaActualizar = dto.Estructuras != null && dto.Estructuras.Any();
-
-        Partida? partida = await this._repositorioPartida.ObtenerPartidaConMapaAsync(dto.PartidaId);
-        if (partida == null) throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No existe.");
+        var partida = await _repositorioPartida.ObtenerPartidaConMapaAsync(dto.PartidaId);
+        if (partida == null)
+            throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No existe la partida.");
 
         partida.JsonMapa = dto.JsonMapa;
         partida.UltimaVez = DateTime.UtcNow;
+        await _repositorioPartida.ActualizarMapaAsync(partida);
 
-        await this._repositorioPartida.ActualizarMapaAsync(partida);
-        
-        if (hayEstructurasParaActualizar)
+        if (dto.Estructuras != null && dto.Estructuras.Any())
         {
-            List<EstructuraMapa> estructurasDePartida =
-                await this._repositorioPartida.ObtenerEstructurasDeUnMapa(dto.PartidaId);
+            // 1️⃣ Eliminar estructuras viejas de esa partida
+            await _estructuraMapaRepositorio.EliminarPorPartidaIdAsync(partida.Id);
 
-            var nuevas = dto.Estructuras!
-                .Where(emDto => emDto.EstructuraId == 0 ||
-                                !estructurasDePartida.Any(em => em.EstructuraId == emDto.EstructuraId))
-                .ToList();
-
-            var modificadas = dto.Estructuras!
-                .Where(emDto => estructurasDePartida.Any(em => em.EstructuraId == emDto.EstructuraId))
-                .ToList();
-
-            var eliminadas = estructurasDePartida
-                .Where(em => !dto.Estructuras!.Any(emDto => emDto.EstructuraId == em.EstructuraId))
-                .ToList();
-        
-            this._estructuraMapaRepositorio.AgregarNuevas(this.ListaDtoToListaEntidad(nuevas, partida.Id));
-
-            foreach (EstructuraMapaDTO mod in modificadas)
+            // 2️⃣ Agregar las nuevas
+            var nuevas = dto.Estructuras.Select(e => new EstructuraMapa
             {
-                var original = estructurasDePartida.First(em => em.EstructuraId == mod.EstructuraId);
-                this.ActualizarEstructuraMapa(original, mod);
-                this._estructuraMapaRepositorio.AgregarUnica(original);
-            }
+                PartidaId = partida.Id,
+                EstructuraId = e.EstructuraId,
+                X = e.X,
+                Y = e.Y,
+                Width = e.Width,
+                Height = e.Height
+            }).ToList();
 
-            this._estructuraMapaRepositorio.RemoverEliminadas(eliminadas);
+            _estructuraMapaRepositorio.AgregarNuevas(nuevas);
 
-            try
-            {
-                await this._repositorioPartida.GuardarCambios();
-            }
-            catch (Exception e)
-            {
-                throw new ErrorInternoExcepction("Ocurrió un error al actualizar el mapa y las estructuras");
-            }
+            // 3️⃣ Guardar cambios
+            await _estructuraMapaRepositorio.GuardarCambios();
         }
-
-        
     }
+
 
     private void ActualizarEstructuraMapa(EstructuraMapa original, EstructuraMapaDTO mod)
     {
