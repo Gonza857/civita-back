@@ -8,9 +8,8 @@ namespace CivitaBack.Data.BO
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
-        public string? Nombre { get; set; }  // Ej: Generadora, Vivienda, Verde
-        public string? Ocupacion { get; set; }
+        public string Nombre { get; set; } 
+        public int Ocupacion { get; set; }
         public int Capacidad { get; set; }
         public int EnergiaPorCiclo { get; set; }
         public int DineroPorCiclo { get; set; }

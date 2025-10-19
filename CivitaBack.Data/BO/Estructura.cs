@@ -16,10 +16,8 @@ namespace CivitaBack.Data.BO
         public int CostoDinero { get; set; }
         public int FelicidadCiclo { get; set; }
         public int ContaminacionCiclo { get; set; }
- 
         public int TipoEstructuraId { get; set; }
-        public TipoEstructura? TipoEstructura { get; set; }
-
+        public TipoEstructura TipoEstructura { get; set; }
         public List<EstructuraMapa>? EstructurasEnMapa { get; set; }
     }
 }

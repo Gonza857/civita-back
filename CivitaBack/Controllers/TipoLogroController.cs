@@ -30,7 +30,6 @@ public class TipoLogroController : ControllerBase
         {
             return Problem("Ocurrió un error al obtener el listado de Tipos de Logros");
         }
-
     }
 
     [HttpPost]
@@ -49,7 +48,6 @@ public class TipoLogroController : ControllerBase
             return Problem("Ocurrió un error al guardar el Tipo de Logro");
 
         }
-        
     }
 
     [HttpDelete("{id}")]

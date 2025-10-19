@@ -66,9 +66,6 @@ builder.Services.AddScoped<ILogroPartidaLogica, LogroPartidaLogica>();
 builder.Services.AddScoped<IEstructuraMapaLogica, EstructuraMapaLogica>();
 builder.Services.AddScoped<IEstructuraMapaRepositorio, EstructuraMapaRepositorio>();
 
-builder.Services.AddScoped<IEstructuraLogica, EstructuraLogica>();
-builder.Services.AddScoped<IEstructuraRepositorio, EstructuraRepositorio>();
-
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 builder.Services.AddHostedService<BackgroundCicloLogica>();
 
@@ -80,6 +77,12 @@ builder.Services.AddScoped<ITipsRepositorio, TipsRepositorio>();
 
 builder.Services.AddScoped<ITipoTipLogica, TipoTipLogica>();
 builder.Services.AddScoped<ITipoTipRepositorio, TipoTipRepositorio>();
+
+builder.Services.AddScoped<IEstructuraLogica, EstructuraLogica>();
+builder.Services.AddScoped<IEstructuraRepositorio, EstructuraRepositorio>();
+
+builder.Services.AddScoped<ITipoEstructuraRepositorio, TipoEstructuraRepositorio>();
+builder.Services.AddScoped<ITipoEstructuraLogica, TipoEstructuraLogica>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
