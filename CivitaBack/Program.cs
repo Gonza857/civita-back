@@ -71,15 +71,18 @@ builder.Services.AddScoped<IEstructuraLogica, EstructuraLogica>();
 builder.Services.AddScoped<IEstructuraRepositorio, EstructuraRepositorio>();
 
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
+builder.Services.AddHostedService<BackgroundCicloLogica>();
 
 builder.Services.AddScoped<ICicloRepositorio, CicloRepositorio>();
 builder.Services.AddScoped<ICicloLogica, CicloLogica>();
 
-builder.Services.AddHostedService<BackgroundCicloLogica>();
 builder.Services.AddScoped<ITipsLogica, TipsLogica>();
 builder.Services.AddScoped<ITipsRepositorio, TipsRepositorio>();
 
 builder.Services.AddSignalR();
+builder.Services.AddScoped<ITipoTipLogica, TipoTipLogica>();
+builder.Services.AddScoped<ITipoTipRepositorio, TipoTipRepositorio>();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

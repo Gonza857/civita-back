@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CivitaBack.Data.BO;
 
-public class LogroPartida
+public class LogroPartida : Auditable
 {
     private DateTime? FechaCompletado {  get; set; }
 

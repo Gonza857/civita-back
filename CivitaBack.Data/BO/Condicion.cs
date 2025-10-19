@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CivitaBack.Data.BO;
 
-public class Condicion
+public class Condicion : Auditable
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -24,6 +24,7 @@ public class LogroRepositorio : ILogroRepositorio
 
     public async Task Actualizar(Logro logro)
     {
+        logro.Editado = DateTime.UtcNow;
         await _context.SaveChangesAsync();
     }
 

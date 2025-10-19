@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CivitaBack.Data.BO;
 
-public class Logro
+public class Logro : Auditable
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
