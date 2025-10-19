@@ -14,19 +14,14 @@ public interface ITipoLogroRepositorio : IRepositorioBase<TipoLogro>
 
 }
 
-public class TipoLogroRepositorio : ITipoLogroRepositorio
+public class TipoLogroRepositorio : GenericoRepositorio, ITipoLogroRepositorio
 {
-    private readonly AppDbContext _context;
-
-    public TipoLogroRepositorio(AppDbContext context)
-    {
-        _context = context;
-    }
+    public TipoLogroRepositorio(AppDbContext context) : base(context) { }
     
     public async Task Actualizar(TipoLogro entidad)
     {
         entidad.Editado = DateTime.UtcNow;
-        await _context.TipoLogro.AddAsync(entidad);
+        _context.TipoLogro.Update(entidad);
         await _context.SaveChangesAsync();
     }
 
@@ -48,10 +43,10 @@ public class TipoLogroRepositorio : ITipoLogroRepositorio
         await _context.SaveChangesAsync();
     }
 
-    public async Task<TipoLogro?> ObtenerPorId(int Id)
+    public async Task<TipoLogro?> ObtenerPorId(int id)
     {
         return await _context.TipoLogro
-            .FirstOrDefaultAsync(tl => tl.Id == Id);
+            .FirstOrDefaultAsync(tl => tl.Id == id);
     }
     
     public async Task<List<TipoLogro>> ObtenerTodos()

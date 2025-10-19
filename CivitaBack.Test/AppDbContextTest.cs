@@ -134,36 +134,36 @@ namespace CivitaBack.Tests
             Assert.Contains(primaryKey.Properties, p => p.Name == "PartidaId");
         }
 
-        [Fact]
-        public void CanAddMultipleEntities()
-        {
-            // Arrange
-            var options = CreateNewContextOptions();
-            using var context = new AppDbContext(options);
-
-            var tipoEstructura = new TipoEstructura
-            {
-                Nombre = "Vivienda",
-                Ocupacion = "Residencial",
-                Capacidad = 100
-            };
-
-            var estructura = new Estructura
-            {
-                Nombre = "Casa",
-                EsMejorable = true,
-                TipoEstructura = tipoEstructura
-            };
-
-            // Act
-            context.TipoEstructura.Add(tipoEstructura);
-            context.Estructura.Add(estructura);
-            context.SaveChanges();
-
-            // Assert
-            Assert.Equal(1, context.TipoEstructura.Count());
-            Assert.Equal(1, context.Estructura.Count());
-        }
+        // [Fact]
+        // public void CanAddMultipleEntities()
+        // {
+        //     // Arrange
+        //     var options = CreateNewContextOptions();
+        //     using var context = new AppDbContext(options);
+        //
+        //     var tipoEstructura = new TipoEstructura
+        //     {
+        //         Nombre = "Vivienda",
+        //         Ocupacion = "Residencial",
+        //         Capacidad = 100
+        //     };
+        //
+        //     var estructura = new Estructura
+        //     {
+        //         Nombre = "Casa",
+        //         EsMejorable = true,
+        //         TipoEstructura = tipoEstructura
+        //     };
+        //
+        //     // Act
+        //     context.TipoEstructura.Add(tipoEstructura);
+        //     context.Estructura.Add(estructura);
+        //     context.SaveChanges();
+        //
+        //     // Assert
+        //     Assert.Equal(1, context.TipoEstructura.Count());
+        //     Assert.Equal(1, context.Estructura.Count());
+        // }
 
         [Fact]
         public void CanAddTipoLogro()

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CivitaBack.Data.DTO;
+﻿namespace CivitaBack.Data.DTO;
 
 public class EstructuraDTO
 {
@@ -16,5 +10,5 @@ public class EstructuraDTO
     public int CostoDinero { get; set; }
     public int FelicidadCiclo { get; set; }
     public int ContaminacionCiclo { get; set; }
-    public int TipoEstructuraId { get; set; }
+    public TipoEstructuraDTO Tipo { get; set; }
 }

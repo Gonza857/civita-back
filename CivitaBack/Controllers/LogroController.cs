@@ -9,9 +9,7 @@ namespace CivitaBack.Api.Controllers;
 [Route("api/[controller]")]
 public class LogroController : ControllerBase
 {
-
     private readonly ILogroLogica _logroLogica;
-
     public LogroController(ILogroLogica ill)
     {
         this._logroLogica = ill;
@@ -36,7 +34,6 @@ public class LogroController : ControllerBase
     {
         if (nuevoLogro == null)
             return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
-
         try
         {
             var logroGuardado = await _logroLogica.Guardar(nuevoLogro);
@@ -46,7 +43,6 @@ public class LogroController : ControllerBase
         {
             return Problem("Ocurrió un error al guardar el Logro");
         }
-
     }
 
     [HttpDelete("{id}")]
@@ -61,8 +57,6 @@ public class LogroController : ControllerBase
         {
             return Problem("Ocurrió un error al eliminar el logro.");
         }
-
-
     }
 
     [HttpGet("{id}")]
@@ -77,7 +71,6 @@ public class LogroController : ControllerBase
         {
             return Problem("Ocurrió un error al obtener el logro.");
         }
-        
     }
 
     [HttpPatch("{id}")]
@@ -95,7 +88,6 @@ public class LogroController : ControllerBase
         {
             return Problem(ex.Message);
         }
-
     }
 
 }
