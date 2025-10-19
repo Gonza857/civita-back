@@ -29,6 +29,7 @@ public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRep
 
     public void AgregarUnica(EstructuraMapa em)
     {
+        em.Editado = DateTime.UtcNow;
         _context.EstructuraMapa.Update(em);
     }
 
