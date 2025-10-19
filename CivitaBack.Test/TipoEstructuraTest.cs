@@ -14,7 +14,7 @@ namespace CivitaBack.Tests
             // Assert
             Assert.Equal(0, tipoEstructura.Id);
             Assert.Null(tipoEstructura.Nombre);
-            Assert.Null(tipoEstructura.Ocupacion);
+            Assert.Equal(0, tipoEstructura.Ocupacion);
             Assert.Equal(0, tipoEstructura.Capacidad);
             Assert.Equal(0, tipoEstructura.EnergiaPorCiclo);
             Assert.Equal(0, tipoEstructura.DineroPorCiclo);
