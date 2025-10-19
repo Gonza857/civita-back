@@ -3,6 +3,7 @@ using CivitaBack.Data.EF;
 using CivitaBack.Data.Repositorio;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Backgrounds;
+using CivitaBack.Logica.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -78,6 +79,7 @@ builder.Services.AddHostedService<BackgroundCicloLogica>();
 builder.Services.AddScoped<ITipsLogica, TipsLogica>();
 builder.Services.AddScoped<ITipsRepositorio, TipsRepositorio>();
 
+builder.Services.AddSignalR();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -109,6 +111,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.MapHub<CicloHub>("/cicloHub");
 
 app.UseHttpsRedirection();
 app.UseCors("AllowViteDev");
