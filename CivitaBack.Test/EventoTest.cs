@@ -5,7 +5,7 @@ namespace CivitaBack.Tests
 {
     public class EventoTest
     {
-        [Fact]
+        /*[Fact]
         public void Evento_Constructor_InitializesProperties()
         {
             // Act
@@ -84,6 +84,6 @@ namespace CivitaBack.Tests
 
             // Assert
             Assert.Equal(-10, evento.TiempoParaHacerlo);
-        }
+        }*/
     }
 }

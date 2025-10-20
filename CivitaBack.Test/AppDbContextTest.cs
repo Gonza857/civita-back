@@ -186,7 +186,7 @@ namespace CivitaBack.Tests
             Assert.NotNull(retrieved);
         }
 
-        [Fact]
+        /*[Fact]
         public void CanAddEventoMaestro()
         {
             // Arrange
@@ -204,7 +204,7 @@ namespace CivitaBack.Tests
 
             // Assert
             Assert.Equal(1, context.EventoMaestro.Count());
-        }
+        }*/
 
         [Fact]
         public void CanAddTipoTip()

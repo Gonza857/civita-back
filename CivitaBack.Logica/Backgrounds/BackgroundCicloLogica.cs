@@ -14,7 +14,7 @@ namespace CivitaBack.Logica.Backgrounds
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<BackgroundCicloLogica> _logger;
         private readonly IHubContext<CicloHub> _hubContext;
-        private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(15);
+        private readonly TimeSpan _intervalo = TimeSpan.FromMinutes(15);
 
         public BackgroundCicloLogica(IServiceProvider serviceProvider, ILogger<BackgroundCicloLogica> logger, IHubContext<CicloHub> hubContext)
         {
@@ -40,7 +40,8 @@ namespace CivitaBack.Logica.Backgrounds
                     var partidas = await cicloLogica.EjecutarCicloAsync();
 
                     // Enviar los recursos a cada grupo de SignalR
-                    foreach (var partida in partidas) { 
+                    foreach (var partida in partidas)
+                    {
                         var payload = new RecursoDTO
                         {
                             Energia = partida.Recursos.Energia,
@@ -50,17 +51,17 @@ namespace CivitaBack.Logica.Backgrounds
                             Poblacion = partida.Recursos.Poblacion
                         };
 
-                    await _hubContext.Clients.Group(partida.Id.ToString())
-                        .SendAsync("RecursosActualizados", payload);
-                }
+                        await _hubContext.Clients.Group(partida.Id.ToString())
+                            .SendAsync("RecursosActualizados", payload);
+                    }
 
                     _logger.LogInformation("✅ Ciclo ejecutado y recursos enviados a SignalR a las {Hora}", DateTime.Now);
-            }
+                }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "❌ Error durante la ejecución del ciclo automático");
-                    
-                    await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken); 
+
+                    await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
                 }
 
             }
