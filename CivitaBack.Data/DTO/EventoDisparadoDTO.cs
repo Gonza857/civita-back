@@ -9,6 +9,7 @@ namespace CivitaBack.Data.DTO
     public class EventoDisparadoDTO
     {
         public int Id { get; set; }
+        public string Titulo { get; set; } = string.Empty;
         public string TextoDescripcion { get; set; } = string.Empty;
         public int EcoCoinsAceptar { get; set; }
         public int FelicidadAceptar { get; set; }
