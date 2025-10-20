@@ -56,13 +56,23 @@ namespace CivitaBack.Logica
                 .SendAsync("EventoDisparado", new EventoDisparadoDTO
                 {
                     Id = evento.Id,
-                    TextoDescripcion = evento.TextoDescripcion
+                    TextoDescripcion = evento.TextoDescripcion,
+                    EcoCoinsAceptar = maestro.EcoCoinsAceptar,
+                    FelicidadAceptar = maestro.FelicidadAceptar,
+                    ContaminacionAceptar = maestro.ContaminacionAceptar,
+                    FelicidadRechazar = maestro.FelicidadRechazar,
+                    ContaminacionRechazar = maestro.ContaminacionRechazar,
                 });
 
             return new EventoDisparadoDTO
             {
                 Id = evento.Id,
-                TextoDescripcion = evento.TextoDescripcion
+                TextoDescripcion = evento.TextoDescripcion,
+                EcoCoinsAceptar = maestro.EcoCoinsAceptar,
+                FelicidadAceptar = maestro.FelicidadAceptar,
+                ContaminacionAceptar = maestro.ContaminacionAceptar,
+                FelicidadRechazar = maestro.FelicidadRechazar,
+                ContaminacionRechazar = maestro.ContaminacionRechazar,
             };
 
         }
