@@ -18,30 +18,31 @@ builder.Services.AddSwaggerGen();
 // CORS para Vite Dev
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowViteDev", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // credenciales
+              .AllowAnyMethod();
     });
 });
+
+var devProfile = Environment.GetEnvironmentVariable("DEV_PROFILE");
+Console.WriteLine($"Perfil DEV_PROFILE: {devProfile ?? "no definido"}");
 
 // Cargar configuración con perfiles
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("DEV_PROFILE")}.json", optional: true)
+    //.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddJsonFile($"appsettings.{devProfile}.json", optional: true)
     .AddEnvironmentVariables();
-
-Console.WriteLine("Perfil DEV_PROFILE: " + Environment.GetEnvironmentVariable("DEV_PROFILE"));
 
 // Configurar DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseNpgsql(connectionString);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine($"Cadena de conexión usada: {connectionString}");
+options.UseNpgsql(connectionString);
 });
 
 builder.Services.AddScoped<IPartidaLogica, PartidaLogica>();
@@ -97,7 +98,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowViteDev");
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

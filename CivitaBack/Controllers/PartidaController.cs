@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CivitaBack.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class PartidaController : ControllerBase
     {
         private readonly IPartidaLogica _partidaLogica;

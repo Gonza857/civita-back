@@ -14,13 +14,13 @@ namespace CivitaBack.Data.Migrations
                 name: "IX_Partida_UsuarioId",
                 table: "Partida");
 
-            migrationBuilder.DropColumn(
+           /* migrationBuilder.DropColumn(
                 name: "Contaminacion",
                 table: "Recurso");
 
             migrationBuilder.DropColumn(
                 name: "Felicidad",
-                table: "Recurso");
+                table: "Recurso");*/
 
             migrationBuilder.AddColumn<int>(
                 name: "Height",
@@ -80,7 +80,7 @@ namespace CivitaBack.Data.Migrations
                 name: "Y",
                 table: "EstructuraEnMapa");
 
-            migrationBuilder.AddColumn<int>(
+           /* migrationBuilder.AddColumn<int>(
                 name: "Contaminacion",
                 table: "Recurso",
                 type: "integer",
@@ -92,7 +92,7 @@ namespace CivitaBack.Data.Migrations
                 table: "Recurso",
                 type: "integer",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0);*/
 
             migrationBuilder.CreateIndex(
                 name: "IX_Partida_UsuarioId",
