@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251019202439_condicion_logro")]
+    partial class condicion_logro
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,7 +42,7 @@ namespace CivitaBack.Data.Migrations
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("EstructuraId")
+                    b.Property<int>("EstructuraId")
                         .HasColumnType("integer");
 
                     b.Property<string>("NombreColumna")
@@ -536,7 +539,9 @@ namespace CivitaBack.Data.Migrations
                 {
                     b.HasOne("CivitaBack.Data.BO.Estructura", "Estructura")
                         .WithMany()
-                        .HasForeignKey("EstructuraId");
+                        .HasForeignKey("EstructuraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Estructura");
                 });

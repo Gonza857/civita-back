@@ -18,6 +18,7 @@ public interface IPartidaLogica
     Task<Partida> CrearPartida(int idUsuario);
     Task Actualizar(PartidaDTO partida, Usuario usuario);
     Task<List<PartidaDTO>> ObtenerPartidas();
+    Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario);
 
     // 🆕 Métodos de mapa
     Task ActualizarMapaDePartidaAsync(GuardarMapaDTO dto);
@@ -102,6 +103,11 @@ public class PartidaLogica : IPartidaLogica
     {
         var partidas = await this._repositorioPartida.ObtenerPartidas();
         return partidas.Select(p => this.PartidaToDTO(p)).ToList();
+    }
+
+    public async Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario)
+    {
+        return await this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
     }
 
     /// <summary>

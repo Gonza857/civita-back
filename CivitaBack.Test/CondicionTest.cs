@@ -16,8 +16,6 @@ namespace CivitaBack.Tests
             Assert.Equal(0, condicion.Cantidad);
             Assert.Equal(0, condicion.EstructuraId);
             Assert.Null(condicion.Estructura);
-            Assert.Equal(0, condicion.RecursoId);
-            Assert.Null(condicion.Recurso);
         }
 
         [Fact]
@@ -33,16 +31,12 @@ namespace CivitaBack.Tests
             condicion.Cantidad = 10;
             condicion.EstructuraId = 5;
             condicion.Estructura = estructura;
-            condicion.RecursoId = 3;
-            condicion.Recurso = recurso;
 
             // Assert
             Assert.Equal(1, condicion.Id);
             Assert.Equal(10, condicion.Cantidad);
             Assert.Equal(5, condicion.EstructuraId);
             Assert.Equal(estructura, condicion.Estructura);
-            Assert.Equal(3, condicion.RecursoId);
-            Assert.Equal(recurso, condicion.Recurso);
         }
 
         [Fact]
@@ -55,8 +49,6 @@ namespace CivitaBack.Tests
                 Cantidad = 5,
                 EstructuraId = 2,
                 Estructura = null,
-                RecursoId = 3,
-                Recurso = null
             };
 
             // Assert
@@ -64,8 +56,6 @@ namespace CivitaBack.Tests
             Assert.Equal(5, condicion.Cantidad);
             Assert.Equal(2, condicion.EstructuraId);
             Assert.Null(condicion.Estructura);
-            Assert.Equal(3, condicion.RecursoId);
-            Assert.Null(condicion.Recurso);
         }
 
         [Fact]
@@ -77,14 +67,12 @@ namespace CivitaBack.Tests
                 Id = 0,
                 Cantidad = 0,
                 EstructuraId = 0,
-                RecursoId = 0
             };
 
             // Assert
             Assert.Equal(0, condicion.Id);
             Assert.Equal(0, condicion.Cantidad);
             Assert.Equal(0, condicion.EstructuraId);
-            Assert.Equal(0, condicion.RecursoId);
         }
     }
 }

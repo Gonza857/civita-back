@@ -8,7 +8,7 @@ namespace CivitaBack.Data.BO;
 
 public class LogroPartida : Auditable
 {
-    private DateTime? FechaCompletado {  get; set; }
+    private DateTime FechaCompletado {  get; set; }
 
     // Relaciones
     public int LogroId { get; set; }

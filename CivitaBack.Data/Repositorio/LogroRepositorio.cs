@@ -25,7 +25,7 @@ public class LogroRepositorio : ILogroRepositorio
     public async Task Actualizar(Logro logro)
     {
         logro.Editado = DateTime.UtcNow;
-        await _context.Logro.AddAsync(logro);
+        _context.Logro.Update(logro);
         await _context.SaveChangesAsync();
     }
 
@@ -49,12 +49,14 @@ public class LogroRepositorio : ILogroRepositorio
     {
         return await _context.Logro
             .Include(tl => tl.TipoLogro)
+            .Include(tl => tl.Condicion)
             .FirstOrDefaultAsync(tl => tl.Id == id);
     }
 
     public async Task<List<Logro>> ObtenerTodos()
     {
         return await _context.Logro
+            .Include(tl => tl.Condicion)
             .Include (tl => tl.TipoLogro)
             .ToListAsync();
     }

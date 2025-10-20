@@ -4,45 +4,45 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CivitaBack.Data.Enum;
 
-[AttributeUsage(AttributeTargets.Field)]
-public class DescripcionRecursoAttribute : Attribute
-{
-    public string Descripcion { get; }
-
-    public DescripcionRecursoAttribute(string descripcion)
-    {
-        Descripcion = descripcion;
-    }
-}
-
 public enum TipoRecurso
 {
-    [DescripcionRecurso("Energía")]
     Energia,
-
-    [DescripcionRecurso("Felicidad")]
     Felicidad,
-
-    [DescripcionRecurso("EcoCoins")]
-    EcoCoins,
-
-    [DescripcionRecurso("Contaminación")]
-    Contaminacion
-
-
+    Contaminacion,
+    Dinero
 }
 
-public static class TipoRecursoExtensions
+public static class TipoRecursoHelper
 {
-    public static string GetDescription(this TipoRecurso value)
+    public static bool TryGetTipoRecurso(string input, out TipoRecurso tipoRecurso)
     {
-        var field = value.GetType().GetField(value.ToString());
-        var attr = (DescripcionRecursoAttribute?)Attribute.GetCustomAttribute(field, typeof(DescripcionRecursoAttribute));
-        return attr?.Descripcion ?? value.ToString();
+        input = input?.Trim();
+        return System.Enum.TryParse<TipoRecurso>(input, ignoreCase: true, out tipoRecurso);
+    }
+
+    public static bool EsTipoRecursoValido(string input)
+    {
+        input = input?.Trim();
+        return System.Enum.GetNames(typeof(TipoRecurso))
+            .Any(e => e.Equals(input, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public static TipoRecurso? ParseTipoRecurso(string input)
+    {
+        input = input?.Trim();
+        if (System.Enum.TryParse<TipoRecurso>(input, true, out var result))
+            return result;
+        return null;
+    }
+
+    public static IEnumerable<string> ObtenerTodosLosTipos()
+    {
+        return System.Enum.GetNames(typeof(TipoRecurso));
     }
 }
-
-

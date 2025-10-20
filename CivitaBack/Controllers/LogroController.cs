@@ -1,5 +1,6 @@
 ﻿using CivitaBack.Data.DTO;
 using CivitaBack.Logica;
+using CivitaBack.Logica.Excepciones;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
@@ -10,9 +11,11 @@ namespace CivitaBack.Api.Controllers;
 public class LogroController : ControllerBase
 {
     private readonly ILogroLogica _logroLogica;
-    public LogroController(ILogroLogica ill)
+    private readonly IPartidaLogica _partidaLogica;
+    public LogroController(ILogroLogica ill, IPartidaLogica ipl)
     {
         this._logroLogica = ill;
+        this._partidaLogica = ipl;
     }
 
     [HttpGet]
@@ -23,7 +26,31 @@ public class LogroController : ControllerBase
             var logros = await _logroLogica.ObtenerListado();
             return Ok(logros);
         }
+        catch (LogroExcepcion ex)
+        {
+            return BadRequest(ex.Message);
+        }
         catch (Exception)
+        {
+            return Problem("Ocurrió un error al obtener el listado de Logros.");
+        }
+    }
+    
+    [HttpGet("DisponibleParaCumplir/{idUsuario}")]
+    public async Task<IActionResult> GetLogrosDisponiblesParaCumplir(int idUsuario)
+    {
+        try
+        {
+            var logros = await _logroLogica.ObtenerListadoInterno();
+            var partida = await _partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
+            var logrosDisponiblesParaCumplir = _logroLogica.ComprobarSiCumpleAlgunLogro(partida, logros);
+            return Ok(logrosDisponiblesParaCumplir);
+        }
+        catch (LogroExcepcion ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
         {
             return Problem("Ocurrió un error al obtener el listado de Logros.");
         }
@@ -33,11 +60,15 @@ public class LogroController : ControllerBase
     public async Task<IActionResult> Guardar([FromBody] LogroDTO? nuevoLogro)
     {
         if (nuevoLogro == null)
-            return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
+            return BadRequest("Los datos recibidos son inválidos");
         try
         {
-            var logroGuardado = await _logroLogica.Guardar(nuevoLogro);
-            return Ok(logroGuardado);
+            await _logroLogica.Crear(nuevoLogro);
+            return Ok();
+        }
+        catch (LogroExcepcion ex)
+        {
+            return BadRequest(ex.Message);
         }
         catch (Exception ex)
         {

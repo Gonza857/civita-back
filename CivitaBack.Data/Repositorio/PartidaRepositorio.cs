@@ -86,12 +86,12 @@ public interface IPartidaRepositorio
                 .ToListAsync();
         }
 
-        public async Task<Partida?> ObtenerPorUsuarioId(int IdUsuario)
+        public async Task<Partida?> ObtenerPorUsuarioId(int idUsuario)
         {
             return await _context.Partida
                 .Include(p => p.Recursos)
                 .Include(p => p.Usuario)
-                .FirstOrDefaultAsync(p => p.UsuarioId == IdUsuario);
+                .FirstOrDefaultAsync(p => p.UsuarioId == idUsuario);
         }
         
         public async Task<bool> ActualizarMapaAsync(Partida partida)

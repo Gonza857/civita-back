@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CivitaBack.Data\CivitaBack.Data.csproj" />
     <ProjectReference Include="..\CivitaBack.Logica\CivitaBack.Logica.csproj" />
+    <ProjectReference Include="..\CivitaBack.Test\CivitaBack.Tests.csproj" />
   </ItemGroup>
 
 </Project>
