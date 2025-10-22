@@ -73,7 +73,6 @@ public interface IPartidaRepositorio
             await _context.Partida.AddAsync(partida);
 
             await _context.SaveChangesAsync();
-            await _context.SaveChangesAsync();
 
             return partida;
         }

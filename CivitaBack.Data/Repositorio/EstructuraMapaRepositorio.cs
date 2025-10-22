@@ -14,8 +14,6 @@ public interface IEstructuraMapaRepositorio
     void RemoverEliminadas(List<EstructuraMapa> emList);
     void AgregarNuevas(List<EstructuraMapa> emList);
     Task GuardarCambios();
-
-
     Task EliminarPorPartidaIdAsync(int partidaId);
     Task AgregarVariasAsync(List<EstructuraMapa> estructuras);
 

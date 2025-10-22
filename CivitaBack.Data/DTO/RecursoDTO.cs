@@ -12,4 +12,6 @@ public class RecursoDTO
     public int Contaminacion { get; set; }
     public int Felicidad { get; set; }
     public int EcoCoins { get; set; }
+    public int Poblacion { get; set; }
+
 }

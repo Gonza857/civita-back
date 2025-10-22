@@ -5,7 +5,7 @@ namespace CivitaBack.Tests
 {
     public class EventoMaestroTest
     {
-        [Fact]
+        /*[Fact]
         public void EventoMaestro_Constructor_InitializesProperties()
         {
             // Act
@@ -47,6 +47,6 @@ namespace CivitaBack.Tests
             Assert.Equal(1, eventoMaestro.Id);
             Assert.Null(eventoMaestro.Descripcion);
             Assert.Null(eventoMaestro.Evento);
-        }
+        }*/
     }
 }

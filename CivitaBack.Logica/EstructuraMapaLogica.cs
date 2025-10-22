@@ -13,6 +13,8 @@ public interface IEstructuraMapaLogica
 {
     void Colocar (Estructura e, Partida p);
 
+    Task ReiniciarEstructurasDePartida(int idPartida);
+
 }
 public class EstructuraMapaLogica : IEstructuraMapaLogica
 {
@@ -31,5 +33,10 @@ public class EstructuraMapaLogica : IEstructuraMapaLogica
            Partida = p
         };
         this.estructuraMapaRepositorio.GuardarCambios();
+    }
+
+    public async Task ReiniciarEstructurasDePartida(int idPartida)
+    {
+        await this.estructuraMapaRepositorio.EliminarPorPartidaIdAsync(idPartida);
     }
 }

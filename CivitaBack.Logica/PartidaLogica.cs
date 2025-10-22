@@ -14,7 +14,7 @@ namespace CivitaBack.Logica;
 
 public interface IPartidaLogica
 {
-    Task<PartidaDTO> ObtenerPorUsuarioId(int IdUsuario);
+    Task<Partida> ObtenerPorUsuarioId(int IdUsuario);
     Task<Partida> CrearPartida(int idUsuario);
     Task Actualizar(PartidaDTO partida, Usuario usuario);
     Task<List<PartidaDTO>> ObtenerPartidas();
@@ -114,11 +114,11 @@ public class PartidaLogica : IPartidaLogica
     /// Devuelve la partida de un usuario
     /// </summary>
     /// <param name="idUsuario">ID del Usuario</param>
-    public async Task<PartidaDTO> ObtenerPorUsuarioId(int IdUsuario)
+    public async Task<Partida> ObtenerPorUsuarioId(int IdUsuario)
     {
         var partida = await this._repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
         if (partida == null) throw new PartidaExcepcion("Partida no encontrada");
-        return this.PartidaToDTO(partida);
+        return partida;
     }
 
     /// <summary>
@@ -262,5 +262,7 @@ public class PartidaLogica : IPartidaLogica
 
         return partida;
     }
+
+    
 }
 
