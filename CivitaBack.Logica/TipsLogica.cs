@@ -88,7 +88,7 @@ namespace CivitaBack.Logica
             tipDTO.Id = entidad.Id;
             tipDTO.Mensaje = entidad.Mensaje;
             tipDTO.TipoId = entidad.TipoId;
-            tipDTO.TipoTipDescripcion = entidad.TipoTip.Descripcion;
+            //tipDTO.TipoTipDescripcion = entidad.TipoTip.Descripcion;
             tipDTO.ElementoAdicional = entidad.ElementoAdicional;
             tipDTO.Expresion =  entidad.Expresion;
             tipDTO.EfectoFiltro = entidad.EfectoFiltro; 
