@@ -16,6 +16,8 @@ public interface ILogroPartidaLogica
     Task<List<LogroDTO>> ObtenerLogrosIncompletos(int usuarioId);
     Task<List<LogroDTO>> ObtenerLogrosCompletados(int usuarioId);
 
+    Task ReiniciarLogros(int partidaId);
+
 }
 
 public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
@@ -66,5 +68,10 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
             Titulo = entidad.Titulo,
             TipoId = entidad.TipoLogro.Id
         };
+    }
+
+    public async Task ReiniciarLogros(int partidaId)
+    {
+        await repositorioLogroPartida.ReiniciarLogrosPartida(partidaId);
     }
 }
