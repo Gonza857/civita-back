@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using CivitaBack.Logica.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,7 +68,6 @@ builder.Services.AddScoped<IEstructuraMapaLogica, EstructuraMapaLogica>();
 builder.Services.AddScoped<IEstructuraMapaRepositorio, EstructuraMapaRepositorio>();
 
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
-builder.Services.AddHostedService<BackgroundCicloLogica>();
 
 builder.Services.AddScoped<ICicloRepositorio, CicloRepositorio>();
 builder.Services.AddScoped<ICicloLogica, CicloLogica>();
@@ -84,6 +84,13 @@ builder.Services.AddScoped<IEstructuraRepositorio, EstructuraRepositorio>();
 builder.Services.AddScoped<ITipoEstructuraRepositorio, TipoEstructuraRepositorio>();
 builder.Services.AddScoped<ITipoEstructuraLogica, TipoEstructuraLogica>();
 
+builder.Services.AddScoped<IEventoLogica, EventoLogica>();
+builder.Services.AddScoped<IEventoRepositorio, EventoRepositorio>();
+
+builder.Services.AddHostedService<BackgroundCicloLogica>();
+//builder.Services.AddHostedService<BackgroundEventoLogica>();
+
+builder.Services.AddSignalR();
 builder.Services.AddScoped<ICondicionRepositorio, CondicionRepositorio>();
 builder.Services.AddScoped<ICondicionLogica, CondicionLogica>();
 
@@ -119,6 +126,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.MapHub<CicloHub>("/cicloHub");
+app.MapHub<EventoHub>("/eventoHub");
 app.UseHttpsRedirection();
 app.UseCors("AllowViteDev");
 app.UseAuthentication();

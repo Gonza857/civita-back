@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251020005034_inicio_eventos")]
+    partial class inicio_eventos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,23 +42,17 @@ namespace CivitaBack.Data.Migrations
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("EsRecompensa")
-                        .HasColumnType("boolean");
-
-                    b.Property<int?>("EstructuraId")
+                    b.Property<int>("EstructuraId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("NombreColumna")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("RecompensaId")
+                    b.Property<int>("RecursoId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EstructuraId");
 
-                    b.HasIndex("RecompensaId");
+                    b.HasIndex("RecursoId");
 
                     b.ToTable("Condicion");
                 });
@@ -265,7 +262,7 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CondicionId")
+                    b.Property<int?>("CondicionId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("Creado")
@@ -598,15 +595,19 @@ namespace CivitaBack.Data.Migrations
                 {
                     b.HasOne("CivitaBack.Data.BO.Estructura", "Estructura")
                         .WithMany()
-                        .HasForeignKey("EstructuraId");
+                        .HasForeignKey("EstructuraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("CivitaBack.Data.BO.Condicion", "Recompensa")
-                        .WithMany("CondicionesAsociadas")
-                        .HasForeignKey("RecompensaId");
+                    b.HasOne("CivitaBack.Data.BO.Recurso", "Recurso")
+                        .WithMany()
+                        .HasForeignKey("RecursoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Estructura");
 
-                    b.Navigation("Recompensa");
+                    b.Navigation("Recurso");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Estructura", b =>
@@ -662,9 +663,7 @@ namespace CivitaBack.Data.Migrations
                 {
                     b.HasOne("CivitaBack.Data.BO.Condicion", "Condicion")
                         .WithMany()
-                        .HasForeignKey("CondicionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CondicionId");
 
                     b.HasOne("CivitaBack.Data.BO.TipoLogro", "TipoLogro")
                         .WithMany()
@@ -757,11 +756,6 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("Partida");
 
                     b.Navigation("Tip");
-                });
-
-            modelBuilder.Entity("CivitaBack.Data.BO.Condicion", b =>
-                {
-                    b.Navigation("CondicionesAsociadas");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Estructura", b =>

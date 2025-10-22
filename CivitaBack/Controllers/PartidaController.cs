@@ -16,6 +16,7 @@ namespace CivitaBack.Api.Controllers
         private readonly IUsuarioLogica _usuarioLogica;
         private readonly IEstructuraLogica _estructuraLogica;
         private readonly IEstructuraMapaLogica _estructuraMapaLogica;
+        private readonly ILogroPartidaLogica _logroPartidaLogica;
         private readonly ILogger<PartidaController> _logger;
 
         public PartidaController(
@@ -25,7 +26,8 @@ namespace CivitaBack.Api.Controllers
             IUsuarioLogica usuarioLogica,
             IEstructuraLogica el,
             IEstructuraMapaLogica estructuraMapaLogica,
-            ILogger<PartidaController> logger)
+            ILogger<PartidaController> logger,
+            ILogroPartidaLogica logroPartidaLogica)
         {
             _partidaLogica = partidaLogica;
             _recursoLogica = recursoLogica;
@@ -33,7 +35,45 @@ namespace CivitaBack.Api.Controllers
             _usuarioLogica = usuarioLogica;
             _estructuraLogica = el;
             _estructuraMapaLogica = estructuraMapaLogica;
+            _logroPartidaLogica = logroPartidaLogica;
             _logger = logger;
+        }
+
+        //PARA EXPO
+        private const int USUARIO_EXPO = 9999;
+
+        [HttpPost("expo/iniciar")]
+        public async Task<IActionResult> IniciarDemo()
+        {
+            try
+            {
+                var partida = await _partidaLogica.CrearPartida(USUARIO_EXPO);
+                await _recursoLogica.ConfigurarInicial(partida);
+                return Ok(partida);
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ErrorInternoExcepction ex)
+            {
+                return Problem("Ocurrió un error al guardar la partida.");
+            }
+        }
+
+        [HttpPost("expo/reiniciar")]
+        public async Task<IActionResult> ReiniciarDemo()
+        {
+            var partida = await _partidaLogica.ObtenerPorUsuarioId(USUARIO_EXPO);
+
+            if (partida == null)
+                return NotFound("No hay partida Demo para reiniciar");
+
+            await _recursoLogica.ConfigurarInicial(partida);
+            await _estructuraMapaLogica.ReiniciarEstructurasDePartida(partida.Id);
+            await _logroPartidaLogica.ReiniciarLogros(partida.Id);
+
+            return Ok("Partida Demo reiniciada");
         }
 
         // 🧱 Crear partida inicial y configurar recursos
@@ -44,6 +84,7 @@ namespace CivitaBack.Api.Controllers
             {
                 var partida = await _partidaLogica.CrearPartida(idUsuario);
                 await _recursoLogica.ConfigurarInicial(partida);
+                //Ver estructuras iniciales segun mapa
                 return Ok(partida);
             }
             catch (PartidaExcepcion ex)
@@ -62,7 +103,7 @@ namespace CivitaBack.Api.Controllers
         {
             try
             {
-                PartidaDTO partida = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
+                Partida partida = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
                 return Ok(partida);
             }
             catch (PartidaExcepcion ex)

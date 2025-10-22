@@ -13,6 +13,8 @@ public interface ILogroPartidaRepositorio : IRepositorioBase<LogroPartida>
 {
     Task<List<Logro>> ObtenerLogrosIncompletos(int partidaId);
     Task<List<Logro>> ObtenerLogrosCompletos(int partidaId);
+
+    Task ReiniciarLogrosPartida(int partidaId);
     Task<List<Logro>> ObtenerLogrosParaReclamarQueNoEstenCumplidos(List<int> idsLogros);
 
     Task<List<Logro>> ObtenerLogrosNoCumplidos(int idPartida);
@@ -53,6 +55,13 @@ public class LogroPartidaRepositorio : GenericoRepositorio, ILogroPartidaReposit
             .Where(l => !l.LogroPartidas.Any(lp => lp.PartidaId == partidaId))
             .ToListAsync();
 
+    }
+
+    public async Task ReiniciarLogrosPartida(int partidaId)
+    {
+        var logros = _context.LogroPartida.Where(e => e.PartidaId == partidaId);
+        _context.LogroPartida.RemoveRange(logros);
+        await _context.SaveChangesAsync();
     }
     
     public async Task<List<Logro>> ObtenerLogrosParaReclamarQueNoEstenCumplidos(List<int> idsLogros)

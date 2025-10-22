@@ -5,7 +5,8 @@ namespace CivitaBack.Logica
 {
     public interface ICicloLogica
     {
-        Task EjecutarCicloAsync();
+        Task<List<Partida>> EjecutarCicloAsync();
+
     }
     public class CicloLogica : ICicloLogica
     {
@@ -17,11 +18,11 @@ namespace CivitaBack.Logica
             _cicloRepositorio = cicloRepositorio;
         }
 
-        public async Task EjecutarCicloAsync()
+        public async Task<List<Partida>> EjecutarCicloAsync()
         {
             List<Partida> partidas = await _cicloRepositorio.ObtenerPartidasConEstructuras();
 
-            if (partidas.Count == 0) return;
+            if (partidas == null || partidas.Count == 0) return new List<Partida>();
 
             foreach (var partida in partidas)
             {
@@ -29,6 +30,7 @@ namespace CivitaBack.Logica
             }
 
             await _cicloRepositorio.GuardarCambiosAsync();
+            return partidas;
         }
 
         private void ProcesarPartida(Partida partida)
@@ -49,13 +51,13 @@ namespace CivitaBack.Logica
                 var tipoEstructura = estructura.TipoEstructura;
 
                 recursosPartida.Energia = 
-                    ActualizarRecurso(recursosPartida.Energia, tipoEstructura.EnergiaPorCiclo);
+                    ActualizarRecurso(recursosPartida.Energia, tipoEstructura.EnergiaPorCiclo, true);
                 recursosPartida.EcoCoins = 
-                    ActualizarRecurso(recursosPartida.EcoCoins, tipoEstructura.DineroPorCiclo);
+                    ActualizarRecurso(recursosPartida.EcoCoins, tipoEstructura.DineroPorCiclo, false);
                 recursosPartida.Felicidad = 
-                    ActualizarRecurso(recursosPartida.Felicidad, estructura.FelicidadCiclo);
+                    ActualizarRecurso(recursosPartida.Felicidad, estructura.FelicidadCiclo, true);
                 recursosPartida.Contaminacion = 
-                    ActualizarRecurso(recursosPartida.Contaminacion, estructura.ContaminacionCiclo);
+                    ActualizarRecurso(recursosPartida.Contaminacion, estructura.ContaminacionCiclo, true);
 
                 if (tipoEstructura.Capacidad > 0)
                     nuevaPoblacion += tipoEstructura.Capacidad;
@@ -64,7 +66,7 @@ namespace CivitaBack.Logica
             partida.Recursos.Poblacion = nuevaPoblacion;
         }
 
-        private int ActualizarRecurso(int cantidadInicial, int cambio)
+        private int ActualizarRecurso(int cantidadInicial, int cambio, bool tieneLimite)
         {
             // if (recursoPartida.Nombre.Equals("Contaminación") && recursoPartida.Cantidad > 90)
             // {
@@ -79,6 +81,9 @@ namespace CivitaBack.Logica
             if (cantidadInicial < 0)
                 cantidadInicial = 0;
             
+            if (tieneLimite && cantidadInicial > 100)
+                cantidadInicial = 100;
+
             return cantidadInicial;
 
         }
