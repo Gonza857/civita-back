@@ -62,6 +62,7 @@ public class LogroPartidaRepositorio : GenericoRepositorio, ILogroPartidaReposit
         var logros = _context.LogroPartida.Where(e => e.PartidaId == partidaId);
         _context.LogroPartida.RemoveRange(logros);
         await _context.SaveChangesAsync();
+    }
     
     public async Task<List<Logro>> ObtenerLogrosParaReclamarQueNoEstenCumplidos(List<int> idsLogros)
     {
