@@ -18,24 +18,25 @@ public interface IPartidaLogica
     Task<Partida> CrearPartida(int idUsuario);
     Task Actualizar(PartidaDTO partida, Usuario usuario);
     Task<List<PartidaDTO>> ObtenerPartidas();
+    Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario);
 
     // 🆕 Métodos de mapa
     Task ActualizarMapaDePartidaAsync(GuardarMapaDTO dto);
     
-    
+    Task ReclamarLogros(Partida partida, List<Logro> logros);
     Task<Partida?> ObtenerMapaAsync(int partidaId);
 }
 
 public class PartidaLogica : IPartidaLogica
 {
     private readonly IPartidaRepositorio _repositorioPartida;
-    private readonly IRecursoLogica _recursoLogica;
+    private readonly IRecursoRepositorio _recursoRepositorio;
     private readonly IEstructuraMapaRepositorio _estructuraMapaRepositorio;
 
-    public PartidaLogica(IPartidaRepositorio rp, IRecursoLogica rl, IEstructuraMapaRepositorio em)
+    public PartidaLogica(IPartidaRepositorio rp, IRecursoRepositorio irr, IEstructuraMapaRepositorio em)
     {
         this._repositorioPartida = rp;
-        this._recursoLogica = rl;
+        this._recursoRepositorio = irr;
         this._estructuraMapaRepositorio = em;
     }
 
@@ -102,6 +103,11 @@ public class PartidaLogica : IPartidaLogica
     {
         var partidas = await this._repositorioPartida.ObtenerPartidas();
         return partidas.Select(p => this.PartidaToDTO(p)).ToList();
+    }
+
+    public async Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario)
+    {
+        return await this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
     }
 
     /// <summary>
@@ -172,6 +178,40 @@ public class PartidaLogica : IPartidaLogica
             // 3️⃣ Guardar cambios
             await _estructuraMapaRepositorio.GuardarCambios();
         }
+    }
+
+    public async Task ReclamarLogros(Partida partida, List<Logro> logros)
+    {
+        if (partida == null) throw new PartidaExcepcion("Ocurrió un error al reclamar los logros");
+        List<Condicion> recompensas = logros
+            .Where(l => l.Condicion?.Recompensa != null)
+            .Select(l => l.Condicion!.Recompensa!)
+            .ToList();
+
+        Recurso? recursoPartida = await this._recursoRepositorio.ObtenerPorId(partida.Id);
+        if (recursoPartida == null)
+            throw new PartidaExcepcion("Recursos de partida no encontrados");
+        
+        // 🔥 Aplica cada recompensa sobre el recurso usando reflexión
+        foreach (var recompensa in recompensas)
+        {
+            if (!string.IsNullOrEmpty(recompensa.NombreColumna))
+            {
+                var propiedad = typeof(Recurso).GetProperty(recompensa.NombreColumna!);
+
+                if (propiedad != null && propiedad.PropertyType == typeof(int))
+                {
+                    int valorActual = (int)propiedad.GetValue(recursoPartida)!;
+                    propiedad.SetValue(recursoPartida, valorActual + recompensa.Cantidad);
+                }
+                else
+                {
+                    Console.WriteLine($"⚠️ Propiedad {recompensa.NombreColumna} no encontrada o no es int en Recurso");
+                }
+            }
+        }
+
+        await this._recursoRepositorio.Actualizar(recursoPartida);
     }
 
 

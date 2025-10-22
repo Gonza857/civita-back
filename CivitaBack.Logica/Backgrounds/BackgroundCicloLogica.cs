@@ -9,7 +9,7 @@ namespace CivitaBack.Logica.Backgrounds
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<BackgroundCicloLogica> _logger;
-        private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(15);
+        private readonly TimeSpan _intervalo = TimeSpan.FromMinutes(5);
 
         public BackgroundCicloLogica(IServiceProvider serviceProvider, ILogger<BackgroundCicloLogica> logger)
         {

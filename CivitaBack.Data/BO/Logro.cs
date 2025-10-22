@@ -20,7 +20,7 @@ public class Logro : Auditable
 
     public TipoLogro TipoLogro { get; set; }
 
-    public Condicion? Condicion { get; set; }
+    public Condicion Condicion { get; set; }
     public ICollection<LogroPartida> LogroPartidas { get; set; }
 
 

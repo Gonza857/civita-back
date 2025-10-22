@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251019202439_condicion_logro")]
+    partial class condicion_logro
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,23 +42,15 @@ namespace CivitaBack.Data.Migrations
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("EsRecompensa")
-                        .HasColumnType("boolean");
-
-                    b.Property<int?>("EstructuraId")
+                    b.Property<int>("EstructuraId")
                         .HasColumnType("integer");
 
                     b.Property<string>("NombreColumna")
                         .HasColumnType("text");
 
-                    b.Property<int?>("RecompensaId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EstructuraId");
-
-                    b.HasIndex("RecompensaId");
 
                     b.ToTable("Condicion");
                 });
@@ -544,15 +539,11 @@ namespace CivitaBack.Data.Migrations
                 {
                     b.HasOne("CivitaBack.Data.BO.Estructura", "Estructura")
                         .WithMany()
-                        .HasForeignKey("EstructuraId");
-
-                    b.HasOne("CivitaBack.Data.BO.Condicion", "Recompensa")
-                        .WithMany("CondicionesAsociadas")
-                        .HasForeignKey("RecompensaId");
+                        .HasForeignKey("EstructuraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Estructura");
-
-                    b.Navigation("Recompensa");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Estructura", b =>
@@ -703,11 +694,6 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("Partida");
 
                     b.Navigation("Tip");
-                });
-
-            modelBuilder.Entity("CivitaBack.Data.BO.Condicion", b =>
-                {
-                    b.Navigation("CondicionesAsociadas");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Estructura", b =>

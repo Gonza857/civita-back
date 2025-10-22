@@ -11,7 +11,7 @@ namespace CivitaBack.Data.Repositorio;
 
 public interface ILogroRepositorio : IRepositorioBase<Logro>
 {
-    
+    Task<bool> ExisteLogroEnCumplidos(int idLogro);
 }
 public class LogroRepositorio : ILogroRepositorio
 {
@@ -25,7 +25,7 @@ public class LogroRepositorio : ILogroRepositorio
     public async Task Actualizar(Logro logro)
     {
         logro.Editado = DateTime.UtcNow;
-        await _context.Logro.AddAsync(logro);
+        _context.Logro.Update(logro);
         await _context.SaveChangesAsync();
     }
 
@@ -49,13 +49,21 @@ public class LogroRepositorio : ILogroRepositorio
     {
         return await _context.Logro
             .Include(tl => tl.TipoLogro)
+            .Include(tl => tl.Condicion)
             .FirstOrDefaultAsync(tl => tl.Id == id);
     }
 
     public async Task<List<Logro>> ObtenerTodos()
     {
         return await _context.Logro
+            .Include(tl => tl.Condicion)
+                .ThenInclude(cond => cond.Recompensa)
             .Include (tl => tl.TipoLogro)
             .ToListAsync();
+    }
+
+    public async Task<bool> ExisteLogroEnCumplidos(int idLogro)
+    {
+        return await _context.LogroPartida.AnyAsync(lp => lp.LogroId == idLogro);
     }
 }

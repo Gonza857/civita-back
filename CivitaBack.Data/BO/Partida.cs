@@ -26,6 +26,6 @@ namespace CivitaBack.Data.BO
         public List<EstructuraMapa>? EstructuraMapa { get; set; }
         public List<TipEnPartida>? TipEnPartida { get; set; }
         // Relación N:N
-        public ICollection<LogroPartida> LogroPartidas { get; set; }
+        public List<LogroPartida> LogroPartidas { get; set; }
     }
 }

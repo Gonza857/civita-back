@@ -84,6 +84,9 @@ builder.Services.AddScoped<IEstructuraRepositorio, EstructuraRepositorio>();
 builder.Services.AddScoped<ITipoEstructuraRepositorio, TipoEstructuraRepositorio>();
 builder.Services.AddScoped<ITipoEstructuraLogica, TipoEstructuraLogica>();
 
+builder.Services.AddScoped<ICondicionRepositorio, CondicionRepositorio>();
+builder.Services.AddScoped<ICondicionLogica, CondicionLogica>();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
