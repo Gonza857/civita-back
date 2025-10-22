@@ -88,6 +88,7 @@ public interface IPartidaRepositorio
         public async Task<Partida?> ObtenerPorUsuarioId(int idUsuario)
         {
             return await _context.Partida
+                .Include(p => p.EstructuraMapa)
                 .Include(p => p.Recursos)
                 .Include(p => p.Usuario)
                 .FirstOrDefaultAsync(p => p.UsuarioId == idUsuario);

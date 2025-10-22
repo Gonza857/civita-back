@@ -23,7 +23,7 @@ public interface IPartidaLogica
     // 🆕 Métodos de mapa
     Task ActualizarMapaDePartidaAsync(GuardarMapaDTO dto);
     
-    Task ReclamarLogros(Partida partida, List<Logro> logros);
+    Task ReclamarLogros(Partida partida, List<LogroDTO> logros);
     Task<Partida?> ObtenerMapaAsync(int partidaId);
 }
 
@@ -32,12 +32,14 @@ public class PartidaLogica : IPartidaLogica
     private readonly IPartidaRepositorio _repositorioPartida;
     private readonly IRecursoRepositorio _recursoRepositorio;
     private readonly IEstructuraMapaRepositorio _estructuraMapaRepositorio;
+    private readonly ILogroRepositorio _logroRepositorio;
 
-    public PartidaLogica(IPartidaRepositorio rp, IRecursoRepositorio irr, IEstructuraMapaRepositorio em)
+    public PartidaLogica(IPartidaRepositorio rp, IRecursoRepositorio irr, IEstructuraMapaRepositorio em, ILogroRepositorio ilr)
     {
         this._repositorioPartida = rp;
         this._recursoRepositorio = irr;
         this._estructuraMapaRepositorio = em;
+        this._logroRepositorio = ilr;
     }
 
     /// <summary>
@@ -180,10 +182,17 @@ public class PartidaLogica : IPartidaLogica
         }
     }
 
-    public async Task ReclamarLogros(Partida partida, List<Logro> logros)
+    public async Task ReclamarLogros(Partida partida, List<LogroDTO> logrosDto)
     {
         if (partida == null) throw new PartidaExcepcion("Ocurrió un error al reclamar los logros");
-        List<Condicion> recompensas = logros
+
+        var logrosDb = await this._logroRepositorio.ObtenerTodos();
+
+        var logrosCoincidentes = logrosDb
+            .Where(l => logrosDto.Any(dto => dto.Id == l.Id))
+            .ToList();
+
+        List<Condicion> recompensas = logrosCoincidentes
             .Where(l => l.Condicion?.Recompensa != null)
             .Select(l => l.Condicion!.Recompensa!)
             .ToList();

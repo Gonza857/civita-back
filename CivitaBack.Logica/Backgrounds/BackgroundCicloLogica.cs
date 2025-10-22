@@ -13,11 +13,9 @@ namespace CivitaBack.Logica.Backgrounds
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<BackgroundCicloLogica> _logger;
-<<<<<<< HEAD
-=======
         private readonly IHubContext<CicloHub> _hubContext;
->>>>>>> desarrollo
-        private readonly TimeSpan _intervalo = TimeSpan.FromMinutes(15);
+
+        private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(15);
 
         public BackgroundCicloLogica(IServiceProvider serviceProvider, ILogger<BackgroundCicloLogica> logger, IHubContext<CicloHub> hubContext)
         {
