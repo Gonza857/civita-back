@@ -91,6 +91,9 @@ builder.Services.AddHostedService<BackgroundCicloLogica>();
 //builder.Services.AddHostedService<BackgroundEventoLogica>();
 
 builder.Services.AddSignalR();
+builder.Services.AddScoped<ICondicionRepositorio, CondicionRepositorio>();
+builder.Services.AddScoped<ICondicionLogica, CondicionLogica>();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

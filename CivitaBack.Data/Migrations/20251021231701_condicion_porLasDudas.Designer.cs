@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251021231701_condicion_porLasDudas")]
+    partial class condicion_porLasDudas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,17 +157,11 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ContaminacionAceptar")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ContaminacionRechazar")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("Creado")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("EcoCoinsAceptar")
-                        .HasColumnType("integer");
+                    b.Property<string>("DescripcionEvento")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
@@ -172,32 +169,11 @@ namespace CivitaBack.Data.Migrations
                     b.Property<int>("EventoMaestroId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FelicidadAceptar")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("FelicidadRechazar")
-                        .HasColumnType("integer");
-
                     b.Property<int>("PartidaId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("Resuelto")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("SeDisparo")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("TextoAceptar")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextoDescripcion")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextoRechazar")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("TiempoParaHacerlo")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -216,41 +192,14 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ContaminacionAceptar")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ContaminacionRechazar")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("Creado")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("EcoCoinsAceptar")
-                        .HasColumnType("integer");
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("FelicidadAceptar")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("FelicidadRechazar")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Nombre")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextoAceptar")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextoDescripcion")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextoRechazar")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

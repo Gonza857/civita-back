@@ -44,9 +44,10 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
     {
         if (usuarioId <= 0)
             throw new LogroPartidaExcepcion("Ocurrió un error al obtener los logros del usuario.");
+
         Partida partida = await this.ObtenerPartidaUsuarioPorId(usuarioId);
-        List<Logro> logrosNoCompletos = await repositorioLogroPartida.ObtenerLogrosCompletos(partida.Id);
-        return logrosNoCompletos.Select(l => this.ToDto(l)).ToList();
+        List<Logro> logrosCompletados = await repositorioLogroPartida.ObtenerLogrosCompletos(partida.Id);
+        return logrosCompletados.Select(l => this.ToDto(l)).ToList();
 
     }
 

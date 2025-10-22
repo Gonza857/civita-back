@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251019202439_condicion_logro")]
+    partial class condicion_logro
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,23 +42,15 @@ namespace CivitaBack.Data.Migrations
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("EsRecompensa")
-                        .HasColumnType("boolean");
-
-                    b.Property<int?>("EstructuraId")
+                    b.Property<int>("EstructuraId")
                         .HasColumnType("integer");
 
                     b.Property<string>("NombreColumna")
                         .HasColumnType("text");
 
-                    b.Property<int?>("RecompensaId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EstructuraId");
-
-                    b.HasIndex("RecompensaId");
 
                     b.ToTable("Condicion");
                 });
@@ -154,17 +149,11 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ContaminacionAceptar")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ContaminacionRechazar")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("Creado")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("EcoCoinsAceptar")
-                        .HasColumnType("integer");
+                    b.Property<string>("DescripcionEvento")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
@@ -172,32 +161,11 @@ namespace CivitaBack.Data.Migrations
                     b.Property<int>("EventoMaestroId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FelicidadAceptar")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("FelicidadRechazar")
-                        .HasColumnType("integer");
-
                     b.Property<int>("PartidaId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("Resuelto")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("SeDisparo")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("TextoAceptar")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextoDescripcion")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextoRechazar")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("TiempoParaHacerlo")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -216,41 +184,14 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ContaminacionAceptar")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ContaminacionRechazar")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("Creado")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("EcoCoinsAceptar")
-                        .HasColumnType("integer");
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("FelicidadAceptar")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("FelicidadRechazar")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Nombre")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextoAceptar")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextoDescripcion")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextoRechazar")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -598,15 +539,11 @@ namespace CivitaBack.Data.Migrations
                 {
                     b.HasOne("CivitaBack.Data.BO.Estructura", "Estructura")
                         .WithMany()
-                        .HasForeignKey("EstructuraId");
-
-                    b.HasOne("CivitaBack.Data.BO.Condicion", "Recompensa")
-                        .WithMany("CondicionesAsociadas")
-                        .HasForeignKey("RecompensaId");
+                        .HasForeignKey("EstructuraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Estructura");
-
-                    b.Navigation("Recompensa");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Estructura", b =>
@@ -757,11 +694,6 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("Partida");
 
                     b.Navigation("Tip");
-                });
-
-            modelBuilder.Entity("CivitaBack.Data.BO.Condicion", b =>
-                {
-                    b.Navigation("CondicionesAsociadas");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.Estructura", b =>

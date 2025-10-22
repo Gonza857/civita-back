@@ -44,9 +44,11 @@ public class RecursoRepositorio : IRecursoRepositorio
         await _context.SaveChangesAsync();
     }
 
-    public Task<Recurso> ObtenerPorId(int id)
+    public async Task<Recurso?> ObtenerPorId(int id)
     {
-        throw new NotImplementedException();
+        return await _context.Recurso
+            .Where(r => r.PartidaId == id)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<Recurso> ObtenerRecursosPartida(int idPartida)

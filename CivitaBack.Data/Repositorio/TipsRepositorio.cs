@@ -15,6 +15,7 @@ namespace CivitaBack.Data.Repositorio
         public async Task<List<Tip>> ObtenerMsjPorIdTipo(int idTipo)
         {
             return await _context.Tip
+                .Include(x => x.TipoTip)
                 .Where(x => x.TipoId == idTipo)
                 .ToListAsync();
         }
