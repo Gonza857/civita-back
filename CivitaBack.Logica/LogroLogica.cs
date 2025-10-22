@@ -2,7 +2,6 @@
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.Repositorio;
 using CivitaBack.Logica.Excepciones;
-using CivitaBack.Tests;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
@@ -16,7 +15,10 @@ public interface ILogroLogica
     Task Eliminar(int Id);
     Task Actualizar(LogroDTO logroDTO, int id);
     Task<List<LogroDTO>> ObtenerLogrosCumplidos(Partida partida);
-    List<Logro> ComprobarSiCumpleAlgunLogro(Partida? partida, List<Logro> logros);
+    Task<List<LogroDTO>> ComprobarSiCumpleAlgunLogro(Partida? partida, List<Logro> logrosDB);
+    Task MarcarLogrosComoCompletados(Partida? partida, List<Logro> logrosDB);
+    
+    Task<List<Logro>> ObtenerLogrosParaObtenerRecompensa(int partidaId);
 }
 
 public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
@@ -24,15 +26,22 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
     private readonly ILogroRepositorio repositorioLogro;
     private readonly ITipoLogroRepositorio repositorioTipoLogro;
     private readonly ICondicionRepositorio _condicionRepositorio;
+    private readonly ILogroPartidaRepositorio _logroPartidaRepositorio;
 
     private readonly List<string> recursos = new List<string> { "Energia", "Contaminacion", "EcoCoins", "Felicidad" };
 
 
-    public LogroLogica(ILogroRepositorio rtl, ITipoLogroRepositorio itlr, ICondicionRepositorio icr)
+    public LogroLogica(
+        ILogroRepositorio rtl, 
+        ITipoLogroRepositorio itlr, 
+        ICondicionRepositorio icr,
+        ILogroPartidaRepositorio ilpr
+        )
     {
         repositorioLogro = rtl;
         repositorioTipoLogro = itlr;
         _condicionRepositorio = icr;
+        _logroPartidaRepositorio = ilpr;
     }
 
     /// <summary>
@@ -157,7 +166,7 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
         return resultado.Select(lp => this.ToDto(lp)).ToList();
     }
 
-    public List<Logro> ComprobarSiCumpleAlgunLogro(Partida? partida, List<Logro> logrosDB)
+    public async Task<List<LogroDTO>> ComprobarSiCumpleAlgunLogro(Partida? partida, List<Logro> logrosDB)
     {
         if (partida == null || logrosDB.Count == 0 || partida.Recursos == null)
             throw new LogroExcepcion("No se pudo obtener si cumple algún logro.");
@@ -194,7 +203,38 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
             }
         }
 
-        return logrosParaPasarACumplido;
+        var idsLogros = logrosParaPasarACumplido.Select(l => l.Id).ToList();
+        var logrosFiltrados = await this._logroPartidaRepositorio
+            .ObtenerLogrosParaReclamarQueNoEstenCumplidos(idsLogros);
+        return logrosFiltrados.Select(l => this.ToDto(l)).ToList();
+    }
+    
+    public async Task MarcarLogrosComoCompletados(Partida? partida, List<Logro> logrosDB)
+    {
+        if (partida == null || logrosDB.Count == 0 || partida.Recursos == null)
+            throw new LogroExcepcion("No se pudo obtener si cumple algún logro.");
+        /*
+            por cada logro
+            verifico que no exista en la bd
+            si no esta lo pongo,
+            si esta, no
+            entro a logro
+
+         */
+
+        foreach (Logro logro in logrosDB)
+        {
+            bool existe = await this.repositorioLogro.ExisteLogroEnCumplidos(logro.Id);
+            if (!existe)
+            {
+                await this._logroPartidaRepositorio.Guardar(new LogroPartida { Partida = partida, Logro = logro });
+            }
+        }
+    }
+
+    public async Task<List<Logro>> ObtenerLogrosParaObtenerRecompensa(int partidaId)
+    {
+        return await this._logroPartidaRepositorio.ObtenerLogrosNoCumplidos(partidaId);
     }
 
     /// <summary>
@@ -211,17 +251,38 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
             TipoId = entidad.TipoLogro.Id,
             Tipo = entidad.TipoLogro.Nombre,
             CondicionId = entidad.Condicion.Id,
+
             Condicion = new CondicionDTO
             {
                 Id = entidad.Condicion.Id,
                 Cantidad = entidad.Condicion.Cantidad,
                 NombreColumna = entidad.Condicion.NombreColumna,
+                EsRecompensa = entidad.Condicion.EsRecompensa,
                 EstructuraId = entidad.Condicion.Estructura?.Id,
                 Estructura = entidad.Condicion.Estructura != null
                     ? new EstructuraCondicionDTO
                     {
                         Id = entidad.Condicion.Estructura.Id,
                         Nombre = entidad.Condicion.Estructura.Nombre
+                    }
+                    : null,
+
+                // ✅ Agregamos el mapeo de la Recompensa (otra Condicion)
+                Recompensa = entidad.Condicion.Recompensa != null
+                    ? new CondicionDTO
+                    {
+                        Id = entidad.Condicion.Recompensa.Id,
+                        Cantidad = entidad.Condicion.Recompensa.Cantidad,
+                        NombreColumna = entidad.Condicion.Recompensa.NombreColumna,
+                        EsRecompensa = entidad.Condicion.Recompensa.EsRecompensa,
+                        EstructuraId = entidad.Condicion.Recompensa.Estructura?.Id,
+                        Estructura = entidad.Condicion.Recompensa.Estructura != null
+                            ? new EstructuraCondicionDTO
+                            {
+                                Id = entidad.Condicion.Recompensa.Estructura.Id,
+                                Nombre = entidad.Condicion.Recompensa.Estructura.Nombre
+                            }
+                            : null
                     }
                     : null
             }

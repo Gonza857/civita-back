@@ -1,8 +1,6 @@
 ﻿using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 
-namespace CivitaBack.Tests;
-
 public class EstructuraCondicionDTO
 {
     public int Id { get; set; }
@@ -14,16 +12,18 @@ public class CondicionDTO
     public int Id { get; set; }
     public int Cantidad { get; set; }
     public string? NombreColumna { get; set; }  // recurso
+    public bool EsRecompensa { get; set; }
     public int? EstructuraId { get; set; }      // solo si es estructura
     public EstructuraCondicionDTO? Estructura { get; set; }
 
-    // Método helper para renderizar la condición como string
-    public string Render()
-    {
-        if (!string.IsNullOrWhiteSpace(NombreColumna))
-            return $"{NombreColumna} - {Cantidad}";
-        if (Estructura != null)
-            return $"{Estructura.Nombre} - {Cantidad}";
-        return "Condición inválida";
-    }
+    // Propiedad que apunta a la recompensa asociada (si tiene)
+    public int? RecompensaId { get; set; }
+    public CondicionDTO? Recompensa { get; set; }
+
+    // ✅ Propiedad calculada para mostrar en la tabla del front
+    // public string RecompensaDescripcion => Recompensa != null 
+    //     ? (!string.IsNullOrWhiteSpace(Recompensa.NombreColumna)
+    //         ? $"{Recompensa.NombreColumna} - {Recompensa.Cantidad}"
+    //         : $"{Recompensa.Estructura?.Nombre} - {Recompensa.Cantidad}")
+    //     : string.Empty;
 }

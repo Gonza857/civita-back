@@ -30,6 +30,21 @@ public class CondicionController: ControllerBase
         }
     }
     
+
+    [HttpGet("Recompensa")]
+    public async Task<IActionResult> RecompensaListado()
+    {
+        try
+        {
+            var recompensas = await _condicionLogica.ObtenerListadoRecompensas();
+            return Ok(recompensas);
+        }
+        catch (Exception)
+        {
+            return Problem("Ocurrió un error al obtener el listado de Recompensas.");
+        }
+    }
+    
     [HttpPost]
     public async Task<IActionResult> Crear([FromBody] CondicionDTO? condicionNueva)
     {
@@ -47,6 +62,26 @@ public class CondicionController: ControllerBase
         catch (Exception ex)
         {
             return Problem("Ocurrió un error al guardar la Condicion");
+        }
+    }
+    
+    [HttpPost("Recompensa")]
+    public async Task<IActionResult> CrearRecompensa([FromBody] CondicionDTO? recompensaNueva)
+    {
+        if (recompensaNueva == null)
+            return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
+        try
+        {
+            await _condicionLogica.CrearRecompensa(recompensaNueva);
+            return Ok();
+        }
+        catch (CondicionExcepcion ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al guardar la Recompensa");
         }
     }
     

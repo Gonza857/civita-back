@@ -49,7 +49,7 @@ public class LogroPartidaController : ControllerBase
         }
         catch (Exception ex)
         {
-            return Problem(ex.Message);
+            return Problem("Ocurrió un error al obtener los logros no completados.");
         }
     }
 

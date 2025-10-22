@@ -43,8 +43,32 @@ public class LogroController : ControllerBase
         {
             var logros = await _logroLogica.ObtenerListadoInterno();
             var partida = await _partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
-            var logrosDisponiblesParaCumplir = _logroLogica.ComprobarSiCumpleAlgunLogro(partida, logros);
+            var logrosDisponiblesParaCumplir = await _logroLogica.ComprobarSiCumpleAlgunLogro(partida, logros);
             return Ok(logrosDisponiblesParaCumplir);
+        }
+        catch (LogroExcepcion ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al obtener el listado de Logros.");
+        }
+    }
+    
+    [HttpGet("ReclamarLogros/{idUsuario}")]
+    public async Task<IActionResult> ReclamarLogros(int idUsuario)
+    {
+        try
+        {
+            var logros = await _logroLogica.ObtenerListadoInterno();
+            var partida = await _partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
+            if (partida == null)
+                return BadRequest("Partida no econtrada");
+            await _logroLogica.MarcarLogrosComoCompletados(partida, logros);
+            var logrosFiltrados = await _logroLogica.ObtenerLogrosParaObtenerRecompensa(partida.Id);
+            await _partidaLogica.ReclamarLogros(partida, logrosFiltrados);
+            return Ok();
         }
         catch (LogroExcepcion ex)
         {

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CivitaBack.Data.BO;
-using CivitaBack.Tests;
 
 namespace CivitaBack.Data.DTO;
 

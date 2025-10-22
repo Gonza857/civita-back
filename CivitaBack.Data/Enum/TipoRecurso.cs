@@ -15,7 +15,7 @@ public enum TipoRecurso
     Energia,
     Felicidad,
     Contaminacion,
-    Dinero
+    EcoCoins
 }
 
 public static class TipoRecursoHelper

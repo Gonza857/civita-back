@@ -6,7 +6,7 @@ namespace CivitaBack.Data.Repositorio;
 
 public interface ICondicionRepositorio : IRepositorioBase<Condicion>
 {
-
+    Task<List<Condicion>> ObtenerTodasRecompensas();
 }
 public class CondicionRepositorio : GenericoRepositorio, ICondicionRepositorio
 {
@@ -22,7 +22,9 @@ public class CondicionRepositorio : GenericoRepositorio, ICondicionRepositorio
     public async Task<List<Condicion>> ObtenerTodos()
     {
         return await _context.Condicion
+            .Where(c => !c.EsRecompensa)
             .Include(c => c.Estructura)
+            .Include(c => c.Recompensa)
             .ToListAsync();
     }
 
@@ -48,5 +50,12 @@ public class CondicionRepositorio : GenericoRepositorio, ICondicionRepositorio
         entidad.Creado = DateTime.UtcNow;
         await _context.Condicion.AddAsync(entidad);
         await base.GuardarCambiosAsync();
+    }
+
+    public async Task<List<Condicion>> ObtenerTodasRecompensas()
+    {
+        return await _context.Condicion
+            .Where(c => c.EsRecompensa)
+            .ToListAsync();
     }
 }

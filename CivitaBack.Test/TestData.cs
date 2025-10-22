@@ -49,13 +49,6 @@ public static class TestData
         Id = 1,
         Nombre = tipo
     };
-    public static Condicion CrearCondicion(string nombreColumna, int cantidad) => new Condicion
-    {
-        Id = 1,
-        Cantidad = cantidad,
-        NombreColumna = nombreColumna,
-        EstructuraId = 0,
-    };
     public static Logro CrearLogro(int id, TipoLogro tipo, Condicion condicion, string titulo) => new Logro
     {
         Id = id,
@@ -64,4 +57,30 @@ public static class TestData
         TipoLogro = tipo,
         Condicion = condicion,
     };
+    public static Condicion CrearCondicion(string nombreColumna, int cantidad) => new Condicion
+    {
+        Id = 1,
+        Cantidad = cantidad,
+        NombreColumna = nombreColumna,
+        EstructuraId = 0,
+    };
+
+    public static Condicion CrearRecompensa(int cantidad, string? columna = null, int? estructuraId = null) => new Condicion
+    {
+        Id = 1,
+        NombreColumna = columna,
+        Cantidad = cantidad,
+        EstructuraId = estructuraId,
+        EsRecompensa = true,
+    };
+    
+    public static CondicionDTO CrearRecompensaDTO(int cantidad, string? columna = null, int? estructuraId = null) => new CondicionDTO
+    {
+        Id = 1,
+        NombreColumna = columna,
+        Cantidad = cantidad,
+        EstructuraId = estructuraId,
+        EsRecompensa = true,
+    };
+
 }
