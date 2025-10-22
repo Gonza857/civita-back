@@ -112,7 +112,7 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate(); // Aplica solo las migraciones pendientes
 }
 
-// Pipeline
+// Pipeline 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
