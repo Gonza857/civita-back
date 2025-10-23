@@ -76,7 +76,7 @@
           "id": 1,
           "name": "casa2_1",
           "type": "casa2",
-          "x": 576,
+          "x": 512,
           "y": 524,
           "width": 1396,
           "height": 428,
@@ -8117,60 +8117,60 @@
       "objects": [
         {
           "id": 1,
-          "name": "base",
+          "name": "base_1",
           "type": "base",
-          "x": 512,
-          "y": 1152,
+          "x": 768,
+          "y": 1120,
           "width": 256,
           "height": 384,
           "visible": true
         },
         {
           "id": 2,
-          "name": "base",
+          "name": "base_2",
           "type": "base",
-          "x": 768,
-          "y": 1152,
+          "x": 512,
+          "y": 1120,
           "width": 256,
           "height": 384,
           "visible": true
         },
         {
           "id": 3,
-          "name": "base",
+          "name": "base_3",
           "type": "base",
           "x": 1024,
-          "y": 1152,
+          "y": 1120,
           "width": 256,
           "height": 384,
           "visible": true
         },
         {
           "id": 4,
-          "name": "base",
+          "name": "base_4",
           "type": "base",
           "x": 1280,
-          "y": 1152,
+          "y": 1120,
           "width": 256,
           "height": 384,
           "visible": true
         },
         {
           "id": 5,
-          "name": "base",
+          "name": "base_5",
           "type": "base",
           "x": 1536,
-          "y": 1152,
+          "y": 1120,
           "width": 256,
           "height": 384,
           "visible": true
         },
         {
           "id": 6,
-          "name": "base",
+          "name": "base_6",
           "type": "base",
           "x": 1760,
-          "y": 1152,
+          "y": 1120,
           "width": 256,
           "height": 384,
           "visible": true
@@ -24353,5 +24353,5 @@
   "type": "map",
   "version": "1.10",
   "width": 80,
-  "felicidad_actual": 60
+  "felicidad_actual": 66
 }

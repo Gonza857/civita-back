@@ -56,10 +56,12 @@ public class LogroRepositorio : ILogroRepositorio
     public async Task<List<Logro>> ObtenerTodos()
     {
         return await _context.Logro
-            .Include(tl => tl.Condicion)
-                .ThenInclude(cond => cond.Recompensa)
-            .Include (tl => tl.TipoLogro)
-            .ToListAsync();
+           .Include(l => l.Condicion)
+               .ThenInclude(c => c.Recompensa)       // Recompensa de la Condicion
+           .Include(l => l.Condicion)
+               .ThenInclude(c => c.Estructura)       // Estructura de la Condicion
+           .Include(l => l.TipoLogro)
+           .ToListAsync();
     }
 
     public async Task<bool> ExisteLogroEnCumplidos(int idLogro)
