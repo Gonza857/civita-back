@@ -16,7 +16,7 @@ public interface ILogroLogica
     Task Actualizar(LogroDTO logroDTO, int id);
     Task<List<LogroDTO>> ObtenerLogrosCumplidos(Partida partida);
     Task<List<LogroDTO>> ComprobarSiCumpleAlgunLogro(Partida? partida, List<Logro> logrosDB);
-    Task MarcarLogrosComoCompletados(Partida? partida, List<Logro> logrosDB);
+    Task MarcarLogrosComoCompletados(Partida? partida, List<LogroDTO> logrosdto);
     
     Task<List<Logro>> ObtenerLogrosParaObtenerRecompensa(int partidaId);
 }
@@ -181,25 +181,32 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
             por cada item de esa lista, valido con logro partida para ver si ya lo cumplió
          */
         List<Logro> logrosParaPasarACumplido = new List<Logro>();
-        
-        foreach (string recurso in this.recursos)
-        {
-            foreach (Logro logro in logrosDB)
-            {
-                Condicion condicion = logro.Condicion;
-                if (condicion.NombreColumna.Equals(recurso))
-                {
-                    // Coincide la columna de condicion con la de recurso (Energia - Energia)
-                    Recurso recursoPartida = partida.Recursos;
-                    var columnaNombre = typeof(Recurso).GetProperty(condicion.NombreColumna);
-                    int valorColumna = (int)columnaNombre.GetValue(recursoPartida);
-                    if (valorColumna >= condicion.Cantidad)
-                    {
-                        // Cumple!
-                        logrosParaPasarACumplido.Add(logro);
-                    }
 
+        foreach (Logro logro in logrosDB)
+        {
+            Condicion condicion = logro.Condicion;
+
+            if (!string.IsNullOrEmpty(condicion.NombreColumna))
+            {
+                // Condición de recurso
+                Recurso recursoPartida = partida.Recursos;
+                var propiedad = typeof(Recurso).GetProperty(condicion.NombreColumna);
+                if (propiedad != null && propiedad.PropertyType == typeof(int))
+                {
+                    int valor = (int)propiedad.GetValue(recursoPartida)!;
+                    if (valor >= condicion.Cantidad)
+                        logrosParaPasarACumplido.Add(logro);
                 }
+            }
+            else if (condicion.EstructuraId != null)
+            {
+                // Cada em en EstructuraMapa = 1 estructura, entonces
+                int cantidadTotal = partida.EstructuraMapa
+                    .Count(em => em.EstructuraId == condicion.EstructuraId);
+
+                if (cantidadTotal >= condicion.Cantidad)
+                    logrosParaPasarACumplido.Add(logro);
+
             }
         }
 
@@ -209,7 +216,7 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
         return logrosFiltrados.Select(l => this.ToDto(l)).ToList();
     }
     
-    public async Task MarcarLogrosComoCompletados(Partida? partida, List<Logro> logrosDB)
+    public async Task MarcarLogrosComoCompletados(Partida? partida, List<LogroDTO> logrosDB)
     {
         if (partida == null || logrosDB.Count == 0 || partida.Recursos == null)
             throw new LogroExcepcion("No se pudo obtener si cumple algún logro.");
@@ -222,12 +229,13 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
 
          */
 
-        foreach (Logro logro in logrosDB)
+        foreach (LogroDTO logro in logrosDB)
         {
             bool existe = await this.repositorioLogro.ExisteLogroEnCumplidos(logro.Id);
             if (!existe)
             {
-                await this._logroPartidaRepositorio.Guardar(new LogroPartida { Partida = partida, Logro = logro });
+                var logroDB = await this.repositorioLogro.ObtenerPorId(logro.Id);
+                await this._logroPartidaRepositorio.Guardar(new LogroPartida { Partida = partida, Logro = logroDB });
             }
         }
     }

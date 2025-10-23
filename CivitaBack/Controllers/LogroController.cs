@@ -65,8 +65,8 @@ public class LogroController : ControllerBase
             var partida = await _partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
             if (partida == null)
                 return BadRequest("Partida no econtrada");
-            await _logroLogica.MarcarLogrosComoCompletados(partida, logros);
-            var logrosFiltrados = await _logroLogica.ObtenerLogrosParaObtenerRecompensa(partida.Id);
+            var logrosFiltrados = await _logroLogica.ComprobarSiCumpleAlgunLogro(partida, logros);
+            await _logroLogica.MarcarLogrosComoCompletados(partida, logrosFiltrados);
             await _partidaLogica.ReclamarLogros(partida, logrosFiltrados);
             return Ok();
         }

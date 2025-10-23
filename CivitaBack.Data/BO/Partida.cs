@@ -19,7 +19,6 @@ namespace CivitaBack.Data.BO
         public Usuario? Usuario { get; set; }
 
         // Relaciones
-        [JsonIgnore]
         public Recurso? Recursos { get; set; }
         public List<Evento>? Evento { get; set; }
         public List<Tienda>? Tienda { get; set; }
