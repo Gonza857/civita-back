@@ -14,6 +14,7 @@ public interface IEstructuraMapaLogica
     void Colocar (Estructura e, Partida p);
 
     Task ReiniciarEstructurasDePartida(int idPartida);
+    Task EliminarEstructuraAsync(EliminarEstructuraDTO dto);
 
 }
 public class EstructuraMapaLogica : IEstructuraMapaLogica
@@ -39,4 +40,16 @@ public class EstructuraMapaLogica : IEstructuraMapaLogica
     {
         await this.estructuraMapaRepositorio.EliminarPorPartidaIdAsync(idPartida);
     }
+
+    public async Task EliminarEstructuraAsync(EliminarEstructuraDTO dto)
+    {
+        var entidad = await estructuraMapaRepositorio.ObtenerCoincidenteAsync(dto);
+
+        if (entidad is null)
+            throw new InvalidOperationException("No se encontró la estructura a eliminar");
+
+        await estructuraMapaRepositorio.EliminarAsync(entidad);
+        await estructuraMapaRepositorio.GuardarCambios();
+    }
+
 }

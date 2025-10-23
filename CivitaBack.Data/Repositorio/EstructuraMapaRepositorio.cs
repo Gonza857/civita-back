@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CivitaBack.Data.BO;
+using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
@@ -16,6 +18,9 @@ public interface IEstructuraMapaRepositorio
     Task GuardarCambios();
     Task EliminarPorPartidaIdAsync(int partidaId);
     Task AgregarVariasAsync(List<EstructuraMapa> estructuras);
+    Task<EstructuraMapa?> ObtenerCoincidenteAsync(EliminarEstructuraDTO dto);
+    Task EliminarAsync(EstructuraMapa entidad);
+
 
 }
 
@@ -59,5 +64,22 @@ public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRep
         await _context.SaveChangesAsync();
     }
 
+    public async Task<EstructuraMapa?> ObtenerCoincidenteAsync(EliminarEstructuraDTO dto)
+    {
+        return await _context.EstructuraMapa.FirstOrDefaultAsync(e =>
+                e.PartidaId == dto.PartidaId &&
+                e.EstructuraId == dto.EstructuraId &&
+                e.X == dto.X &&
+                e.Y == dto.Y &&
+                e.Width == dto.Width &&
+                e.Height == dto.Height
+            );
+    }
+
+    public async Task EliminarAsync(EstructuraMapa entidad)
+    {
+        _context.EstructuraMapa.Remove(entidad);
+        await Task.CompletedTask;
+    }
 
 }

@@ -1,5 +1,6 @@
 ﻿using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
+using CivitaBack.Data.Repositorio;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Excepciones;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,7 @@ namespace CivitaBack.Api.Controllers
         private readonly IEstructuraMapaLogica _estructuraMapaLogica;
         private readonly ILogroPartidaLogica _logroPartidaLogica;
         private readonly ILogger<PartidaController> _logger;
+        
 
         public PartidaController(
             IPartidaLogica partidaLogica,
@@ -103,6 +105,7 @@ namespace CivitaBack.Api.Controllers
         {
             try
             {
+                idUsuario = 1; 
                 Partida partida = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
                 return Ok(partida);
             }
@@ -269,6 +272,26 @@ namespace CivitaBack.Api.Controllers
                 return Problem("Error al actualizar el mapa.");
             }
         }
+
+        [HttpDelete("expo/eliminar-estructura")]
+        public async Task<IActionResult> EliminarEstructura([FromBody] EliminarEstructuraDTO dto)
+        {
+            try
+            {
+                await _estructuraMapaLogica.EliminarEstructuraAsync(dto);
+                return Ok("Estructura eliminada correctamente");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Problem("Error eliminando la estructura");
+            }
+        }
+
+       
 
         // [HttpPost("Colocar/{partidaId}/{estructuraId}/usuario/{idUsuario}")]
         // public async Task<IActionResult> ColocarEstructura(int partidaId, int estructuraId, int idUsuario)

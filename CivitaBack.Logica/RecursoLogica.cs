@@ -38,10 +38,10 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
         Recurso recurso = new Recurso
         {
             PartidaId = partida.Id,
-            EcoCoins = 50,
+            EcoCoins = 200,
             Felicidad = 40,
-            Energia = 20,
-            Contaminacion = 70,
+            Energia = 30,
+            Contaminacion = 60,
         };
         await this.repositorioRecurso.GuardarRecurso(recurso);
     }
