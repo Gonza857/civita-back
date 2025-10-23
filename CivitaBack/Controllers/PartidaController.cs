@@ -64,7 +64,7 @@ namespace CivitaBack.Api.Controllers
         [HttpPost("expo/reiniciar")]
         public async Task<IActionResult> ReiniciarDemo()
         {
-            var partida = await _partidaLogica.ObtenerPorUsuarioId(USUARIO_EXPO);
+            var partida = await _partidaLogica.ObtenerPorUsuarioId(41);
 
             if (partida == null)
                 return NotFound("No hay partida Demo para reiniciar");

@@ -53,7 +53,7 @@ public interface IPartidaRepositorio
             var rutaMapa = Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory, 
                 "..", "..", "..", "..",                
-                "CivitaBack.Data", "DTO", "mapa_base.json"
+                "CivitaBack.Data", "Mapa", "mapa3.json"
             );
 
             rutaMapa = Path.GetFullPath(rutaMapa);
