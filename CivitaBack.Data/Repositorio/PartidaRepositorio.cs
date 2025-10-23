@@ -53,7 +53,7 @@ public interface IPartidaRepositorio
             var rutaMapa = Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory, 
                 "..", "..", "..", "..",                
-                "CivitaBack.Data", "DTO", "mapa_base.json"
+                "CivitaBack.Data", "Mapa", "mapa3.json"
             );
 
             rutaMapa = Path.GetFullPath(rutaMapa);
@@ -150,7 +150,7 @@ public interface IPartidaRepositorio
             if (partida == null)
                 throw new Exception("No se encontró la partida.");
 
-            var pathBase = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "mapa", "mapa_base.json");
+            var pathBase = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "mapa", "mapa3.json");
             if (!File.Exists(pathBase))
                 throw new Exception($"No se encontró el archivo base del mapa en {pathBase}");
 
