@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace CivitaBack.Data.BO;
 
@@ -14,6 +15,7 @@ public class Recurso : Auditable
     public int EcoCoins { get; set; }
     public int Poblacion { get; set; }
     public int PartidaId { get; set; }
+    [JsonIgnore]
     public Partida? Partida { get; set; }
 
     public Recurso() { }
