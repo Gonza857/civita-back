@@ -38,7 +38,7 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
         Recurso recurso = new Recurso
         {
             PartidaId = partida.Id,
-            EcoCoins = 200,
+            EcoCoins = 450,
             Felicidad = 40,
             Energia = 30,
             Contaminacion = 60,

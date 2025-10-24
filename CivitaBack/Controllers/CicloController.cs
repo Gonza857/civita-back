@@ -1,4 +1,5 @@
 ﻿using CivitaBack.Logica;
+using CivitaBack.Logica.Backgrounds;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +11,14 @@ namespace CivitaBack.Api.Controllers
     {
         private readonly ICicloLogica _cicloLogica;
         private readonly ILogger<CicloController> _logger;
+        private readonly BackgroundCicloLogica _cicloBackground; 
 
-        public CicloController(ICicloLogica cicloLogica, ILogger<CicloController> logger)
+        public CicloController(ICicloLogica cicloLogica, ILogger<CicloController> logger, BackgroundCicloLogica background)
         {
             _cicloLogica = cicloLogica;
             _logger = logger;
             _logger.LogInformation("CicloController instanciado");
+            _cicloBackground = background; 
 
         }
 
@@ -42,6 +45,20 @@ namespace CivitaBack.Api.Controllers
                 _logger.LogError(ex, "❌ Error al procesar el ciclo manual");
                 return StatusCode(500, new { mensaje = "Error al procesar el ciclo", error = ex.Message });
             }
+        }
+
+        [HttpPost("pausar")]
+        public IActionResult Pausar()
+        {
+            _cicloBackground.Pausar();
+            return Ok(new { mensaje = "Ciclo pausado" });
+        }
+
+        [HttpPost("continuar")]
+        public IActionResult Continuar()
+        {
+            _cicloBackground.Continuar();
+            return Ok(new { mensaje = "Ciclo continuado" });
         }
 
     }

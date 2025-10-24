@@ -87,8 +87,11 @@ builder.Services.AddScoped<ITipoEstructuraLogica, TipoEstructuraLogica>();
 builder.Services.AddScoped<IEventoLogica, EventoLogica>();
 builder.Services.AddScoped<IEventoRepositorio, EventoRepositorio>();
 
-builder.Services.AddHostedService<BackgroundCicloLogica>();
-//builder.Services.AddHostedService<BackgroundEventoLogica>();
+builder.Services.AddSingleton<BackgroundCicloLogica>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundCicloLogica>());
+
+
+
 
 builder.Services.AddSignalR();
 builder.Services.AddScoped<ICondicionRepositorio, CondicionRepositorio>();

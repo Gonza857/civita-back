@@ -37,10 +37,10 @@ namespace CivitaBack.Logica
         {
             if (partida == null || partida.Recursos == null)
                 throw new Exception();
-            
+
             Recurso recursosPartida = partida.Recursos;
             int nuevaPoblacion = 0;
-                
+
             foreach (var estructuraEnMapa in partida.EstructuraMapa)
             {
 
@@ -50,17 +50,27 @@ namespace CivitaBack.Logica
                 var estructura = estructuraEnMapa.Estructura;
                 var tipoEstructura = estructura.TipoEstructura;
 
-                recursosPartida.Energia = 
+                recursosPartida.Energia =
                     ActualizarRecurso(recursosPartida.Energia, tipoEstructura.EnergiaPorCiclo, true);
-                recursosPartida.EcoCoins = 
+                recursosPartida.EcoCoins =
                     ActualizarRecurso(recursosPartida.EcoCoins, tipoEstructura.DineroPorCiclo, false);
-                recursosPartida.Felicidad = 
+                recursosPartida.Felicidad =
                     ActualizarRecurso(recursosPartida.Felicidad, estructura.FelicidadCiclo, true);
-                recursosPartida.Contaminacion = 
+                recursosPartida.Contaminacion =
                     ActualizarRecurso(recursosPartida.Contaminacion, estructura.ContaminacionCiclo, true);
 
                 if (tipoEstructura.Capacidad > 0)
                     nuevaPoblacion += tipoEstructura.Capacidad;
+            }
+
+            if (recursosPartida.Contaminacion > 70)
+            {
+                recursosPartida.Felicidad = ActualizarRecurso(recursosPartida.Felicidad, -5, true);
+            }
+
+            if (recursosPartida.Contaminacion < 10)
+            {
+                recursosPartida.Felicidad = ActualizarRecurso(recursosPartida.Felicidad, 3, true);
             }
 
             partida.Recursos.Poblacion = nuevaPoblacion;
@@ -80,7 +90,7 @@ namespace CivitaBack.Logica
 
             if (cantidadInicial < 0)
                 cantidadInicial = 0;
-            
+
             if (tieneLimite && cantidadInicial > 100)
                 cantidadInicial = 100;
 

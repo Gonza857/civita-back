@@ -14,6 +14,8 @@ namespace CivitaBack.Logica.Backgrounds
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<BackgroundCicloLogica> _logger;
         private readonly IHubContext<CicloHub> _hubContext;
+        private readonly ManualResetEventSlim _pauseEvent = new(true); // empieza "activo"
+
 
         private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(3); // 7/8
 
@@ -24,6 +26,9 @@ namespace CivitaBack.Logica.Backgrounds
             _hubContext = hubContext;
         }
 
+        public void Pausar() => _pauseEvent.Reset();
+        public void Continuar() => _pauseEvent.Set();
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("🟢 CicloBackgroundService iniciado a las {Hora}", DateTime.Now);
@@ -32,6 +37,10 @@ namespace CivitaBack.Logica.Backgrounds
             {
                 try
                 {
+
+                    //Espera si está en pausa
+                    _pauseEvent.Wait(stoppingToken);
+
                     using var scope = _serviceProvider.CreateScope();
                     var cicloLogica = scope.ServiceProvider.GetRequiredService<ICicloLogica>();
 
