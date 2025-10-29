@@ -1,24 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entities;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio;
-
-public interface ILogroPartidaRepositorio : IRepositorioBase<LogroPartida>
-{
-    Task<List<Logro>> ObtenerLogrosIncompletos(int partidaId);
-    Task<List<Logro>> ObtenerLogrosCompletos(int partidaId);
-
-    Task ReiniciarLogrosPartida(int partidaId);
-    Task<List<Logro>> ObtenerLogrosParaReclamarQueNoEstenCumplidos(List<int> idsLogros);
-
-    Task<List<Logro>> ObtenerLogrosNoCumplidos(int idPartida);
-}
 
 public class LogroPartidaRepositorio : GenericoRepositorio, ILogroPartidaRepositorio
 {

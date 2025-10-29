@@ -1,25 +1,10 @@
-﻿using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entities;
 using CivitaBack.Data.EF;
-using CivitaBack.Data.Repositorio;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio
 {
-    public interface IUsuarioRepositorio
-    {
-        Task<Usuario> ObtenerUsuarioPorMail(string mail);
-        Task<Usuario?> ObtenerUsuarioPorNombre(string nombreUsuario);
-        Task<Usuario> CrearUsuario(Usuario usuario);
-
-        Task<Usuario> ObtenerPorId(int id);
-        Task<List<Usuario>> ObtenerTodosLosUsuarios();
-
-    }
 
     public class UsuarioRepositorio : IUsuarioRepositorio
     {

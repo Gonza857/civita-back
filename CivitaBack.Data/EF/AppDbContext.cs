@@ -1,5 +1,5 @@
-﻿using CivitaBack.Data.BO;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Entities;
 
 namespace CivitaBack.Data.EF;
 
@@ -28,21 +28,7 @@ public partial class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configurar tabla de unión
-        modelBuilder.Entity<LogroPartida>()
-            .HasKey(lp => new { lp.LogroId, lp.PartidaId }); // PK compuesta
-
-        modelBuilder.Entity<LogroPartida>()
-            .HasOne(lp => lp.Logro)
-            .WithMany(l => l.LogroPartidas)
-            .HasForeignKey(lp => lp.LogroId);
-
-        modelBuilder.Entity<LogroPartida>()
-            .HasOne(lp => lp.Partida)
-            .WithMany(p => p.LogroPartidas)
-            .HasForeignKey(lp => lp.PartidaId);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
-
-
 
 }

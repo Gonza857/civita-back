@@ -1,19 +1,14 @@
-﻿using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entities;
 using CivitaBack.Data.DTO;
-using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
 using CivitaBack.Logica.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace CivitaBack.Logica
 {

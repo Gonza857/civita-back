@@ -1,13 +1,10 @@
-﻿using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entities;
 using CivitaBack.Data.EF;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
-public interface ICondicionRepositorio : IRepositorioBase<Condicion>
-{
-    Task<List<Condicion>> ObtenerTodasRecompensas();
-}
 public class CondicionRepositorio : GenericoRepositorio, ICondicionRepositorio
 {
     public CondicionRepositorio(AppDbContext context) : base(context) { }

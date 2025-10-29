@@ -1,33 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
-using CivitaBack.Data.BO;
+﻿using System.Text.Json;
+using CivitaBack.Domain.Entities;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
 using CivitaBack.Logica.Excepciones;
 using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio;
-
-public interface IPartidaRepositorio
-{
-    Task GuardarCambios();
-    
-    Task<Partida?> ObtenerPorUsuarioId(int IdUsuario);
-    Task<Partida> CrearPartida(int idUsuario);
-    Task<List<Partida>> ObtenerPartidas();
-    void Guardar(Partida partida);
-    
-    Task<bool> ActualizarMapaAsync(Partida partida);
-    
-    Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapaDTO> estructuras);
-    Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId);
-    Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId);
-    Task<List<EstructuraMapa>> ObtenerEstructurasDeUnMapa(int partidaId);
-}
 
     public class PartidaRepositorio : GenericoRepositorio, IPartidaRepositorio
 {
@@ -102,38 +81,29 @@ public interface IPartidaRepositorio
             return rowsAfectadas > 0;
         }
 
-        public async Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapaDTO> estructuras)
+    public async Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapa> nuevas)
+    {
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        try
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                var existentes = _context.EstructuraMapa.Where(e => e.PartidaId == partidaId);
-                _context.EstructuraMapa.RemoveRange(existentes);
-                await _context.SaveChangesAsync();
+            var existentes = _context.EstructuraMapa.Where(e => e.PartidaId == partidaId);
+            _context.EstructuraMapa.RemoveRange(existentes);
+            await _context.SaveChangesAsync();
 
-                var nuevas = estructuras.Select(e => new EstructuraMapa
-                {
-                    PartidaId = partidaId,
-                    EstructuraId = e.EstructuraId,
-                    X = e.X,
-                    Y = e.Y,
-                    Width = e.Width,
-                    Height = e.Height,
-                    Editado = DateTime.UtcNow
-                });
+            await _context.EstructuraMapa.AddRangeAsync(nuevas);
+            await _context.SaveChangesAsync();
 
-                await _context.EstructuraMapa.AddRangeAsync(nuevas);
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw new PersistenciaException("Ocurrió un error al actualizar.");
-            }
+            await transaction.CommitAsync();
         }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
 
-        public async Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId)
+
+    public async Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId)
         {
             return await _context.Partida
                 .Include(p => p.EstructuraMapa)

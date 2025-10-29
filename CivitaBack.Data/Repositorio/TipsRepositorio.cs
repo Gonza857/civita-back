@@ -1,13 +1,10 @@
-﻿using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entities;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio
 {
-    public interface ITipsRepositorio : IRepositorioBase<Tip>
-    {
-        Task<List<Tip>> ObtenerMsjPorIdTipo(int idTipo);
-    }
     public class TipsRepositorio : GenericoRepositorio, ITipsRepositorio
     {
         public TipsRepositorio(AppDbContext context) : base(context) { }
