@@ -71,7 +71,7 @@ public class CondicionLogica : ICondicionLogica, IParser<Condicion, CondicionDTO
 
         condicion.Cantidad = condicionDto.Cantidad;
 
-        await this._condicionRepositorio.Guardar(condicion);
+        await this._condicionRepositorio.Agregar(condicion);
     }
 
     /// <summary>
@@ -177,7 +177,7 @@ public class CondicionLogica : ICondicionLogica, IParser<Condicion, CondicionDTO
         recompensa.Cantidad = recompensaDto.Cantidad;
         recompensa.EsRecompensa = true;
 
-        await this._condicionRepositorio.Guardar(recompensa);
+        await this._condicionRepositorio.Agregar(recompensa);
     }
 
     private void ValidarCondicionDTO(CondicionDTO condicionDto)

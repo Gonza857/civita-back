@@ -49,7 +49,7 @@ public class LogroController : ControllerBase
         catch (LogroExcepcion ex)
         {
             return BadRequest(ex.Message);
-        }
+        }   
         catch (Exception ex)
         {
             return Problem("Ocurrió un error al obtener el listado de Logros.");

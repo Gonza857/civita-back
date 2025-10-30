@@ -76,7 +76,7 @@ public class TipoLogroLogica : ITipoLogroLogica
             Nombre = tipoLogroDto.Nombre
         }; 
         
-        await this.repositorioTipoLogro.Guardar(tipoLogro);
+        await this.repositorioTipoLogro.Agregar(tipoLogro);
         return this.TipoLogroToDTO(tipoLogro);
     }
 

@@ -116,7 +116,7 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
             
         };
         
-        await this.repositorioLogro.Guardar(logro);
+        await this.repositorioLogro.Agregar(logro);
     }
 
     /// <summary>
@@ -235,7 +235,7 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
             if (!existe)
             {
                 var logroDB = await this.repositorioLogro.ObtenerPorId(logro.Id);
-                await this._logroPartidaRepositorio.Guardar(new LogroPartida { Partida = partida, Logro = logroDB });
+                await this._logroPartidaRepositorio.Agregar(new LogroPartida { Partida = partida, Logro = logroDB });
             }
         }
     }

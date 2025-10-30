@@ -53,7 +53,7 @@ namespace CivitaBack.Logica
                 EfectoFiltro = tip.EfectoFiltro,
             };
             
-            await this._tipsRepositorio.Guardar(nuevoTip);
+            await this._tipsRepositorio.Agregar(nuevoTip);
         }
 
         public async Task Actualizar(TipDTO tip, int id)

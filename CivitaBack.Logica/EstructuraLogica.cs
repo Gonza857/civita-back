@@ -66,7 +66,7 @@ public class EstructuraLogica : IEstructuraLogica, IParser<Estructura, Estructur
             Creado = DateTime.UtcNow,
         };
         
-        await this._repositorioEstructura.Guardar(estructuraNueva);
+        await this._repositorioEstructura.Agregar(estructuraNueva);
     }
 
     public async Task Eliminar(int idEstructura)

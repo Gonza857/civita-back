@@ -80,7 +80,7 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica, IParser<TipoEstructur
             EnergiaPorCiclo = tipoEstructuraDTO.EnergiaPorCiclo,
         }; 
         
-        await this._repositorioTipoEstructura.Guardar(tipoEstructura);
+        await this._repositorioTipoEstructura.Agregar(tipoEstructura);
         return this.ToDto(tipoEstructura);
     }
     

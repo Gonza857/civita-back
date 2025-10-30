@@ -47,7 +47,7 @@ public class TipoTipLogica : ITipoTipLogica, IParser<TipoTip, TipoTipDTO>
         {
             Descripcion = tipoTipDto.Descripcion,
         };
-        await this._repositorioTipoTip.Guardar(nuevo);
+        await this._repositorioTipoTip.Agregar(nuevo);
     }
 
     public async Task<TipoTipDTO> ObtenerPorId(int id)

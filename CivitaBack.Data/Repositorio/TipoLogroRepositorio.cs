@@ -37,10 +37,20 @@ public class TipoLogroRepositorio : GenericoRepositorio, ITipoLogroRepositorio
         }
     }
     
-    public async Task Guardar(TipoLogro tipoLogro)
+    public async Task Agregar(TipoLogro tipoLogro)
     {
         await _context.TipoLogro.AddAsync(tipoLogro);
         await _context.SaveChangesAsync();
+    }
+
+    public Task AgregarVarios(List<TipoLogro> entidades)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Guardar()
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<TipoLogro?> ObtenerPorId(int id)

@@ -45,11 +45,21 @@ public class CondicionRepositorio : GenericoRepositorio, ICondicionRepositorio
         }
     }
 
-    public async Task Guardar(Condicion entidad)
+    public async Task Agregar(Condicion entidad)
     {
         entidad.Creado = DateTime.UtcNow;
         await _context.Condicion.AddAsync(entidad);
         await base.GuardarCambiosAsync();
+    }
+
+    public Task AgregarVarios(List<Condicion> entidades)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Guardar()
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<List<Condicion>> ObtenerTodasRecompensas()

@@ -40,9 +40,19 @@ public class TipoTipRepositorio : GenericoRepositorio, ITipoTipRepositorio
         // await base.GuardarCambiosAsync();
     }
 
-    public async Task Guardar(TipoTip entidad)
+    public async Task Agregar(TipoTip entidad)
     {
         await _context.TipoTip.AddAsync(entidad);
         await base.GuardarCambiosAsync();
+    }
+
+    public Task AgregarVarios(List<TipoTip> entidades)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Guardar()
+    {
+        throw new NotImplementedException();
     }
 }

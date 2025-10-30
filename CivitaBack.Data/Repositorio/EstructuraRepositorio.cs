@@ -36,10 +36,20 @@ public class EstructuraRepositorio : GenericoRepositorio, IEstructuraRepositorio
         }
     }
 
-    public async Task Guardar(Estructura entidad)
+    public async Task Agregar(Estructura entidad)
     {
         await _context.Estructura.AddAsync(entidad);
         await _context.SaveChangesAsync();
+    }
+
+    public Task AgregarVarios(List<Estructura> entidades)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Guardar()
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<Estructura?> ObtenerPorId(int id)

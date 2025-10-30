@@ -6,5 +6,7 @@ public interface IRepositorioBase<T> where T : class
     Task<List<T>> ObtenerTodos();
     Task Actualizar(T entidad);
     Task Eliminar(int id);
-    Task Guardar(T entidad);
+    Task Agregar(T entidad);
+    Task AgregarVarios(List<T> entidades);
+    Task Guardar();
 }

@@ -43,9 +43,19 @@ public class TipoEstructuraRepositorio : GenericoRepositorio, ITipoEstructuraRep
         }
     }
 
-    public async Task Guardar(TipoEstructura entidad)
+    public async Task Agregar(TipoEstructura entidad)
     {
         await _context.TipoEstructura.AddAsync(entidad);
         await base.GuardarCambiosAsync();
+    }
+
+    public Task AgregarVarios(List<TipoEstructura> entidades)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Guardar()
+    {
+        throw new NotImplementedException();
     }
 }

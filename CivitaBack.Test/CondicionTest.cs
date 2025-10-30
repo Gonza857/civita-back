@@ -106,7 +106,7 @@ namespace CivitaBack.Tests
             await _condicionLogica.CrearRecompensa(recompensa);
         
             // Assert
-            _mockCondicionRepositorio.Verify(r => r.Guardar(It.IsAny<Condicion>()), Times.Once);
+            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Once);
         }
         
         [Fact]
@@ -118,7 +118,7 @@ namespace CivitaBack.Tests
         
             // Act & Assert
             await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Guardar(It.IsAny<Condicion>()), Times.Never);
+            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
         }
         
         [Fact]
@@ -129,7 +129,7 @@ namespace CivitaBack.Tests
         
             // Act & Assert
             await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Guardar(It.IsAny<Condicion>()), Times.Never);
+            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
         }
         
         [Fact]
@@ -140,7 +140,7 @@ namespace CivitaBack.Tests
         
             // Act & Assert
             await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Guardar(It.IsAny<Condicion>()), Times.Never);
+            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
         }
         
         [Fact]
@@ -151,7 +151,7 @@ namespace CivitaBack.Tests
         
             // Act & Assert
             await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Guardar(It.IsAny<Condicion>()), Times.Never);
+            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
         }
         
         [Fact]

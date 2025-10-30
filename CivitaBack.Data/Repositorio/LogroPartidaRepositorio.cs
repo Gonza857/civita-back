@@ -105,7 +105,9 @@ public class LogroPartidaRepositorio : GenericoRepositorio, ILogroPartidaReposit
 
     public Task Actualizar(LogroPartida entidad)
     {
-        throw new NotImplementedException();
+        entidad.Editado = DateTime.UtcNow;
+        _context.Set<LogroPartida>().Update(entidad);
+        return Task.CompletedTask;
     }
 
     public Task Eliminar(int id)
@@ -113,10 +115,23 @@ public class LogroPartidaRepositorio : GenericoRepositorio, ILogroPartidaReposit
         throw new NotImplementedException();
     }
 
-    public async Task Guardar(LogroPartida entidad)
+    public async Task Agregar(LogroPartida entidad)
     {
         entidad.Creado = DateTime.UtcNow;
         await _context.LogroPartida.AddAsync(entidad);
+    }
+
+    public async Task AgregarVarios(List<LogroPartida> entidades)
+    {
+        foreach (var e in entidades)
+        {
+            e.Creado = DateTime.UtcNow;
+        }
+        await _context.LogroPartida.AddRangeAsync(entidades);
+    }
+
+    public async Task Guardar()
+    {
         await base.GuardarCambiosAsync();
     }
 }

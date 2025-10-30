@@ -57,6 +57,7 @@ public static class TestData
         TipoLogro = tipo,
         Condicion = condicion,
     };
+    
     public static Condicion CrearCondicion(string nombreColumna, int cantidad) => new Condicion
     {
         Id = 1,

@@ -26,14 +26,23 @@ public class RecursoRepositorio : IRecursoRepositorio
     {
         entidad.Editado = DateTime.UtcNow;
         _context.Recurso.Update(entidad);
-        await _context.SaveChangesAsync();
     }
     public Task Eliminar(int id)
     {
         throw new NotImplementedException();
     }
 
-    public Task Guardar(Recurso entidad)
+    public Task Agregar(Recurso entidad)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task AgregarVarios(List<Recurso> entidades)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Guardar()
     {
         throw new NotImplementedException();
     }

@@ -39,10 +39,20 @@ public class LogroRepositorio : ILogroRepositorio
         }
     }
 
-    public async Task Guardar(Logro entidad)
+    public async Task Agregar(Logro entidad)
     {
         await _context.Logro.AddAsync(entidad);
         await _context.SaveChangesAsync();
+    }
+
+    public Task AgregarVarios(List<Logro> entidades)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Guardar()
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<Logro> ObtenerPorId(int id)
