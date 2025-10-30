@@ -42,6 +42,11 @@ public class CondicionRepositorio : GenericoRepositorio, ICondicionRepositorio
         }
     }
 
+    public Task Guardar(Condicion entidad)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task Agregar(Condicion entidad)
     {
         entidad.Creado = DateTime.UtcNow;

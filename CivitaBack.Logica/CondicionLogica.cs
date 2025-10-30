@@ -20,7 +20,7 @@ public interface ICondicionLogica
     
 }
 
-public class CondicionLogica : ICondicionLogica, IParser<Condicion, CondicionDTO>
+public class CondicionLogica : ICondicionLogica, IParser<CondicionEF, CondicionDTO>
 {
     private readonly ICondicionRepositorio _condicionRepositorio;
     private readonly IEstructuraRepositorio estructuraRepositorio;
@@ -51,11 +51,11 @@ public class CondicionLogica : ICondicionLogica, IParser<Condicion, CondicionDTO
     {
         this.ValidarCondicionDTO(condicionDto);
 
-        var condicion = new Condicion();
+        var condicion = new CondicionEF();
 
         if (condicionDto.EstructuraId.HasValue)
         {
-            Estructura e = await this.estructuraRepositorio.ObtenerPorId(condicionDto.EstructuraId.Value);
+            EstructuraEF e = await this.estructuraRepositorio.ObtenerPorId(condicionDto.EstructuraId.Value);
             if (e != null)
             {
                 condicion.EstructuraId = e.Id;
@@ -106,14 +106,14 @@ public class CondicionLogica : ICondicionLogica, IParser<Condicion, CondicionDTO
 
         this.ValidarCondicionDTO(condicionDto);
 
-        Condicion? condicionDb = await this._condicionRepositorio.ObtenerPorId(id);
+        CondicionEF? condicionDb = await this._condicionRepositorio.ObtenerPorId(id);
         if (condicionDb == null)
             throw new CondicionExcepcion("Ocurrió un error al actualizar la Condicion");
 
 
         if (condicionDto.EstructuraId.HasValue)
         {
-            Estructura e = await this.estructuraRepositorio.ObtenerPorId(condicionDto.EstructuraId.Value);
+            EstructuraEF e = await this.estructuraRepositorio.ObtenerPorId(condicionDto.EstructuraId.Value);
             if (e != null)
             {
                 condicionDb.EstructuraId = e.Id;
@@ -127,7 +127,7 @@ public class CondicionLogica : ICondicionLogica, IParser<Condicion, CondicionDTO
             condicionDb.EstructuraId = null;
         }
         
-        Condicion? recompensaDb;
+        CondicionEF? recompensaDb;
         if (condicionDto.RecompensaId.HasValue)
         {
             recompensaDb = await this._condicionRepositorio.ObtenerPorId(condicionDto.RecompensaId.Value);
@@ -156,11 +156,11 @@ public class CondicionLogica : ICondicionLogica, IParser<Condicion, CondicionDTO
     {
         this.ValidarRecompensaDTO(recompensaDto);
 
-        var recompensa = new Condicion();
+        var recompensa = new CondicionEF();
 
         if (recompensaDto.EstructuraId.HasValue)
         {
-            Estructura? e = await this.estructuraRepositorio.ObtenerPorId(recompensaDto.EstructuraId.Value);
+            EstructuraEF? e = await this.estructuraRepositorio.ObtenerPorId(recompensaDto.EstructuraId.Value);
             if (e != null)
             {
                 recompensa.EstructuraId = e.Id;
@@ -216,7 +216,7 @@ public class CondicionLogica : ICondicionLogica, IParser<Condicion, CondicionDTO
             throw new CondicionExcepcion("La cantidad de la recompensa no puede ser menor a 0");
     }
 
-    private CondicionDTO ToRecompensaDto(Condicion recompensa)
+    private CondicionDTO ToRecompensaDto(CondicionEF recompensa)
     {
         CondicionDTO c = new CondicionDTO
         {
@@ -227,7 +227,7 @@ public class CondicionLogica : ICondicionLogica, IParser<Condicion, CondicionDTO
         return c;
     }
 
-    public CondicionDTO ToDto(Condicion entidad)
+    public CondicionDTO ToDto(CondicionEF entidad)
     {
         var dto = new CondicionDTO
         {

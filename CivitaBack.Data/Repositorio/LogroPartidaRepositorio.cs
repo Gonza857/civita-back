@@ -1,97 +1,91 @@
-﻿using CivitaBack.Domain.Entities;
+﻿using AutoMapper;
+using CivitaBack.Data.BO;
+using CivitaBack.Domain.Entities;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio;
 
-public class LogroPartidaRepositorio : GenericoRepositorio, ILogroPartidaRepositorio
+public class LogroPartidaRepositorio 
+    : GenericoRepositorio<LogroPartida, LogroPartidaEF>, ILogroPartidaRepositorio
 {
-    public LogroPartidaRepositorio(AppDbContext context) : base(context) { }
+    public LogroPartidaRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
     
     public async Task<List<Logro>> ObtenerLogrosCompletos(int partidaId)
     {
-        //SELECT*
-        //FROM Logros l
-        //WHERE EXISTS(
-        //    SELECT 1
-        //    FROM LogroPartida lp
-        //    WHERE lp.LogroId = l.Id
-        //      AND lp.PartidaId = @partidaId
-        //);
-        return await _context.Logro
+        List<LogroEF> logros = await _context.Logro
             .Include(l => l.TipoLogro)
             .Where(l => l.LogroPartidas.Any(lp => lp.PartidaId == partidaId))
             .ToListAsync();
+        return base.MapearLista<Logro>(logros);
     }
 
     public async Task<List<Logro>> ObtenerLogrosIncompletos(int partidaId)
     {
-        //SELECT*
-        //FROM Logros l
-        //WHERE NOT EXISTS(
-        //    SELECT 1
-        //    FROM LogroPartida lp
-        //    WHERE lp.LogroId = l.Id
-        //      AND lp.PartidaId = @partidaId
-        //);
-        return await _context.Logro
+        List<LogroEF> logros = await _context.Logro
             .Include(l => l.TipoLogro)
             .Where(l => !l.LogroPartidas.Any(lp => lp.PartidaId == partidaId))
             .ToListAsync();
+        return base.MapearLista<Logro>(logros);
 
     }
 
     public async Task ReiniciarLogrosPartida(int partidaId)
     {
-        var logros = _context.LogroPartida.Where(e => e.PartidaId == partidaId);
+        List<LogroPartidaEF> logros = await _context.LogroPartida
+            .Where(e => e.PartidaId == partidaId)
+            .ToListAsync();
+
         _context.LogroPartida.RemoveRange(logros);
-        await _context.SaveChangesAsync();
     }
     
     public async Task<List<Logro>> ObtenerLogrosParaReclamarQueNoEstenCumplidos(List<int> idsLogros)
     {
         // Traemos los IDs de los logros ya cumplidos
-        var logrosCumplidosIds = await _context.LogroPartida
+        List<int> logrosCumplidosIds = await _context.LogroPartida
             .Select(lp => lp.LogroId)
             .Distinct()
             .ToListAsync();
 
         // Devolvemos los logros que están en la lista que me diste,
         // pero que no figuran en LogroPartida
-        return await _context.Logro
+        List<LogroEF> logros =  await _context.Logro
             .Where(l => idsLogros.Contains(l.Id) && !logrosCumplidosIds.Contains(l.Id))
             .ToListAsync();
+        return base.MapearLista<Logro>(logros);
     }
     
     public async Task<List<Logro>> ObtenerLogrosNoCumplidos(int partidaId)
     {
-        var logrosCumplidosIds = await _context.LogroPartida
+        List<int> logrosCumplidosIds = await _context.LogroPartida
             .Where(lp => lp.PartidaId == partidaId)
             .Select(lp => lp.LogroId)
             .ToListAsync();
 
-        var logrosNoCumplidos = await _context.Logro
+        List<LogroEF> logrosNoCumplidos = await _context.Logro
             .Where(l => !logrosCumplidosIds.Contains(l.Id))
             .ToListAsync();
 
-        return logrosNoCumplidos;
+        return base.MapearLista<Logro>(logrosNoCumplidos);
     }
 
-    public Task<LogroPartida?> ObtenerPorId(int id)
+    public async Task<LogroPartida?> ObtenerPorId(int id)
     {
-        throw new NotImplementedException();
+        var lpEf = await base.ObtenerPorId(id);
+        return base.Mapear<LogroPartida>(lpEf);
     }
 
-    public Task<List<LogroPartida>> ObtenerTodos()
+    public async Task<List<LogroPartida>> ObtenerTodos()
     {
-        throw new NotImplementedException();
+        var listaLogroPartidaEf = await base.ObtenerTodos();
+        return base.MapearLista<LogroPartida>(listaLogroPartidaEf);
     }
 
     public Task Actualizar(LogroPartida entidad)
     {
-        entidad.Editado = DateTime.UtcNow;
-        _context.Set<LogroPartida>().Update(entidad);
+        this.ActualizarEditado(entidad);
+        base.Actualizar(entidad);
         return Task.CompletedTask;
     }
 
@@ -100,23 +94,25 @@ public class LogroPartidaRepositorio : GenericoRepositorio, ILogroPartidaReposit
         throw new NotImplementedException();
     }
 
+    public Task Guardar(LogroPartida entidad)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task Agregar(LogroPartida entidad)
     {
-        entidad.Creado = DateTime.UtcNow;
-        await _context.LogroPartida.AddAsync(entidad);
+        this.ActualizarCreado(entidad);
+        var entidadParaGuardar = base.Mapear<LogroPartidaEF>(entidad);
+        await _context.LogroPartida.AddAsync(entidadParaGuardar);
     }
 
     public async Task AgregarVarios(List<LogroPartida> entidades)
     {
-        foreach (var e in entidades)
-        {
-            e.Creado = DateTime.UtcNow;
-        }
-        await _context.LogroPartida.AddRangeAsync(entidades);
+        foreach (var e in entidades) this.ActualizarCreado(e);
+        await base.AgregarVarios(entidades);
     }
-
-    public async Task Guardar()
-    {
-        await base.GuardarCambiosAsync();
-    }
+    
+    private void ActualizarEditado(LogroPartida entidad) => entidad.Editado = DateTime.UtcNow;
+    private void ActualizarCreado(LogroPartida entidad) => entidad.Creado = DateTime.UtcNow;
+    
 }

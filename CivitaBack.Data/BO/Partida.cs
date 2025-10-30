@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace CivitaBack.Data.BO
 {
-    public class Partida : Auditable
+    public class PartidaEF : Auditable
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -22,9 +22,9 @@ namespace CivitaBack.Data.BO
         public Recurso? Recursos { get; set; }
         public List<Evento>? Evento { get; set; }
         public List<Tienda>? Tienda { get; set; }
-        public List<EstructuraMapa>? EstructuraMapa { get; set; }
+        public List<EstructuraMapaEF>? EstructuraMapa { get; set; }
         public List<TipEnPartida>? TipEnPartida { get; set; }
         // Relación N:N
-        public List<LogroPartida> LogroPartidas { get; set; }
+        public List<LogroPartidaEF> LogroPartidas { get; set; }
     }
 }

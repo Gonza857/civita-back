@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace CivitaBack.Data.BO;
 
-public class EstructuraMapa : Auditable
+public class EstructuraMapaEF : AuditableEF
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -13,10 +13,10 @@ public class EstructuraMapa : Auditable
     // Relaciones
     public int PartidaId { get; set; }
     [JsonIgnore]
-    public Partida? Partida { get; set; }
+    public PartidaEF? Partida { get; set; }
     public int EstructuraId { get; set; }
     [JsonIgnore]
-    public Estructura? Estructura { get; set; }
+    public EstructuraEF? Estructura { get; set; }
 
     public int X { get; set; }
     public int Y { get; set; }

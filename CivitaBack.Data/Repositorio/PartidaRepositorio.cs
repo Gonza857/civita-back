@@ -1,4 +1,6 @@
 ﻿using System.Text.Json;
+using AutoMapper;
+using CivitaBack.Data.BO;
 using CivitaBack.Domain.Entities;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
@@ -8,78 +10,66 @@ using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio;
 
-    public class PartidaRepositorio : GenericoRepositorio, IPartidaRepositorio
+public class PartidaRepositorio
+    : GenericoRepositorio<Partida, PartidaEF>, IPartidaRepositorio
+
 {
-        public PartidaRepositorio(AppDbContext context) : base(context) { }
-        
-        // --------------------------------------------------------------------
-        // 🧱 Métodos básicos (compatibles con rama desarrollo)
-        // --------------------------------------------------------------------
-        public async Task GuardarCambios()
+    public PartidaRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
+    
+
+    public async Task<Partida> CrearPartida(int idUsuario)
+    {
+        var rutaMapa = Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            "..", "..", "..", "..",
+            "CivitaBack.Data", "Mapa", "mapa3.json"
+        );
+
+        rutaMapa = Path.GetFullPath(rutaMapa);
+
+        if (!File.Exists(rutaMapa))
+            throw new FileNotFoundException("No se encontró el archivo de mapa base.", rutaMapa);
+
+        var contenidoMapa = File.ReadAllText(rutaMapa);
+
+        var partida = new Partida
         {
-            await base.GuardarCambiosAsync();
-        }
+            UsuarioId = idUsuario,
+            JsonMapa = contenidoMapa,
+            UltimaVez = DateTime.UtcNow
+        };
 
-        public void Guardar(Partida partida)
-        {
-            _context.Add(partida);
-            _context.SaveChanges();
-        }
+        await _context.Partida.AddAsync(partida);
 
-        public async Task<Partida> CrearPartida(int idUsuario)
-        {
-         
-            var rutaMapa = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory, 
-                "..", "..", "..", "..",                
-                "CivitaBack.Data", "Mapa", "mapa3.json"
-            );
+        await _context.SaveChangesAsync();
 
-            rutaMapa = Path.GetFullPath(rutaMapa);
-            
-            if (!File.Exists(rutaMapa))
-                throw new FileNotFoundException("No se encontró el archivo de mapa base.", rutaMapa);
+        return partida;
+    }
 
-            var contenidoMapa = File.ReadAllText(rutaMapa);
+    public override async Task<List<Partida>> ObtenerTodos()
+    {
+        var partidas = await _context.Partida
+            .Include(p => p.Usuario)
+            .Include(p => p.Recursos)
+            .ToListAsync();
+        return base.MapearLista<Partida>(partidas);
+    }
 
-            var partida = new Partida
-            {
-                UsuarioId = idUsuario,
-                JsonMapa = contenidoMapa,
-                UltimaVez = DateTime.UtcNow
-            };
+    public async Task<Partida?> ObtenerPorUsuarioId(int idUsuario)
+    {
+        var partida =  await _context.Partida
+            .Include(p => p.EstructuraMapa)
+            .Include(p => p.Recursos)
+            .Include(p => p.Usuario)
+            .FirstOrDefaultAsync(p => p.UsuarioId == idUsuario);
+        return base.Mapear<Partida>(partida);
+    }
 
-            await _context.Partida.AddAsync(partida);
-
-            await _context.SaveChangesAsync();
-
-            return partida;
-        }
-        
-        public async Task<List<Partida>> ObtenerPartidas()
-        {
-            return await _context.Partida
-                .Include(p => p.Usuario)
-                .Include(p => p.Recursos)
-                .ToListAsync();
-        }
-
-        public async Task<Partida?> ObtenerPorUsuarioId(int idUsuario)
-        {
-            return await _context.Partida
-                .Include(p => p.EstructuraMapa)
-                .Include(p => p.Recursos)
-                .Include(p => p.Usuario)
-                .FirstOrDefaultAsync(p => p.UsuarioId == idUsuario);
-        }
-        
-        public async Task<bool> ActualizarMapaAsync(Partida partida)
-        {
-            partida.Editado = DateTime.UtcNow;
-            _context.Partida.Update(partida);
-            var rowsAfectadas = await _context.SaveChangesAsync();
-            return rowsAfectadas > 0;
-        }
+    public async Task<bool> ActualizarMapaAsync(Partida partida)
+    {
+        await base.Actualizar(partida);
+        return 1 > 0;
+    }
 
     public async Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapa> nuevas)
     {
@@ -104,88 +94,87 @@ namespace CivitaBack.Data.Repositorio;
 
 
     public async Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId)
+    {
+        return await _context.Partida
+            .Include(p => p.EstructuraMapa)
+            .ThenInclude(em => em.Estructura)
+            .FirstOrDefaultAsync(p => p.Id == partidaId);
+    }
+
+    public async Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId)
+    {
+        var partida = await _context.Partida
+            .Include(p => p.EstructuraMapa)
+            .ThenInclude(em => em.Estructura)
+            .FirstOrDefaultAsync(p => p.Id == partidaId);
+
+        if (partida == null)
+            throw new Exception("No se encontró la partida.");
+
+        var pathBase = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "mapa", "mapa3.json");
+        if (!File.Exists(pathBase))
+            throw new Exception($"No se encontró el archivo base del mapa en {pathBase}");
+
+        var mapaJson = await File.ReadAllTextAsync(pathBase);
+        using var doc = JsonDocument.Parse(mapaJson);
+
+        // 🔹 Capas base (solo tiles, sin objetos)
+        var capasBase = doc.RootElement
+            .GetProperty("layers")
+            .EnumerateArray()
+            .Where(l => l.GetProperty("type").GetString() != "objectgroup")
+            .Select(l => JsonSerializer.Deserialize<object>(l.GetRawText()))
+            .ToList();
+
+        // 🔹 Capas dinámicas a partir de estructuras en la BD
+        var estructuras = partida.EstructuraMapa ?? new List<EstructuraMapa>();
+        var capasDinamicas = new Dictionary<string, List<object>>();
+
+        foreach (var e in estructuras)
         {
-            return await _context.Partida
-                .Include(p => p.EstructuraMapa)
-                .ThenInclude(em => em.Estructura)
-                .FirstOrDefaultAsync(p => p.Id == partidaId);
+            var tipo = e.Estructura?.Nombre?.ToLower() ?? "desconocido";
+            if (!capasDinamicas.ContainsKey(tipo))
+                capasDinamicas[tipo] = new List<object>();
+
+            capasDinamicas[tipo].Add(new
+            {
+                id = e.Id,
+                name = $"{tipo}_{e.Id}",
+                type = tipo,
+                x = e.X,
+                y = e.Y + e.Height,
+                width = e.Width,
+                height = e.Height,
+                visible = true
+            });
         }
 
-        public async Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId)
+        var capasEstructuras = capasDinamicas.Select(c => new
         {
-            var partida = await _context.Partida
-                .Include(p => p.EstructuraMapa)
-                .ThenInclude(em => em.Estructura)
-                .FirstOrDefaultAsync(p => p.Id == partidaId);
+            name = c.Key,
+            type = "objectgroup",
+            objects = c.Value
+        }).ToList();
 
-            if (partida == null)
-                throw new Exception("No se encontró la partida.");
+        var todasLasCapas = capasBase.Concat(capasEstructuras).ToList();
 
-            var pathBase = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "mapa", "mapa3.json");
-            if (!File.Exists(pathBase))
-                throw new Exception($"No se encontró el archivo base del mapa en {pathBase}");
+        var mapaFinal = new
+        {
+            width = doc.RootElement.GetProperty("width").GetInt32(),
+            height = doc.RootElement.GetProperty("height").GetInt32(),
+            tilewidth = doc.RootElement.GetProperty("tilewidth").GetInt32(),
+            tileheight = doc.RootElement.GetProperty("tileheight").GetInt32(),
+            layers = todasLasCapas,
+            felicidad_actual = 60
+        };
 
-            var mapaJson = await File.ReadAllTextAsync(pathBase);
-            using var doc = JsonDocument.Parse(mapaJson);
-
-            // 🔹 Capas base (solo tiles, sin objetos)
-            var capasBase = doc.RootElement
-                .GetProperty("layers")
-                .EnumerateArray()
-                .Where(l => l.GetProperty("type").GetString() != "objectgroup")
-                .Select(l => JsonSerializer.Deserialize<object>(l.GetRawText()))
-                .ToList();
-
-            // 🔹 Capas dinámicas a partir de estructuras en la BD
-            var estructuras = partida.EstructuraMapa ?? new List<EstructuraMapa>();
-            var capasDinamicas = new Dictionary<string, List<object>>();
-
-            foreach (var e in estructuras)
-            {
-                var tipo = e.Estructura?.Nombre?.ToLower() ?? "desconocido";
-                if (!capasDinamicas.ContainsKey(tipo))
-                    capasDinamicas[tipo] = new List<object>();
-
-                capasDinamicas[tipo].Add(new
-                {
-                    id = e.Id,
-                    name = $"{tipo}_{e.Id}",
-                    type = tipo,
-                    x = e.X,
-                    y = e.Y + e.Height,
-                    width = e.Width,
-                    height = e.Height,
-                    visible = true
-                });
-            }
-
-            var capasEstructuras = capasDinamicas.Select(c => new
-            {
-                name = c.Key,
-                type = "objectgroup",
-                objects = c.Value
-            }).ToList();
-
-            var todasLasCapas = capasBase.Concat(capasEstructuras).ToList();
-
-            var mapaFinal = new
-            {
-                width = doc.RootElement.GetProperty("width").GetInt32(),
-                height = doc.RootElement.GetProperty("height").GetInt32(),
-                tilewidth = doc.RootElement.GetProperty("tilewidth").GetInt32(),
-                tileheight = doc.RootElement.GetProperty("tileheight").GetInt32(),
-                layers = todasLasCapas,
-                felicidad_actual = 60
-            };
-
-            return JsonSerializer.Serialize(mapaFinal, new JsonSerializerOptions { WriteIndented = true });
-        }
+        return JsonSerializer.Serialize(mapaFinal, new JsonSerializerOptions { WriteIndented = true });
+    }
 
     public Task<List<EstructuraMapa>> ObtenerEstructurasDeUnMapa(int partidaId)
     {
         return _context.EstructuraMapa
             .Where(e => e.PartidaId == partidaId)
-            .ToListAsync();    
+            .ToListAsync();
     }
 }
-

@@ -24,7 +24,7 @@ namespace CivitaBack.Tests
         {
             // Arrange
             var tipEnPartida = new TipEnPartida();
-            var partida = new Partida { Id = 1 };
+            var partida = new PartidaEF { Id = 1 };
             var tip = new Tip { Id = 1 };
 
             // Act

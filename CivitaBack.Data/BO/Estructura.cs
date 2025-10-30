@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CivitaBack.Data.BO
 {
-    public class Estructura : Auditable
+    public class EstructuraEF : AuditableEF
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -18,6 +18,6 @@ namespace CivitaBack.Data.BO
         public int ContaminacionCiclo { get; set; }
         public int TipoEstructuraId { get; set; }
         public TipoEstructura TipoEstructura { get; set; }
-        public List<EstructuraMapa>? EstructurasEnMapa { get; set; }
+        public List<EstructuraMapaEF>? EstructurasEnMapa { get; set; }
     }
 }

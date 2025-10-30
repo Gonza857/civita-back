@@ -24,7 +24,7 @@ namespace CivitaBack.Tests
         {
             // Arrange
             var tienda = new Tienda();
-            var partida = new Partida { Id = 1 };
+            var partida = new PartidaEF { Id = 1 };
 
             // Act
             tienda.Id = 1;

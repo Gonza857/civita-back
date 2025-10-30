@@ -1,21 +1,97 @@
 ﻿using CivitaBack.Data.EF;
+using AutoMapper;
+using CivitaBack.Data.BO;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
-public abstract class GenericoRepositorio
+public abstract class GenericoRepositorio<TDominio, TEf> : IRepositorioBase<TDominio>
+    where TDominio : class
+    where TEf : class
 {
     protected readonly AppDbContext _context;
+    protected readonly IMapper _mapper;
+    protected readonly DbSet<TEf> _dbSet; // Un DbSet genérico
 
-    public GenericoRepositorio(AppDbContext context)
+    public GenericoRepositorio(AppDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
+        _dbSet = _context.Set<TEf>(); 
     }
     
-    // Método genérico para guardar cambios de manera asíncrona
-    protected async Task GuardarCambiosAsync()
+    public async Task Agregar(TDominio entidad)
     {
-        await _context.SaveChangesAsync();
+        var entidadEF = _mapper.Map<TEf>(entidad);
+        if (entidadEF is AuditableEF auditable)
+        {
+            auditable.Creado = DateTime.UtcNow;
+            auditable.Editado = DateTime.UtcNow; // También se setea al crear
+        }
+        await _dbSet.AddAsync(entidadEF);
     }
 
+    public Task AgregarVarios(ICollection<TDominio> entidades)
+    {
+        var entidadesEF = _mapper.Map<IEnumerable<TEf>>(entidades);
+        _dbSet.AddRange(entidadesEF);
+        return Task.CompletedTask;
+    }
+
+    public Task Actualizar(TDominio entidad)
+    {
+        var entidadEF = _mapper.Map<TEf>(entidad);
+        if (entidadEF is AuditableEF auditable) auditable.Editado = DateTime.UtcNow;
+        _dbSet.Update(entidadEF); 
+        return Task.CompletedTask;
+    }
+    
+    public async Task Eliminar(int id)
+    {
+        // Usamos FindAsync que es perfecto para buscar por PK
+        var entidadEF = await _dbSet.FindAsync(id);
+        if (entidadEF != null)
+        {
+            _dbSet.Remove(entidadEF);
+        }
+    }
+    
+    // --- MÉTODOS "VIRTUALES" ---
+    // (Estos pueden ser sobreescritos por las clases hijas si necesitan
+    // lógica especial, como los `Include`s)
+
+    public virtual async Task<TDominio?> ObtenerPorId(int id)
+    {
+        // Implementación base: solo busca por Id sin Includes
+        var entidadEF = await _dbSet.AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == id);
+        return _mapper.Map<TDominio>(entidadEF);
+    }
+
+    public virtual async Task<List<TDominio>> ObtenerTodos()
+    {
+        // Implementación base: solo trae todos sin Includes
+        var listaEF = await _dbSet.AsNoTracking().ToListAsync();
+        return _mapper.Map<List<TDominio>>(listaEF);
+    }
+
+    /// <summary>
+    /// Mapea un objeto de origen a un nuevo objeto de destino.
+    /// </summary>
+    /// <typeparam name="TDestino">El tipo de destino (ej: Domain.Entities.Logro)</typeparam>
+    /// <param name="source">El objeto de origen (ej: Data.BO.Logro)</param>
+    /// <returns>Un nuevo objeto de tipo TDestino.</returns>
+    protected TDestino Mapear<TDestino>(object? source)
+    {
+        return _mapper.Map<TDestino>(source);
+    }
+
+    /// <summary>
+    /// Mapea una lista de objetos de origen a una nueva lista de destino.
+    /// </summary>
+    protected List<TDestino> MapearLista<TDestino>(object sourceList)
+    {
+        return _mapper.Map<List<TDestino>>(sourceList);
+    }
     
 }

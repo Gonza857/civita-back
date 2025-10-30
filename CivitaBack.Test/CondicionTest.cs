@@ -43,8 +43,8 @@ namespace CivitaBack.Tests
         public void Condicion_SetProperties_ValuesAreSet()
         {
             // Arrange
-            var condicion = new Condicion();
-            var estructura = new Estructura { Id = 1 };
+            var condicion = new CondicionEF();
+            var estructura = new EstructuraEF { Id = 1 };
             var recurso = new Recurso { Id = 1 };
 
             // Act
@@ -64,7 +64,7 @@ namespace CivitaBack.Tests
         public void Condicion_WithNullReferences_PropertiesCanBeNull()
         {
             // Arrange
-            var condicion = new Condicion
+            var condicion = new CondicionEF
             {
                 Id = 1,
                 Cantidad = 5,
@@ -83,7 +83,7 @@ namespace CivitaBack.Tests
         public void Condicion_WithZeroValues_PropertiesCanBeZero()
         {
             // Arrange
-            var condicion = new Condicion
+            var condicion = new CondicionEF
             {
                 Id = 0,
                 Cantidad = 0,
@@ -106,7 +106,7 @@ namespace CivitaBack.Tests
             await _condicionLogica.CrearRecompensa(recompensa);
         
             // Assert
-            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Once);
+            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<CondicionEF>()), Times.Once);
         }
         
         [Fact]
@@ -118,7 +118,7 @@ namespace CivitaBack.Tests
         
             // Act & Assert
             await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
+            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<CondicionEF>()), Times.Never);
         }
         
         [Fact]
@@ -129,7 +129,7 @@ namespace CivitaBack.Tests
         
             // Act & Assert
             await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
+            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<CondicionEF>()), Times.Never);
         }
         
         [Fact]
@@ -140,7 +140,7 @@ namespace CivitaBack.Tests
         
             // Act & Assert
             await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
+            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<CondicionEF>()), Times.Never);
         }
         
         [Fact]
@@ -151,17 +151,17 @@ namespace CivitaBack.Tests
         
             // Act & Assert
             await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
+            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<CondicionEF>()), Times.Never);
         }
         
         [Fact]
         public async void Obtener_Recompensa_OK()
         {
             // Arrange
-            Condicion recompensa1 = TestData.CrearRecompensa( 500, "Energia");
-            Condicion recompensa2 = TestData.CrearRecompensa( 300, "Energia");
-            Condicion recompensa3 = TestData.CrearRecompensa( 400, "Energia");
-            var listaRecompensas = new List<Condicion>{recompensa1, recompensa2, recompensa3};
+            CondicionEF recompensa1 = TestData.CrearRecompensa( 500, "Energia");
+            CondicionEF recompensa2 = TestData.CrearRecompensa( 300, "Energia");
+            CondicionEF recompensa3 = TestData.CrearRecompensa( 400, "Energia");
+            var listaRecompensas = new List<CondicionEF>{recompensa1, recompensa2, recompensa3};
             _mockCondicionRepositorio
                 .Setup(r => r.ObtenerTodasRecompensas())
                 .ReturnsAsync(listaRecompensas);

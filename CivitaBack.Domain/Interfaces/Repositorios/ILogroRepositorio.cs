@@ -2,7 +2,7 @@
 
 namespace CivitaBack.Domain.Interfaces.Repositorios
 {
-    public interface ILogroRepositorio : IRepositorioBase<Logro>
+    public interface ILogroRepositorio
     {
         Task<bool> ExisteLogroEnCumplidos(int idLogro);
     }

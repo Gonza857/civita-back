@@ -106,7 +106,7 @@ namespace CivitaBack.Api.Controllers
             try
             {
                 idUsuario = 1; 
-                Partida partida = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
+                PartidaEF partida = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
                 return Ok(partida);
             }
             catch (PartidaExcepcion ex)

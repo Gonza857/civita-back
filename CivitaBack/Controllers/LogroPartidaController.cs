@@ -22,7 +22,7 @@ public class LogroPartidaController : ControllerBase
     {
         try
         {
-            Partida? partida = await this._partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
+            PartidaEF? partida = await this._partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
             await _logroPartidaLogica.ReclamarLogros(partida);
             return Ok();
         }
@@ -37,7 +37,7 @@ public class LogroPartidaController : ControllerBase
     {
         try
         {
-            Partida? partida = await this._partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
+            PartidaEF? partida = await this._partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
 
             var logros = await (status?.ToLower().Trim() switch
             {

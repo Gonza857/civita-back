@@ -16,6 +16,6 @@ namespace CivitaBack.Data.BO
 
         // Relaciones
         [JsonIgnore]
-        public Partida Partida { get; set; }
+        public PartidaEF Partida { get; set; }
     }
 }

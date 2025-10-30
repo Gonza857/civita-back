@@ -11,17 +11,17 @@ public interface ILogroLogica
     Task<LogroDTO> ObtenerPorId(int Id);
     Task Crear(LogroDTO entidad);
     Task<List<LogroDTO>> ObtenerListado();
-    Task<List<Logro>> ObtenerListadoInterno();
+    Task<List<LogroEF>> ObtenerListadoInterno();
     Task Eliminar(int Id);
     Task Actualizar(LogroDTO logroDTO, int id);
-    Task<List<LogroDTO>> ObtenerLogrosCumplidos(Partida partida);
-    Task<List<LogroDTO>> ComprobarSiCumpleAlgunLogro(Partida? partida, List<Logro> logrosDB);
-    Task MarcarLogrosComoCompletados(Partida? partida, List<LogroDTO> logrosdto);
+    Task<List<LogroDTO>> ObtenerLogrosCumplidos(PartidaEF partida);
+    Task<List<LogroDTO>> ComprobarSiCumpleAlgunLogro(PartidaEF? partida, List<LogroEF> logrosDB);
+    Task MarcarLogrosComoCompletados(PartidaEF? partida, List<LogroDTO> logrosdto);
     
-    Task<List<Logro>> ObtenerLogrosParaObtenerRecompensa(int partidaId);
+    Task<List<LogroEF>> ObtenerLogrosParaObtenerRecompensa(int partidaId);
 }
 
-public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
+public class LogroLogica : IParser<LogroEF, LogroDTO>, ILogroLogica
 {
     private readonly ILogroRepositorio repositorioLogro;
     private readonly ITipoLogroRepositorio repositorioTipoLogro;
@@ -62,7 +62,7 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
     public async Task Actualizar(LogroDTO logroDTO, int id)
     {
         this.ValidarLogro(logroDTO);
-        Logro logroBuscado = await this.repositorioLogro.ObtenerPorId(id);
+        LogroEF logroBuscado = await this.repositorioLogro.ObtenerPorId(id);
         var tipoLogroBuscado = await this.repositorioTipoLogro.ObtenerPorId(logroDTO.TipoId);
         
         if (logroBuscado == null || tipoLogroBuscado == null) 
@@ -76,7 +76,7 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
         await this.repositorioLogro.Actualizar(logroBuscado);
     }
 
-    public async Task<List<Logro>> ObtenerListadoInterno()
+    public async Task<List<LogroEF>> ObtenerListadoInterno()
     {
         return await this.repositorioLogro.ObtenerTodos();
     }
@@ -103,11 +103,11 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
         if (tipoLogro == null) 
             throw new LogroExcepcion("No se proporcionó Tipo de Logro.");
 
-        Condicion? condicion = await this._condicionRepositorio.ObtenerPorId(entidad.CondicionId);
+        CondicionEF? condicion = await this._condicionRepositorio.ObtenerPorId(entidad.CondicionId);
         if (condicion == null)
             throw new LogroExcepcion("No se proporcionó condición.");
 
-        var logro = new Logro
+        var logro = new LogroEF
         {
             Titulo = entidad.Titulo,
             Descripcion = entidad.Descripcion,
@@ -142,16 +142,16 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
         return this.ToDto(logro);
     }
 
-    public async Task<List<LogroDTO>> ObtenerLogrosCumplidos(Partida partida)
+    public async Task<List<LogroDTO>> ObtenerLogrosCumplidos(PartidaEF partida)
     {
-        List<LogroPartida> logrosPartida = partida.LogroPartidas;
+        List<LogroPartidaEF> logrosPartida = partida.LogroPartidas;
         if (logrosPartida.Count != 0) return logrosPartida.Select(lp => this.ToDto(lp.Logro)).ToList();
 
-        List<Logro> logros = logrosPartida.Select(lp => lp.Logro).ToList();
-        List<Logro> resultado = new List<Logro>();
-        foreach (Logro logro in logros)
+        List<LogroEF> logros = logrosPartida.Select(lp => lp.Logro).ToList();
+        List<LogroEF> resultado = new List<LogroEF>();
+        foreach (LogroEF logro in logros)
         {
-            Condicion condicionParaCumplirLogro = logro.Condicion;
+            CondicionEF condicionParaCumplirLogro = logro.Condicion;
             var propiedad = typeof(Recurso).GetProperty(condicionParaCumplirLogro.NombreColumna);
             if (propiedad != null)
             {
@@ -166,7 +166,7 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
         return resultado.Select(lp => this.ToDto(lp)).ToList();
     }
 
-    public async Task<List<LogroDTO>> ComprobarSiCumpleAlgunLogro(Partida? partida, List<Logro> logrosDB)
+    public async Task<List<LogroDTO>> ComprobarSiCumpleAlgunLogro(PartidaEF? partida, List<LogroEF> logrosDB)
     {
         if (partida == null || logrosDB.Count == 0 || partida.Recursos == null)
             throw new LogroExcepcion("No se pudo obtener si cumple algún logro.");
@@ -180,11 +180,11 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
             si no cumple, no lo retorno
             por cada item de esa lista, valido con logro partida para ver si ya lo cumplió
          */
-        List<Logro> logrosParaPasarACumplido = new List<Logro>();
+        List<LogroEF> logrosParaPasarACumplido = new List<LogroEF>();
 
-        foreach (Logro logro in logrosDB)
+        foreach (LogroEF logro in logrosDB)
         {
-            Condicion condicion = logro.Condicion;
+            CondicionEF condicion = logro.Condicion;
 
             if (!string.IsNullOrEmpty(condicion.NombreColumna))
             {
@@ -216,7 +216,7 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
         return logrosFiltrados.Select(l => this.ToDto(l)).ToList();
     }
     
-    public async Task MarcarLogrosComoCompletados(Partida? partida, List<LogroDTO> logrosDB)
+    public async Task MarcarLogrosComoCompletados(PartidaEF? partida, List<LogroDTO> logrosDB)
     {
         if (partida == null || logrosDB.Count == 0 || partida.Recursos == null)
             throw new LogroExcepcion("No se pudo obtener si cumple algún logro.");
@@ -235,12 +235,12 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
             if (!existe)
             {
                 var logroDB = await this.repositorioLogro.ObtenerPorId(logro.Id);
-                await this._logroPartidaRepositorio.Agregar(new LogroPartida { Partida = partida, Logro = logroDB });
+                await this._logroPartidaRepositorio.Agregar(new LogroPartidaEF { Partida = partida, Logro = logroDB });
             }
         }
     }
 
-    public async Task<List<Logro>> ObtenerLogrosParaObtenerRecompensa(int partidaId)
+    public async Task<List<LogroEF>> ObtenerLogrosParaObtenerRecompensa(int partidaId)
     {
         return await this._logroPartidaRepositorio.ObtenerLogrosNoCumplidos(partidaId);
     }
@@ -249,7 +249,7 @@ public class LogroLogica : IParser<Logro, LogroDTO>, ILogroLogica
     /// Convierte entidad de dominio a DTO
     /// </summary>
     /// <param name="entidad">Logro</param>
-    public LogroDTO ToDto(Logro entidad)
+    public LogroDTO ToDto(LogroEF entidad)
     {
         return new LogroDTO
         {

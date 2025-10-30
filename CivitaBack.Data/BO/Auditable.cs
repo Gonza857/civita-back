@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace CivitaBack.Data.BO;
 
 [Owned]
-public class Auditable
+public class AuditableEF
 {
     public DateTime Creado { get; set; } = DateTime.UtcNow;
     public DateTime? Editado { get; set; }

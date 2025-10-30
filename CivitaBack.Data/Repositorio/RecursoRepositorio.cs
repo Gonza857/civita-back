@@ -23,6 +23,11 @@ public class RecursoRepositorio : IRecursoRepositorio
         throw new NotImplementedException();
     }
 
+    public Task Guardar(Recurso entidad)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task Agregar(Recurso entidad)
     {
         throw new NotImplementedException();

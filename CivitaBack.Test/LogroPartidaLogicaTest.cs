@@ -46,14 +46,14 @@ public class LogroPartidaLogicaTest
     {
         // Arrange
         Usuario usuario = TestData.CrearUsuarioBase();
-        Partida partida = TestData.CrearPartida(usuario);
+        PartidaEF partida = TestData.CrearPartida(usuario);
         partida.Recursos = new Recurso();
         partida.EstructuraMapa = new List<EstructuraMapa>();
         
         TipoLogro tipoLogro = TestData.CrearTipoLogro("Recurso");
-        Condicion condicion = TestData.CrearCondicion("Energia", 500);
-        Logro logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Obtené 500 de energía");
-        List<Logro> logrosDb = new List<Logro>{ logro1 }; 
+        CondicionEF condicion = TestData.CrearCondicion("Energia", 500);
+        LogroEF logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Obtené 500 de energía");
+        List<LogroEF> logrosDb = new List<LogroEF>{ logro1 }; 
         
         _mockLogroPartidaRepo
             .Setup(l => l.ObtenerLogrosCompletos(partida.Id))
@@ -71,14 +71,14 @@ public class LogroPartidaLogicaTest
     {
         // Arrange
         Usuario usuario = TestData.CrearUsuarioBase();
-        Partida partida = TestData.CrearPartida(usuario);
+        PartidaEF partida = TestData.CrearPartida(usuario);
         partida.Recursos = new Recurso();
         partida.EstructuraMapa = new List<EstructuraMapa>();
         
         TipoLogro tipoLogro = TestData.CrearTipoLogro("Recurso");
-        Condicion condicion = TestData.CrearCondicion("Energia", 500);
-        Logro logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Obtené 500 de energía");
-        List<Logro> logrosDb = new List<Logro>{ logro1 }; 
+        CondicionEF condicion = TestData.CrearCondicion("Energia", 500);
+        LogroEF logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Obtené 500 de energía");
+        List<LogroEF> logrosDb = new List<LogroEF>{ logro1 }; 
         
         _mockLogroPartidaRepo
             .Setup(l => l.ObtenerLogrosIncompletos(partida.Id))
@@ -98,14 +98,14 @@ public class LogroPartidaLogicaTest
     {
         // Arrange
         Usuario usuario = TestData.CrearUsuarioBase();
-        Partida partida = TestData.CrearPartida(usuario);
+        PartidaEF partida = TestData.CrearPartida(usuario);
         partida.Recursos = TestData.CrearRecurso(partida, 500, 0, 0, 0); // Tiene 500 de Energía
         partida.EstructuraMapa = new List<EstructuraMapa>();
         
         TipoLogro tipoLogro = TestData.CrearTipoLogro("Recurso");
-        Condicion condicion = TestData.CrearCondicion("Energia", 500); // Necesita 500
-        Logro logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Obtené 500 de energía");
-        List<Logro> logrosDb = new List<Logro>{ logro1 }; 
+        CondicionEF condicion = TestData.CrearCondicion("Energia", 500); // Necesita 500
+        LogroEF logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Obtené 500 de energía");
+        List<LogroEF> logrosDb = new List<LogroEF>{ logro1 }; 
         
         _mockLogroPartidaRepo
             .Setup(l => l.ObtenerLogrosIncompletos(partida.Id))
@@ -123,14 +123,14 @@ public class LogroPartidaLogicaTest
     {
         // Arrange
         Usuario usuario = TestData.CrearUsuarioBase();
-        Partida partida = TestData.CrearPartida(usuario);
+        PartidaEF partida = TestData.CrearPartida(usuario);
         partida.Recursos = TestData.CrearRecurso(partida, 499, 0, 0, 0); // Tiene 499 de Energía
         partida.EstructuraMapa = new List<EstructuraMapa>();
         
         TipoLogro tipoLogro = TestData.CrearTipoLogro("Recurso");
-        Condicion condicion = TestData.CrearCondicion("Energia", 500); // Necesita 500
-        Logro logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Obtené 500 de energía");
-        List<Logro> logrosDb = new List<Logro>{ logro1 }; 
+        CondicionEF condicion = TestData.CrearCondicion("Energia", 500); // Necesita 500
+        LogroEF logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Obtené 500 de energía");
+        List<LogroEF> logrosDb = new List<LogroEF>{ logro1 }; 
         
         _mockLogroPartidaRepo
             .Setup(l => l.ObtenerLogrosIncompletos(partida.Id))
@@ -150,7 +150,7 @@ public class LogroPartidaLogicaTest
     {
         // Arrange
         Usuario usuario = TestData.CrearUsuarioBase();
-        Partida partida = TestData.CrearPartida(usuario);
+        PartidaEF partida = TestData.CrearPartida(usuario);
         partida.Recursos = TestData.CrearRecurso(partida, 0, 0, 0, 0);
         partida.EstructuraMapa = new List<EstructuraMapa>
         {
@@ -159,9 +159,9 @@ public class LogroPartidaLogicaTest
         };
         
         TipoLogro tipoLogro = TestData.CrearTipoLogro("Estructura");
-        Condicion condicion = new Condicion { NombreColumna = null, EstructuraId = 5, Cantidad = 2 }; // Necesita 2
-        Logro logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Construí 2 de X");
-        List<Logro> logrosDb = new List<Logro>{ logro1 }; 
+        CondicionEF condicion = new CondicionEF { NombreColumna = null, EstructuraId = 5, Cantidad = 2 }; // Necesita 2
+        LogroEF logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Construí 2 de X");
+        List<LogroEF> logrosDb = new List<LogroEF>{ logro1 }; 
         
         _mockLogroPartidaRepo
             .Setup(l => l.ObtenerLogrosIncompletos(partida.Id))
@@ -179,7 +179,7 @@ public class LogroPartidaLogicaTest
     {
         // Arrange
         Usuario usuario = TestData.CrearUsuarioBase();
-        Partida partida = TestData.CrearPartida(usuario);
+        PartidaEF partida = TestData.CrearPartida(usuario);
         partida.Recursos = TestData.CrearRecurso(partida, 0, 0, 0, 0);
         partida.EstructuraMapa = new List<EstructuraMapa>
         {
@@ -187,9 +187,9 @@ public class LogroPartidaLogicaTest
         };
         
         TipoLogro tipoLogro = TestData.CrearTipoLogro("Estructura");
-        Condicion condicion = new Condicion { NombreColumna = null, EstructuraId = 5, Cantidad = 2 }; // Necesita 2
-        Logro logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Construí 2 de X");
-        List<Logro> logrosDb = new List<Logro>{ logro1 }; 
+        CondicionEF condicion = new CondicionEF { NombreColumna = null, EstructuraId = 5, Cantidad = 2 }; // Necesita 2
+        LogroEF logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Construí 2 de X");
+        List<LogroEF> logrosDb = new List<LogroEF>{ logro1 }; 
         
         _mockLogroPartidaRepo
             .Setup(l => l.ObtenerLogrosIncompletos(partida.Id))
@@ -208,7 +208,7 @@ public class LogroPartidaLogicaTest
     public async Task Logros_ObtenerCompletados_ConPartidaNull_Falla()
     {
         // Arrange
-        Partida? partida = null;
+        PartidaEF? partida = null;
         // Act & Assert
         await Assert.ThrowsAsync<LogroPartidaExcepcion>(
             () => _logroPartidaLogica.ObtenerLogrosCompletados(partida)
@@ -220,7 +220,7 @@ public class LogroPartidaLogicaTest
     {
         // Arrange
         Usuario usuario = TestData.CrearUsuarioBase();
-        Partida partida = TestData.CrearPartida(usuario);
+        PartidaEF partida = TestData.CrearPartida(usuario);
         partida.Recursos = null; // Forzamos el estado inválido
         partida.EstructuraMapa = new List<EstructuraMapa>();
     
@@ -236,14 +236,14 @@ public class LogroPartidaLogicaTest
     {
         // Arrange
         Usuario usuario = TestData.CrearUsuarioBase();
-        Partida partida = TestData.CrearPartida(usuario);
+        PartidaEF partida = TestData.CrearPartida(usuario);
         partida.Recursos = TestData.CrearRecurso(partida, 1000, 0, 0, 0); // Tiene recursos de sobra
         partida.EstructuraMapa = new List<EstructuraMapa>();
         
         TipoLogro tipoLogro = TestData.CrearTipoLogro("Recurso");
-        Condicion condicion = TestData.CrearCondicion("ColumnaInvalida", 500); // Columna Rota
-        Logro logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Logro Roto");
-        List<Logro> logrosDb = new List<Logro>{ logro1 }; 
+        CondicionEF condicion = TestData.CrearCondicion("ColumnaInvalida", 500); // Columna Rota
+        LogroEF logro1 = TestData.CrearLogro(1, tipoLogro, condicion, "Logro Roto");
+        List<LogroEF> logrosDb = new List<LogroEF>{ logro1 }; 
         
         _mockLogroPartidaRepo
             .Setup(l => l.ObtenerLogrosIncompletos(partida.Id))
@@ -265,14 +265,14 @@ public class LogroPartidaLogicaTest
     {
         // Arrange
         Usuario usuario = TestData.CrearUsuarioBase();
-        Partida partida = TestData.CrearPartida(usuario);
+        PartidaEF partida = TestData.CrearPartida(usuario);
         partida.Recursos = TestData.CrearRecurso(partida, 0, 0, 0, 0);
         partida.EstructuraMapa = new List<EstructuraMapa>();
         
         // Simulamos que ObtenerLogrosIncompletos devuelve una lista vacía
         _mockLogroPartidaRepo
             .Setup(l => l.ObtenerLogrosIncompletos(partida.Id))
-            .ReturnsAsync(new List<Logro>());
+            .ReturnsAsync(new List<LogroEF>());
         
         // Act
         await _logroPartidaLogica.ReclamarLogros(partida);
@@ -280,7 +280,7 @@ public class LogroPartidaLogicaTest
         // Assert
         // Verificamos que NUNCA se intentó guardar nada
         _mockRecursoRepo.Verify(r => r.Actualizar(It.IsAny<Recurso>()), Times.Never);
-        _mockLogroPartidaRepo.Verify(r => r.AgregarVarios(It.IsAny<List<LogroPartida>>()), Times.Never);
+        _mockLogroPartidaRepo.Verify(r => r.AgregarVarios(It.IsAny<List<LogroPartidaEF>>()), Times.Never);
         _mockUnitOfWork.Verify(u => u.CommitAsync(), Times.Never);
     }
 
@@ -292,19 +292,19 @@ public class LogroPartidaLogicaTest
         int logroId = 10;
         
         Usuario usuario = TestData.CrearUsuarioBase();
-        Partida partida = TestData.CrearPartida(usuario);
+        PartidaEF partida = TestData.CrearPartida(usuario);
         partida.Id = partidaId;
         partida.Recursos = TestData.CrearRecurso(partida, 500, 0, 0, 0); // 500 Energía, 0 Oro
         partida.EstructuraMapa = new List<EstructuraMapa>();
 
         // La recompensa (que es de tipo Condicion) da 100 de Oro
-        Condicion recompensa = TestData.CrearCondicion("EcoCoins", 100);
-        Condicion condicion = TestData.CrearCondicion("Energia", 500);
+        CondicionEF recompensa = TestData.CrearCondicion("EcoCoins", 100);
+        CondicionEF condicion = TestData.CrearCondicion("Energia", 500);
         condicion.Recompensa = recompensa; // Asignamos la recompensa
         
         TipoLogro tipoLogro = TestData.CrearTipoLogro("Recurso");
-        Logro logro1 = TestData.CrearLogro(logroId, tipoLogro, condicion, "Logro de Energía");
-        List<Logro> logrosDb = new List<Logro>{ logro1 }; 
+        LogroEF logro1 = TestData.CrearLogro(logroId, tipoLogro, condicion, "Logro de Energía");
+        List<LogroEF> logrosDb = new List<LogroEF>{ logro1 }; 
         
         // Simulamos que SÍ hay un logro para reclamar
         _mockLogroPartidaRepo
@@ -327,7 +327,7 @@ public class LogroPartidaLogicaTest
         
         // 3. ¿Se preparó el Agregado de LogroPartida UNA VEZ?
         _mockLogroPartidaRepo.Verify(
-            r => r.AgregarVarios(It.Is<List<LogroPartida>>(lista => 
+            r => r.AgregarVarios(It.Is<List<LogroPartidaEF>>(lista => 
                 lista.Count == 1 && 
                 lista[0].LogroId == logroId && 
                 lista[0].PartidaId == partidaId

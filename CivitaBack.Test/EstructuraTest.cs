@@ -9,7 +9,7 @@ namespace CivitaBack.Tests
         public void Estructura_Constructor_InitializesProperties()
         {
             // Act
-            var estructura = new Estructura();
+            var estructura = new EstructuraEF();
 
             // Assert
             Assert.Equal(0, estructura.Id);
@@ -29,7 +29,7 @@ namespace CivitaBack.Tests
         public void Estructura_SetProperties_ValuesAreSet()
         {
             // Arrange
-            var estructura = new Estructura();
+            var estructura = new EstructuraEF();
             var tipoEstructura = new TipoEstructura { Id = 1 };
 
             // Act
@@ -61,7 +61,7 @@ namespace CivitaBack.Tests
         public void Estructura_WithNullValues_PropertiesCanBeNull()
         {
             // Arrange
-            var estructura = new Estructura
+            var estructura = new EstructuraEF
             {
                 Id = 1,
                 Nombre = null,
@@ -82,7 +82,7 @@ namespace CivitaBack.Tests
         public void Estructura_BooleanProperties_CanBeSetToTrue()
         {
             // Arrange
-            var estructura = new Estructura();
+            var estructura = new EstructuraEF();
 
             // Act
             estructura.EsMejorable = true;

@@ -1,69 +1,59 @@
-﻿using CivitaBack.Domain.Entities;
+﻿using AutoMapper;
+using CivitaBack.Data.BO;
+using CivitaBack.Domain.Entities;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio;
 
-public class LogroRepositorio : ILogroRepositorio
+public class LogroRepositorio 
+    : GenericoRepositorio<Logro, LogroEF>, ILogroRepositorio
 {
-    private readonly AppDbContext _context;
-
-    public LogroRepositorio(AppDbContext context)
-    {
-        _context = context;
-    }
+    public LogroRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
     public async Task Actualizar(Logro logro)
     {
-        logro.Editado = DateTime.UtcNow;
-        _context.Logro.Update(logro);
-        await _context.SaveChangesAsync();
+        await base.Actualizar(logro);
     }
 
     public async Task Eliminar(int id)
     {
-        var logro = await _context.Logro.FirstOrDefaultAsync(tl => tl.Id == id);
-        if (logro != null)
-        {
-            _context.Logro.Remove(logro);
-            await _context.SaveChangesAsync();
-        }
+        await base.Eliminar(id);
     }
+    
 
     public async Task Agregar(Logro entidad)
     {
-        await _context.Logro.AddAsync(entidad);
-        await _context.SaveChangesAsync();
+        await base.Agregar(entidad);
     }
 
-    public Task AgregarVarios(List<Logro> entidades)
+    public async Task AgregarVarios(List<Logro> entidades)
     {
-        throw new NotImplementedException();
+        await base.AgregarVarios(entidades);
     }
-
-    public Task Guardar()
+    
+    public override async Task<Logro?> ObtenerPorId(int id)
     {
-        throw new NotImplementedException();
-    }
-
-    public async Task<Logro> ObtenerPorId(int id)
-    {
-        return await _context.Logro
+        LogroEF? logro = await _context.Logro
             .Include(tl => tl.TipoLogro)
             .Include(tl => tl.Condicion)
             .FirstOrDefaultAsync(tl => tl.Id == id);
+        if (logro == null) return null;
+        return base.Mapear<Logro>(logro);
     }
 
-    public async Task<List<Logro>> ObtenerTodos()
+    public override async Task<List<Logro>> ObtenerTodos()
     {
-        return await _context.Logro
+        List<LogroEF> logros = await _context.Logro
            .Include(l => l.Condicion)
                .ThenInclude(c => c.Recompensa)       // Recompensa de la Condicion
            .Include(l => l.Condicion)
                .ThenInclude(c => c.Estructura)       // Estructura de la Condicion
            .Include(l => l.TipoLogro)
            .ToListAsync();
+        
+        return base.MapearLista<Logro>(logros);
     }
 
     public async Task<bool> ExisteLogroEnCumplidos(int idLogro)

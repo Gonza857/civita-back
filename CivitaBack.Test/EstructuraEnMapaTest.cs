@@ -24,8 +24,8 @@ namespace CivitaBack.Tests
         {
             // Arrange
             var estructuraEnMapa = new EstructuraMapa();
-            var partida = new Partida { Id = 1 };
-            var estructura = new Estructura { Id = 1 };
+            var partida = new PartidaEF { Id = 1 };
+            var estructura = new EstructuraEF { Id = 1 };
 
             // Act
             estructuraEnMapa.Id = 1;

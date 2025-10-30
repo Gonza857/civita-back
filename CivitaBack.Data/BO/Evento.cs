@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CivitaBack.Data.BO
 {
-    public class Evento : Auditable
+    public class Evento : AuditableEF
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -25,6 +25,6 @@ namespace CivitaBack.Data.BO
         public EventoMaestro? EventoMaestro { get; set; }
 
         public int PartidaId { get; set; }
-        public Partida? Partida { get; set; }
+        public PartidaEF? Partida { get; set; }
     }
 }

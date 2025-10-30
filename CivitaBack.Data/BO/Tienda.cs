@@ -13,6 +13,6 @@ namespace CivitaBack.Data.BO
         public string? CodigoArticulo { get; set; }
 
         public int PartidaId { get; set; }
-        public Partida? Partida { get; set; }
+        public PartidaEF? Partida { get; set; }
     }
 }

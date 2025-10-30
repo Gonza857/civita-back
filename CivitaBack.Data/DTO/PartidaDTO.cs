@@ -26,6 +26,6 @@ public class PartidaDTO
 
     [Range(0, int.MaxValue, ErrorMessage = "Las EcoCoins no pueden ser negativas")]
     public int EcoCoins { get; set; }
-    public Partida? Partida { get; set; } 
+    public PartidaEF? Partida { get; set; } 
 
 }

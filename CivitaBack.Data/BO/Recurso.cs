@@ -16,7 +16,7 @@ public class Recurso : Auditable
     public int Poblacion { get; set; }
     public int PartidaId { get; set; }
     [JsonIgnore]
-    public Partida? Partida { get; set; }
+    public PartidaEF? Partida { get; set; }
 
     public Recurso() { }
 
@@ -25,7 +25,7 @@ public class Recurso : Auditable
         int contaminacion, 
         int felicidad, 
         int ecoCoins, 
-        Partida partida)
+        PartidaEF partida)
     {
         Energia = energia;
         Contaminacion = contaminacion;

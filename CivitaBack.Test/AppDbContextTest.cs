@@ -73,7 +73,7 @@ namespace CivitaBack.Tests
             context.Usuario.Add(usuario);
             context.SaveChanges();
 
-            var partida = new Partida
+            var partida = new PartidaEF
             {
                 UsuarioId = usuario.Id,
                 UltimaVez = DateTime.Now,
@@ -122,7 +122,7 @@ namespace CivitaBack.Tests
             using var context = new AppDbContext(options);
 
             // Get the entity type for LogroPartida
-            var entityType = context.Model.FindEntityType(typeof(LogroPartida));
+            var entityType = context.Model.FindEntityType(typeof(LogroPartidaEF));
 
             // Act
             var primaryKey = entityType?.FindPrimaryKey();

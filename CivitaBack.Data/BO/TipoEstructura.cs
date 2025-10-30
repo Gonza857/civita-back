@@ -14,6 +14,6 @@ namespace CivitaBack.Data.BO
         public int EnergiaPorCiclo { get; set; }
         public int DineroPorCiclo { get; set; }
 
-        public List<Estructura>? Estructura { get; set; }
+        public List<EstructuraEF>? Estructura { get; set; }
     }
 }

@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace CivitaBack.Data.BO;
 
-public class LogroPartida : Auditable
+public class LogroPartidaEF : AuditableEF
 {
     private DateTime FechaCompletado {  get; set; }
 
     // Relaciones
     public int LogroId { get; set; }
-    public Logro? Logro { get; set; }
+    public LogroEF? Logro { get; set; }
 
     public int PartidaId { get; set; }
-    public Partida? Partida { get; set; }
+    public PartidaEF? Partida { get; set; }
 
 }

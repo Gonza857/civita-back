@@ -9,7 +9,7 @@ namespace CivitaBack.Tests
         public void Partida_Constructor_InitializesProperties()
         {
             // Act
-            var partida = new Partida();
+            var partida = new PartidaEF();
 
             // Assert
             Assert.Equal(0, partida.Id);
@@ -29,7 +29,7 @@ namespace CivitaBack.Tests
         public void Partida_SetProperties_ValuesAreSet()
         {
             // Arrange
-            var partida = new Partida();
+            var partida = new PartidaEF();
             var fecha = DateTime.Now;
 
             // Act
@@ -49,7 +49,7 @@ namespace CivitaBack.Tests
         public void Partida_WithNullValues_PropertiesCanBeNull()
         {
             // Arrange
-            var partida = new Partida
+            var partida = new PartidaEF
             {
                 Id = 1,
                 UltimaVez = null,
@@ -70,7 +70,7 @@ namespace CivitaBack.Tests
         public void Partida_WithDateTime_HandlesDateTimeCorrectly()
         {
             // Arrange
-            var partida = new Partida();
+            var partida = new PartidaEF();
             var specificDate = new DateTime(2023, 12, 25, 10, 30, 0);
 
             // Act

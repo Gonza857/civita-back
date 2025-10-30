@@ -11,18 +11,18 @@ public static class TestData
         Mail = "test@ejemplo.com"
     };
     
-    public static Partida CrearPartida(Usuario usuario) => new Partida
+    public static PartidaEF CrearPartida(Usuario usuario) => new PartidaEF
     {
         Id = 1,
         Usuario = usuario,
-        LogroPartidas = new List<LogroPartida>()
+        LogroPartidas = new List<LogroPartidaEF>()
     };
 
-    public static void LlenarPartidaConLogros(Partida partida, List<Logro> logrosCompletados)
+    public static void LlenarPartidaConLogros(PartidaEF partida, List<LogroEF> logrosCompletados)
     {
-        foreach (Logro logro in logrosCompletados)
+        foreach (LogroEF logro in logrosCompletados)
         {
-            LogroPartida lp = new LogroPartida
+            LogroPartidaEF lp = new LogroPartidaEF
             {
                 PartidaId = partida.Id,
                 LogroId = logro.Id,
@@ -33,7 +33,7 @@ public static class TestData
     }
     
     public static Recurso CrearRecurso(
-        Partida partida, 
+        PartidaEF partida, 
         int energiaQty, int felicidadQty, int contaminacionQty, int dineroQty
         ) => new Recurso
     {
@@ -49,7 +49,7 @@ public static class TestData
         Id = 1,
         Nombre = tipo
     };
-    public static Logro CrearLogro(int id, TipoLogro tipo, Condicion condicion, string titulo) => new Logro
+    public static LogroEF CrearLogro(int id, TipoLogro tipo, CondicionEF condicion, string titulo) => new LogroEF
     {
         Id = id,
         Titulo = titulo,
@@ -58,7 +58,7 @@ public static class TestData
         Condicion = condicion,
     };
     
-    public static Condicion CrearCondicion(string nombreColumna, int cantidad) => new Condicion
+    public static CondicionEF CrearCondicion(string nombreColumna, int cantidad) => new CondicionEF
     {
         Id = 1,
         Cantidad = cantidad,
@@ -66,7 +66,7 @@ public static class TestData
         EstructuraId = 0,
     };
 
-    public static Condicion CrearRecompensa(int cantidad, string? columna = null, int? estructuraId = null) => new Condicion
+    public static CondicionEF CrearRecompensa(int cantidad, string? columna = null, int? estructuraId = null) => new CondicionEF
     {
         Id = 1,
         NombreColumna = columna,

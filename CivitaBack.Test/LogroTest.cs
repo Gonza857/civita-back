@@ -9,7 +9,7 @@ namespace CivitaBack.Tests
         public void Logro_Constructor_InitializesProperties()
         {
             // Act
-            var logro = new Logro();
+            var logro = new LogroEF();
 
             // Assert
             Assert.Equal(0, logro.Id);
@@ -24,9 +24,9 @@ namespace CivitaBack.Tests
         public void Logro_SetProperties_ValuesAreSet()
         {
             // Arrange
-            var logro = new Logro();
+            var logro = new LogroEF();
             var tipoLogro = new TipoLogro { Id = 1, Nombre = "Test Type" };
-            var condicion = new Condicion { Id = 1, Cantidad = 10 };
+            var condicion = new CondicionEF { Id = 1, Cantidad = 10 };
 
             // Act
             logro.Id = 1;
@@ -47,7 +47,7 @@ namespace CivitaBack.Tests
         public void Logro_WithNullValues_PropertiesCanBeNull()
         {
             // Arrange
-            var logro = new Logro
+            var logro = new LogroEF
             {
                 Id = 1,
                 Titulo = null,
@@ -68,7 +68,7 @@ namespace CivitaBack.Tests
         public void Logro_DefaultDescripcion_IsEmptyString()
         {
             // Act
-            var logro = new Logro();
+            var logro = new LogroEF();
 
             // Assert
             Assert.Equal(string.Empty, logro.Descripcion);

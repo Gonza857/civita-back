@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CivitaBack.Data.BO;
 
-public class Logro : Auditable
+public class LogroEF : Auditable
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -20,8 +20,8 @@ public class Logro : Auditable
 
     public TipoLogro TipoLogro { get; set; }
 
-    public Condicion Condicion { get; set; }
-    public ICollection<LogroPartida> LogroPartidas { get; set; }
+    public CondicionEF Condicion { get; set; }
+    public ICollection<LogroPartidaEF> LogroPartidas { get; set; }
 
 
 }

@@ -12,7 +12,7 @@ namespace CivitaBack.Data.BO
 
         // Relaciones
         public int PartidaId { get; set; }
-        public Partida? Partida { get; set; }
+        public PartidaEF? Partida { get; set; }
 
         public int TipId { get; set; }
         public Tip? Tip { get; set; }

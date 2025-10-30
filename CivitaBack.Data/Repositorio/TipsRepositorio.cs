@@ -49,6 +49,11 @@ namespace CivitaBack.Data.Repositorio
             }
         }
 
+        public Task Guardar(Tip entidad)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task Agregar(Tip entidad)
         {
             await _context.Tip.AddAsync(entidad);

@@ -14,17 +14,17 @@ namespace CivitaBack.Logica;
 
 public interface IPartidaLogica
 {
-    Task<Partida> ObtenerPorUsuarioId(int IdUsuario);
-    Task<Partida> CrearPartida(int idUsuario);
+    Task<PartidaEF> ObtenerPorUsuarioId(int IdUsuario);
+    Task<PartidaEF> CrearPartida(int idUsuario);
     Task Actualizar(PartidaDTO partida, Usuario usuario);
     Task<List<PartidaDTO>> ObtenerPartidas();
-    Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario);
+    Task<PartidaEF?> ObtenerPartidaPorIdInterno(int idUsuario);
 
     // 🆕 Métodos de mapa
     Task ActualizarMapaDePartidaAsync(GuardarMapaDTO dto);
     
-    Task ReclamarLogros(Partida partida, List<LogroDTO> logros);
-    Task<Partida?> ObtenerMapaAsync(int partidaId);
+    Task ReclamarLogros(PartidaEF partida, List<LogroDTO> logros);
+    Task<PartidaEF?> ObtenerMapaAsync(int partidaId);
 }
 
 public class PartidaLogica : IPartidaLogica
@@ -67,7 +67,7 @@ public class PartidaLogica : IPartidaLogica
         if (usuario == null)
             throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: Datos inválidos.");
         
-        Partida? partidaBuscada = await this._repositorioPartida.ObtenerPorUsuarioId(usuario.Id);
+        PartidaEF? partidaBuscada = await this._repositorioPartida.ObtenerPorUsuarioId(usuario.Id);
         
         if (partidaBuscada == null || partidaBuscada.Recursos == null)
             throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No encontrada.");
@@ -84,7 +84,7 @@ public class PartidaLogica : IPartidaLogica
     /// Crea una partida nueva para un usuario
     /// </summary>
     /// <param name="idUsuario">Id de usuario</param>
-    public async Task<Partida> CrearPartida(int idUsuario)
+    public async Task<PartidaEF> CrearPartida(int idUsuario)
     {
         var partidaExistente = await this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
         if (partidaExistente != null)
@@ -107,7 +107,7 @@ public class PartidaLogica : IPartidaLogica
         return partidas.Select(p => this.PartidaToDTO(p)).ToList();
     }
 
-    public async Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario)
+    public async Task<PartidaEF?> ObtenerPartidaPorIdInterno(int idUsuario)
     {
         return await this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
     }
@@ -116,7 +116,7 @@ public class PartidaLogica : IPartidaLogica
     /// Devuelve la partida de un usuario
     /// </summary>
     /// <param name="idUsuario">ID del Usuario</param>
-    public async Task<Partida> ObtenerPorUsuarioId(int IdUsuario)
+    public async Task<PartidaEF> ObtenerPorUsuarioId(int IdUsuario)
     {
         var partida = await this._repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
         if (partida == null) throw new PartidaExcepcion("Partida no encontrada");
@@ -127,7 +127,7 @@ public class PartidaLogica : IPartidaLogica
     /// Convierte la entidad de dominio (BO) en un DTO para devolver como respuesta.
     /// </summary>
     /// <param name="partida">Partida con recursos</param>
-    private PartidaDTO PartidaToDTO(Partida partida)
+    private PartidaDTO PartidaToDTO(PartidaEF partida)
     {
         return new PartidaDTO
         {
@@ -182,7 +182,7 @@ public class PartidaLogica : IPartidaLogica
         }
     }
 
-    public async Task ReclamarLogros(Partida partida, List<LogroDTO> logrosDto)
+    public async Task ReclamarLogros(PartidaEF partida, List<LogroDTO> logrosDto)
     {
         if (partida == null) throw new PartidaExcepcion("Ocurrió un error al reclamar los logros");
 
@@ -192,7 +192,7 @@ public class PartidaLogica : IPartidaLogica
             .Where(l => logrosDto.Any(dto => dto.Id == l.Id))
             .ToList();
 
-        List<Condicion> recompensas = logrosCoincidentes
+        List<CondicionEF> recompensas = logrosCoincidentes
             .Where(l => l.Condicion?.Recompensa != null)
             .Select(l => l.Condicion!.Recompensa!)
             .ToList();
@@ -255,7 +255,7 @@ public class PartidaLogica : IPartidaLogica
     /// Obtiene el mapa de una partida.
     /// </summary>  
     /// <param name="partidaId">ID de partida</param>
-    public async Task<Partida?> ObtenerMapaAsync(int partidaId)
+    public async Task<PartidaEF?> ObtenerMapaAsync(int partidaId)
     {
         var partida = await _repositorioPartida.ObtenerPartidaConMapaAsync(partidaId);
         if (partida == null)

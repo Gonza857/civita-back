@@ -28,6 +28,11 @@ public class EstructuraRepositorio : GenericoRepositorio, IEstructuraRepositorio
         }
     }
 
+    public Task Guardar(Estructura entidad)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task Agregar(Estructura entidad)
     {
         await _context.Estructura.AddAsync(entidad);

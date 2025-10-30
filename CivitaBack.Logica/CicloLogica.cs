@@ -1,11 +1,12 @@
 ﻿using CivitaBack.Data.BO;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Logica
 {
     public interface ICicloLogica
     {
-        Task<List<Partida>> EjecutarCicloAsync();
+        Task<List<PartidaEF>> EjecutarCicloAsync();
 
     }
     public class CicloLogica : ICicloLogica
@@ -18,11 +19,11 @@ namespace CivitaBack.Logica
             _cicloRepositorio = cicloRepositorio;
         }
 
-        public async Task<List<Partida>> EjecutarCicloAsync()
+        public async Task<List<PartidaEF>> EjecutarCicloAsync()
         {
-            List<Partida> partidas = await _cicloRepositorio.ObtenerPartidasConEstructuras();
+            List<PartidaEF> partidas = await _cicloRepositorio.ObtenerPartidasConEstructuras();
 
-            if (partidas == null || partidas.Count == 0) return new List<Partida>();
+            if (partidas == null || partidas.Count == 0) return new List<PartidaEF>();
 
             foreach (var partida in partidas)
             {
@@ -33,7 +34,7 @@ namespace CivitaBack.Logica
             return partidas;
         }
 
-        private void ProcesarPartida(Partida partida)
+        private void ProcesarPartida(PartidaEF partida)
         {
             if (partida == null || partida.Recursos == null)
                 throw new Exception();

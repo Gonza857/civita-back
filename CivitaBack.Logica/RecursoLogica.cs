@@ -14,7 +14,7 @@ namespace CivitaBack.Logica;
 
 public interface IRecursoLogica
 {
-    Task ConfigurarInicial(Partida partida);
+    Task ConfigurarInicial(PartidaEF partida);
 
     Task<RecursoDTO> ObtenerRecursos(int idPartida);
     Task ModificarEnergia(int idPartida, int cantidad);
@@ -32,7 +32,7 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
         repositorioRecurso = rr;
     }
 
-    public async Task ConfigurarInicial(Partida partida)
+    public async Task ConfigurarInicial(PartidaEF partida)
     {
         if (partida == null) throw new PartidaExcepcion("No se proporcionó Partida");
         Recurso recurso = new Recurso

@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
-using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
-using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Entities;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
 using CivitaBack.Utils;
 using Microsoft.Extensions.Logging;
@@ -66,12 +66,13 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
     /// </summary>
     /// <param name="rlp">Repositorio para la entidad de unión LogroPartida.</param>
     /// <param name="irr">Repositorio para la entidad Recurso.</param>
-    /// <param name="ilr">Repositorio para la entidad Logro.</param>
+    /// <param name="iudt">Repositorio para guardar.</param>
+    /// <param name="logger">Logger.</param>
     public LogroPartidaLogica(
-        ILogroPartidaRepositorio rlp, 
-        IRecursoRepositorio irr, 
-        IUnidadDeTrabajo iudt,
-        ILogger<LogroPartidaLogica> logger
+            ILogroPartidaRepositorio rlp, 
+            IRecursoRepositorio irr, 
+            IUnidadDeTrabajo iudt,
+            ILogger<LogroPartidaLogica> logger
         )
     {
         _repositorioLogroPartida = rlp;
@@ -144,7 +145,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
     }
     
     /// <summary>
-    /// Modifica un objeto <see cref="Recurso"/> en memoria, sumando las cantidades de las recompensas.
+    /// Modifica un objeto <see cref="Data.BO.Recurso"/> en memoria, sumando las cantidades de las recompensas.
     /// </summary>
     /// <param name="recursoPartida">El objeto Recurso a modificar.</param>
     /// <param name="recompensas">La lista de recompensas (Condicion) a aplicar.</param>
@@ -185,7 +186,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
     /// Método orquestador privado que obtiene y filtra los logros listos para reclamar.
     /// </summary>
     /// <param name="partida">La partida validada.</param>
-    /// <returns>Una lista de entidades <see cref="Logro"/> que cumplen las condiciones.</returns>
+    /// <returns>Una lista de entidades <see cref="LogroEF"/> que cumplen las condiciones.</returns>
     private async Task<List<Logro>> ObtenerLogrosParaReclamables(Partida partida)
     {
         // 1. Obtener los que AÚN NO están en la tabla LogroPartida
@@ -250,7 +251,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
     
 
     /// <summary>
-    /// Convierte una entidad <see cref="Logro"/> a su <see cref="LogroDTO"/> correspondiente.
+    /// Convierte una entidad <see cref="LogroEF"/> a su <see cref="LogroDTO"/> correspondiente.
     /// </summary>
     /// <param name="entidad">La entidad Logro a convertir.</param>
     /// <returns>El DTO.</returns>
@@ -282,7 +283,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
     }
 
     /// <summary>
-    /// Helper para convertir una lista de entidades <see cref="Logro"/> a DTOs.
+    /// Helper para convertir una lista de entidades <see cref="LogroEF"/> a DTOs.
     /// </summary>
     /// <param name="logros">La lista de entidades.</param>
     /// <returns>La lista de DTOs.</returns>
