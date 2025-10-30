@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entities;
 using CivitaBack.Data.DTO;
-using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Logica;
 
@@ -43,7 +38,8 @@ public class EstructuraMapaLogica : IEstructuraMapaLogica
 
     public async Task EliminarEstructuraAsync(EliminarEstructuraDTO dto)
     {
-        var entidad = await estructuraMapaRepositorio.ObtenerCoincidenteAsync(dto);
+        var entidad = await estructuraMapaRepositorio.ObtenerCoincidenteAsync(dto.PartidaId, dto.EstructuraId, dto.X, dto.Y, dto.Width, 
+            dto.Height);
 
         if (entidad is null)
             throw new InvalidOperationException("No se encontró la estructura a eliminar");

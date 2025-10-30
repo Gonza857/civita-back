@@ -1,13 +1,10 @@
-﻿using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entities;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio;
 
-public interface ITipoEstructuraRepositorio : IRepositorioBase<TipoEstructura>
-{
-
-}
 public class TipoEstructuraRepositorio : GenericoRepositorio, ITipoEstructuraRepositorio
 {
     public TipoEstructuraRepositorio(AppDbContext context) : base(context) { }

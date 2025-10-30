@@ -1,34 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entities;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Interfaces.Repositorios;
+
 
 namespace CivitaBack.Data.Repositorio;
-
-public interface IEstructuraMapaRepositorio
-{
-    void AgregarUnica(EstructuraMapa em);
-    void RemoverEliminadas(List<EstructuraMapa> emList);
-    void AgregarNuevas(List<EstructuraMapa> emList);
-    Task GuardarCambios();
-    Task EliminarPorPartidaIdAsync(int partidaId);
-    Task AgregarVariasAsync(List<EstructuraMapa> estructuras);
-    Task<EstructuraMapa?> ObtenerCoincidenteAsync(EliminarEstructuraDTO dto);
-    Task EliminarAsync(EstructuraMapa entidad);
-
-
-}
 
 public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRepositorio
 {
     public EstructuraMapaRepositorio(AppDbContext context) : base(context) { }
-    
-    
+
+
 
     public void AgregarUnica(EstructuraMapa em)
     {
@@ -45,7 +28,7 @@ public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRep
     {
         _context.EstructuraMapa.AddRange(emList);
     }
-    
+
     public async Task GuardarCambios()
     {
         await base.GuardarCambiosAsync();
@@ -64,16 +47,16 @@ public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRep
         await _context.SaveChangesAsync();
     }
 
-    public async Task<EstructuraMapa?> ObtenerCoincidenteAsync(EliminarEstructuraDTO dto)
+    public async Task<EstructuraMapa?> ObtenerCoincidenteAsync(int partidaId, int estructuraId, int x, int y, int width, int height)
     {
         return await _context.EstructuraMapa.FirstOrDefaultAsync(e =>
-                e.PartidaId == dto.PartidaId &&
-                e.EstructuraId == dto.EstructuraId &&
-                e.X == dto.X &&
-                e.Y == dto.Y &&
-                e.Width == dto.Width &&
-                e.Height == dto.Height
-            );
+            e.PartidaId == partidaId &&
+            e.EstructuraId == estructuraId &&
+            e.X == x &&
+            e.Y == y &&
+            e.Width == width &&
+            e.Height == height
+        );
     }
 
     public async Task EliminarAsync(EstructuraMapa entidad)

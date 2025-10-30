@@ -1,14 +1,11 @@
-﻿using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entities;
 using CivitaBack.Data.EF;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio
 {
-    public interface ICicloRepositorio
-    {
-        Task GuardarCambiosAsync();
-        Task<List<Partida>> ObtenerPartidasConEstructuras();
-    }
+
     public class CicloRepositorio : ICicloRepositorio
     {
         private readonly AppDbContext _context;

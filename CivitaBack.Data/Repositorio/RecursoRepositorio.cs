@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entities;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio;
-public interface IRecursoRepositorio : IRepositorioBase<Recurso>
-{
-    Task GuardarRecurso(Recurso recurso);
-    Task<Recurso> ObtenerRecursosPartida(int idPartida);
-}
 public class RecursoRepositorio : IRecursoRepositorio
 {
     private readonly AppDbContext _context;

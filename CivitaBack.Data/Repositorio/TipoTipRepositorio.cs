@@ -1,13 +1,9 @@
-﻿using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entities;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio;
-
-public interface ITipoTipRepositorio : IRepositorioBase<TipoTip>
-{
-
-}
 
 public class TipoTipRepositorio : GenericoRepositorio, ITipoTipRepositorio
 {
