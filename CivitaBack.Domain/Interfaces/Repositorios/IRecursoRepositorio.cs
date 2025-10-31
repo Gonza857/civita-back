@@ -1,10 +1,9 @@
-﻿using CivitaBack.Domain.Entities;
+﻿using CivitaBack.Domain.Entidades;
 
 namespace CivitaBack.Domain.Interfaces.Repositorios
 {
     public interface IRecursoRepositorio : IRepositorioBase<Recurso>
     {
-        Task GuardarRecurso(Recurso recurso);
         Task<Recurso> ObtenerRecursosPartida(int idPartida);
     }
 }

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace CivitaBack.Data.BO
 {
-    public class Usuario : Auditable
+    public class UsuarioEF : AuditableEF
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

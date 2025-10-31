@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CivitaBack.Data.BO;
+﻿using System.ComponentModel.DataAnnotations;
+using CivitaBack.Domain.Entidades;
 
 namespace CivitaBack.Data.DTO;
 
@@ -26,6 +21,6 @@ public class PartidaDTO
 
     [Range(0, int.MaxValue, ErrorMessage = "Las EcoCoins no pueden ser negativas")]
     public int EcoCoins { get; set; }
-    public PartidaEF? Partida { get; set; } 
+    public Partida? Partida { get; set; } 
 
 }

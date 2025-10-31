@@ -1,63 +1,47 @@
-﻿using CivitaBack.Domain.Entities;
+﻿using AutoMapper;
+using CivitaBack.Data.BO;
+using CivitaBack.Domain.Entidades;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio;
 
-public class TipoEstructuraRepositorio : GenericoRepositorio, ITipoEstructuraRepositorio
+public class TipoEstructuraRepositorio
+    : GenericoRepositorio<TipoEstructura, TipoEstructuraEF>, ITipoEstructuraRepositorio
 {
-    public TipoEstructuraRepositorio(AppDbContext context) : base(context) { }
+    public TipoEstructuraRepositorio (AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
-    public async Task<TipoEstructura?> ObtenerPorId(int id)
+    public override async Task<TipoEstructura?> ObtenerPorId(int id)
     {
-        return await _context.TipoEstructura
+        var estructura = await _context.TipoEstructura
                 .FirstOrDefaultAsync(tl => tl.Id == id);
+        return base.Mapear<TipoEstructura>(estructura);
     }
 
-    public async Task<List<TipoEstructura>> ObtenerTodos()
+    public override async Task<List<TipoEstructura>> ObtenerTodos()
     {
-        return await _context.TipoEstructura
-            .ToListAsync();
+        return base.MapearLista<TipoEstructura>(await base.ObtenerTodos());
     }
 
     public async Task Actualizar(TipoEstructura entidad)
     {
-        entidad.Editado = DateTime.UtcNow;
-        _context.TipoEstructura.Update(entidad);
-        await base.GuardarCambiosAsync();
+        await base.Actualizar(entidad);
     }
 
     public async Task Eliminar(int id)
     {
-        var tipoEstructura = await _context.TipoEstructura
-            .FirstOrDefaultAsync(tl => tl.Id == id);
-        
-        if (tipoEstructura != null)
-        { 
-            _context.TipoEstructura.Remove(tipoEstructura);
-            await base.GuardarCambiosAsync();
-        }
+        await base.Eliminar(id);
     }
-
-    public Task Guardar(TipoEstructura entidad)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public async Task Agregar(TipoEstructura entidad)
     {
-        await _context.TipoEstructura.AddAsync(entidad);
-        await base.GuardarCambiosAsync();
+        await base.Agregar(entidad);
     }
 
-    public Task AgregarVarios(List<TipoEstructura> entidades)
+    public async Task AgregarVarios(List<TipoEstructura> entidades)
     {
-        throw new NotImplementedException();
+        await base.AgregarVarios(entidades);
     }
-
-    public Task Guardar()
-    {
-        throw new NotImplementedException();
-    }
+    
 }

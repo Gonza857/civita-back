@@ -1,4 +1,4 @@
-﻿using CivitaBack.Domain.Entities;
+﻿using CivitaBack.Domain.Entidades;
 
 namespace CivitaBack.Domain.Interfaces.Repositorios
 {
@@ -12,8 +12,7 @@ namespace CivitaBack.Domain.Interfaces.Repositorios
         void Guardar(Partida partida);
 
         Task<bool> ActualizarMapaAsync(Partida partida);
-
-        Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapa> estructuras);
+        
         Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId);
         Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId);
         Task<List<EstructuraMapa>> ObtenerEstructurasDeUnMapa(int partidaId);

@@ -1,8 +1,8 @@
-﻿using CivitaBack.Domain.Entities;
+﻿using CivitaBack.Domain.Entidades;
 
 namespace CivitaBack.Domain.Interfaces.Repositorios
 {
-    public interface ILogroPartidaRepositorio : IRepositorioBase<LogroPartida>
+    public interface ILogroPartidaRepositorio
     {
         Task<List<Logro>> ObtenerLogrosIncompletos(int partidaId);
         Task<List<Logro>> ObtenerLogrosCompletos(int partidaId);

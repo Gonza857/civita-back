@@ -1,31 +1,25 @@
-﻿using CivitaBack.Domain.Entities;
+﻿using AutoMapper;
+using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
-using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
-public class TipoLogroRepositorio : GenericoRepositorio, ITipoLogroRepositorio
+public class TipoLogroRepositorio 
+    : GenericoRepositorio<TipoLogro, TipoLogroEF>, ITipoLogroRepositorio 
 {
-    public TipoLogroRepositorio(AppDbContext context) : base(context) { }
+    public TipoLogroRepositorio (AppDbContext context, IMapper mapper) : base(context, mapper) { }
     
     public async Task Actualizar(TipoLogro entidad)
     {
-        entidad.Editado = DateTime.UtcNow;
-        _context.TipoLogro.Update(entidad);
-        await _context.SaveChangesAsync();
+        await base.Actualizar(entidad);
     }
 
     public async Task Eliminar(int id)
     {
-        var tipoLogro = await _context.TipoLogro
-            .FirstOrDefaultAsync(tl => tl.Id == id);
-        
-        if (tipoLogro != null)
-        { 
-            _context.TipoLogro.Remove(tipoLogro);
-            await _context.SaveChangesAsync();
-        }
+        await base.Eliminar(id);
     }
 
     public Task Guardar(TipoLogro entidad)
@@ -35,8 +29,7 @@ public class TipoLogroRepositorio : GenericoRepositorio, ITipoLogroRepositorio
 
     public async Task Agregar(TipoLogro tipoLogro)
     {
-        await _context.TipoLogro.AddAsync(tipoLogro);
-        await _context.SaveChangesAsync();
+        await base.Agregar(tipoLogro);
     }
 
     public Task AgregarVarios(List<TipoLogro> entidades)
@@ -49,14 +42,11 @@ public class TipoLogroRepositorio : GenericoRepositorio, ITipoLogroRepositorio
         throw new NotImplementedException();
     }
 
-    public async Task<TipoLogro?> ObtenerPorId(int id)
+    public override async Task<TipoLogro?> ObtenerPorId(int id)
     {
-        return await _context.TipoLogro
+        var tipoLogroEf = await _context.TipoLogro
             .FirstOrDefaultAsync(tl => tl.Id == id);
+        return base.Mapear<TipoLogro>(tipoLogroEf);
     }
     
-    public async Task<List<TipoLogro>> ObtenerTodos()
-    {
-        return await _context.TipoLogro.ToListAsync();
-    }
 }

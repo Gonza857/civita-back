@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace CivitaBack.Data.BO;
 
-public class Recurso : Auditable
+public class RecursoEF : AuditableEF
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -18,9 +18,9 @@ public class Recurso : Auditable
     [JsonIgnore]
     public PartidaEF? Partida { get; set; }
 
-    public Recurso() { }
+    public RecursoEF() { }
 
-    public Recurso(
+    public RecursoEF(
         int energia, 
         int contaminacion, 
         int felicidad, 

@@ -1,18 +1,15 @@
 ﻿using System.Text.Json;
 using AutoMapper;
 using CivitaBack.Data.BO;
-using CivitaBack.Domain.Entities;
-using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
-using CivitaBack.Logica.Excepciones;
-using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
 public class PartidaRepositorio
     : GenericoRepositorio<Partida, PartidaEF>, IPartidaRepositorio
-
 {
     public PartidaRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
     
@@ -39,11 +36,19 @@ public class PartidaRepositorio
             UltimaVez = DateTime.UtcNow
         };
 
-        await _context.Partida.AddAsync(partida);
-
+        await base.Agregar(partida);
         await _context.SaveChangesAsync();
-
         return partida;
+    }
+
+    public Task<List<Partida>> ObtenerPartidas()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Guardar(Partida partida)
+    {
+        throw new NotImplementedException();
     }
 
     public override async Task<List<Partida>> ObtenerTodos()
@@ -53,6 +58,11 @@ public class PartidaRepositorio
             .Include(p => p.Recursos)
             .ToListAsync();
         return base.MapearLista<Partida>(partidas);
+    }
+
+    public Task GuardarCambios()
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<Partida?> ObtenerPorUsuarioId(int idUsuario)
@@ -70,43 +80,24 @@ public class PartidaRepositorio
         await base.Actualizar(partida);
         return 1 > 0;
     }
-
-    public async Task ActualizarEstructurasMapaAsync(int partidaId, List<EstructuraMapa> nuevas)
-    {
-        await using var transaction = await _context.Database.BeginTransactionAsync();
-        try
-        {
-            var existentes = _context.EstructuraMapa.Where(e => e.PartidaId == partidaId);
-            _context.EstructuraMapa.RemoveRange(existentes);
-            await _context.SaveChangesAsync();
-
-            await _context.EstructuraMapa.AddRangeAsync(nuevas);
-            await _context.SaveChangesAsync();
-
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
-    }
-
+    
 
     public async Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId)
-    {
-        return await _context.Partida
-            .Include(p => p.EstructuraMapa)
-            .ThenInclude(em => em.Estructura)
-            .FirstOrDefaultAsync(p => p.Id == partidaId);
-    }
-
-    public async Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId)
     {
         var partida = await _context.Partida
             .Include(p => p.EstructuraMapa)
             .ThenInclude(em => em.Estructura)
             .FirstOrDefaultAsync(p => p.Id == partidaId);
+        return base.Mapear<Partida>(partida);
+    }
+
+    public async Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId)
+    {
+        var partidaEf = await _context.Partida
+            .Include(p => p.EstructuraMapa)
+            .ThenInclude(em => em.Estructura)
+            .FirstOrDefaultAsync(p => p.Id == partidaId);
+        var partida = base.Mapear<Partida>(partidaEf);
 
         if (partida == null)
             throw new Exception("No se encontró la partida.");
@@ -171,10 +162,11 @@ public class PartidaRepositorio
         return JsonSerializer.Serialize(mapaFinal, new JsonSerializerOptions { WriteIndented = true });
     }
 
-    public Task<List<EstructuraMapa>> ObtenerEstructurasDeUnMapa(int partidaId)
+    public async Task<List<EstructuraMapa>> ObtenerEstructurasDeUnMapa(int partidaId)
     {
-        return _context.EstructuraMapa
+        var estructuraMapaEf = await _context.EstructuraMapa
             .Where(e => e.PartidaId == partidaId)
             .ToListAsync();
+        return base.MapearLista<EstructuraMapa>(estructuraMapaEf);
     }
 }

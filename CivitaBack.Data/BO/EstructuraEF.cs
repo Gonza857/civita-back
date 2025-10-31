@@ -17,7 +17,7 @@ namespace CivitaBack.Data.BO
         public int FelicidadCiclo { get; set; }
         public int ContaminacionCiclo { get; set; }
         public int TipoEstructuraId { get; set; }
-        public TipoEstructura TipoEstructura { get; set; }
+        public TipoEstructuraEF TipoEstructura { get; set; }
         public List<EstructuraMapaEF>? EstructurasEnMapa { get; set; }
     }
 }

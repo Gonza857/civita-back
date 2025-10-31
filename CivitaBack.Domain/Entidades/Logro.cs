@@ -1,6 +1,6 @@
 ﻿using CivitaBack.Domain.Common;
 
-namespace CivitaBack.Domain.Entities;
+namespace CivitaBack.Domain.Entidades;
 
 public class Logro : Auditable
 {

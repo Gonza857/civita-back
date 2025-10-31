@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CivitaBack.Data.BO;
 
-public class TipoLogro : Auditable
+public class TipoLogroEF : AuditableEF
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.BO;
-using CivitaBack.Domain.Entities;
 using CivitaBack.Data.EF;
-using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 

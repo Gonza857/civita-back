@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
 
 namespace CivitaBack.Logica;

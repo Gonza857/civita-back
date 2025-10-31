@@ -1,14 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.Extensions.Logging;
 
 namespace CivitaBack.Data.BO
 {
-    public class Evento : AuditableEF
+    public class EventoMaestroEF : AuditableEF
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
+        public string? Nombre { get; set; } = string.Empty;
         public string TextoDescripcion { get; set; } = string.Empty;
         public string TextoAceptar { get; set; } = string.Empty;
         public string TextoRechazar { get; set; } = string.Empty;
@@ -17,14 +18,6 @@ namespace CivitaBack.Data.BO
         public int ContaminacionAceptar { get; set; }
         public int FelicidadRechazar { get; set; }
         public int ContaminacionRechazar { get; set; }
-
-        public bool SeDisparo { get; set; } = false; 
-        public bool Resuelto { get; set; } = false;
-
-        public int EventoMaestroId { get; set; }
-        public EventoMaestro? EventoMaestro { get; set; }
-
-        public int PartidaId { get; set; }
-        public PartidaEF? Partida { get; set; }
+        public List<Evento>? Evento { get; set; }
     }
 }

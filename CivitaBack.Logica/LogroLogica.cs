@@ -1,6 +1,8 @@
 ﻿using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
 using CivitaBack.Utils;
 
@@ -23,7 +25,7 @@ public interface ILogroLogica
 
 public class LogroLogica : IParser<LogroEF, LogroDTO>, ILogroLogica
 {
-    private readonly ILogroRepositorio repositorioLogro;
+    private readonly ILogroRepositorio _repositorioLogro;
     private readonly ITipoLogroRepositorio repositorioTipoLogro;
     private readonly ICondicionRepositorio _condicionRepositorio;
     private readonly ILogroPartidaRepositorio _logroPartidaRepositorio;
@@ -38,7 +40,7 @@ public class LogroLogica : IParser<LogroEF, LogroDTO>, ILogroLogica
         ILogroPartidaRepositorio ilpr
         )
     {
-        repositorioLogro = rtl;
+        _repositorioLogro = rtl;
         repositorioTipoLogro = itlr;
         _condicionRepositorio = icr;
         _logroPartidaRepositorio = ilpr;
@@ -62,8 +64,8 @@ public class LogroLogica : IParser<LogroEF, LogroDTO>, ILogroLogica
     public async Task Actualizar(LogroDTO logroDTO, int id)
     {
         this.ValidarLogro(logroDTO);
-        LogroEF logroBuscado = await this.repositorioLogro.ObtenerPorId(id);
-        var tipoLogroBuscado = await this.repositorioTipoLogro.ObtenerPorId(logroDTO.TipoId);
+        Logro? logroBuscado = await this._repositorioLogro.ObtenerPorId(id);
+        TipoLogro tipoLogroBuscado = await this.repositorioTipoLogro.ObtenerPorId(logroDTO.TipoId);
         
         if (logroBuscado == null || tipoLogroBuscado == null) 
             throw new LogroExcepcion("Ocurrió un error al actualizar el Logro");
@@ -73,12 +75,12 @@ public class LogroLogica : IParser<LogroEF, LogroDTO>, ILogroLogica
         logroBuscado.Titulo = logroDTO.Titulo;
         logroBuscado.TipoLogro = tipoLogroBuscado;
 
-        await this.repositorioLogro.Actualizar(logroBuscado);
+        await this._repositorioLogro.Actualizar(logroBuscado);
     }
 
     public async Task<List<LogroEF>> ObtenerListadoInterno()
     {
-        return await this.repositorioLogro.ObtenerTodos();
+        return await this._repositorioLogro.ObtenerTodos();
     }
 
     /// <summary>
@@ -89,7 +91,7 @@ public class LogroLogica : IParser<LogroEF, LogroDTO>, ILogroLogica
     {
         if (id <= 0) 
             throw new LogroExcepcion("No se pudo borrar el Logro");
-        await this.repositorioLogro.Eliminar(id);
+        await this._repositorioLogro.Eliminar(id);
     }
 
     /// <summary>
@@ -116,7 +118,7 @@ public class LogroLogica : IParser<LogroEF, LogroDTO>, ILogroLogica
             
         };
         
-        await this.repositorioLogro.Agregar(logro);
+        await this._repositorioLogro.Agregar(logro);
     }
 
     /// <summary>
@@ -124,7 +126,7 @@ public class LogroLogica : IParser<LogroEF, LogroDTO>, ILogroLogica
     /// </summary>
     public async Task<List<LogroDTO>> ObtenerListado()
     {
-        var logros = await this.repositorioLogro.ObtenerTodos();
+        var logros = await this._repositorioLogro.ObtenerTodos();
         return logros
           .Select(p => this.ToDto(p))
           .ToList();
@@ -136,7 +138,7 @@ public class LogroLogica : IParser<LogroEF, LogroDTO>, ILogroLogica
     /// <param name="id">Id de Logro</param>
     public async Task<LogroDTO> ObtenerPorId(int id)
     {
-        var logro = await this.repositorioLogro.ObtenerPorId(id);
+        var logro = await this._repositorioLogro.ObtenerPorId(id);
         if (logro == null) 
             throw new LogroExcepcion("No se pudo obtener el logro");
         return this.ToDto(logro);
@@ -231,10 +233,10 @@ public class LogroLogica : IParser<LogroEF, LogroDTO>, ILogroLogica
 
         foreach (LogroDTO logro in logrosDB)
         {
-            bool existe = await this.repositorioLogro.ExisteLogroEnCumplidos(logro.Id);
+            bool existe = await this._repositorioLogro.ExisteLogroEnCumplidos(logro.Id);
             if (!existe)
             {
-                var logroDB = await this.repositorioLogro.ObtenerPorId(logro.Id);
+                var logroDB = await this._repositorioLogro.ObtenerPorId(logro.Id);
                 await this._logroPartidaRepositorio.Agregar(new LogroPartidaEF { Partida = partida, Logro = logroDB });
             }
         }

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CivitaBack.Data.BO;
 
-public class LogroEF : Auditable
+public class LogroEF : AuditableEF
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -18,7 +13,7 @@ public class LogroEF : Auditable
 
     public string Descripcion { get; set; } = string.Empty;
 
-    public TipoLogro TipoLogro { get; set; }
+    public TipoLogroEF TipoLogro { get; set; }
 
     public CondicionEF Condicion { get; set; }
     public ICollection<LogroPartidaEF> LogroPartidas { get; set; }

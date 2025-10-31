@@ -1,6 +1,6 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
-using CivitaBack.Data.Repositorio;
+﻿using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;

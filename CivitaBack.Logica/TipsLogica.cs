@@ -1,6 +1,7 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
-using CivitaBack.Data.Repositorio;
+﻿using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica
@@ -19,10 +20,13 @@ namespace CivitaBack.Logica
     {
         private readonly ITipsRepositorio _tipsRepositorio;
         private readonly ITipoTipRepositorio _tiposTipRepositorio;
-        public TipsLogica(ITipsRepositorio itr, ITipoTipRepositorio ittr)
+        private readonly IUnidadDeTrabajo _unidadDeTrabajo;
+
+        public TipsLogica(ITipsRepositorio itr, ITipoTipRepositorio ittr, IUnidadDeTrabajo iudt)
         {
             _tipsRepositorio = itr;
             _tiposTipRepositorio = ittr;
+            _unidadDeTrabajo = iudt;
         }
 
         public async Task<List<TipDTO>> ObtenerMsjPorIdTipo(int id)
@@ -52,8 +56,17 @@ namespace CivitaBack.Logica
                 Mensaje = tip.Mensaje,
                 EfectoFiltro = tip.EfectoFiltro,
             };
+
+            try
+            {
+                await this._tipsRepositorio.Agregar(nuevoTip);
+                await this._unidadDeTrabajo.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new ErrorInternoExcepction("Ocurrió un error al crear un Tip");
+            }
             
-            await this._tipsRepositorio.Agregar(nuevoTip);
         }
 
         public async Task Actualizar(TipDTO tip, int id)
@@ -72,7 +85,15 @@ namespace CivitaBack.Logica
             tipDb.Mensaje = tip.Mensaje;
             tipDb.EfectoFiltro = tip.EfectoFiltro;
             
-            await this._tipsRepositorio.Actualizar(tipDb);
+            try
+            {
+                await this._tipsRepositorio.Actualizar(tipDb);
+                await this._unidadDeTrabajo.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new ErrorInternoExcepction("Ocurrió un error al Actualizar un Tip");
+            }
         }
 
         public async Task<TipDTO?> ObtenerPorIdTipo(int id)

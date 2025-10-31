@@ -56,6 +56,17 @@ public abstract class GenericoRepositorio<TDominio, TEf> : IRepositorioBase<TDom
         }
     }
     
+    /// <summary>
+    /// Prepara la eliminación de una colección de entidades.
+    /// </summary>
+    /// <param name="entidades">La colección de entidades de Dominio a eliminar.</param>
+    public Task EliminarVarios(ICollection<TDominio> entidades)
+    {
+        var entidadesEf = _mapper.Map<IEnumerable<TEf>>(entidades);
+        _dbSet.RemoveRange(entidadesEf);
+        return Task.CompletedTask;
+    }
+    
     // --- MÉTODOS "VIRTUALES" ---
     // (Estos pueden ser sobreescritos por las clases hijas si necesitan
     // lógica especial, como los `Include`s)

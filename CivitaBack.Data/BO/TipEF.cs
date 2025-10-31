@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CivitaBack.Data.BO
 {
-    public class Tip : Auditable
+    public class TipEF : AuditableEF
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -17,9 +17,9 @@ namespace CivitaBack.Data.BO
         public string? ElementoAdicional { get; set; }
         public bool EfectoFiltro { get; set; }
         public int TipoId { get; set; }
-        public TipoTip TipoTip { get; set; }
+        public TipoTipEF TipoTip { get; set; }
 
-        public List<TipEnPartida>? TipEnPartida { get; set; }
+        public List<TipEnPartidaEF?> TipEnPartida { get; set; }
 
     }
 }

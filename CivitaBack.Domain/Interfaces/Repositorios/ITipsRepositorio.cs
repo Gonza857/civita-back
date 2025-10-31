@@ -1,4 +1,4 @@
-﻿using CivitaBack.Domain.Entities;
+﻿using CivitaBack.Domain.Entidades;
 
 namespace CivitaBack.Domain.Interfaces.Repositorios
 {

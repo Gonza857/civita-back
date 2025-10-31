@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
+using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
-using CivitaBack.Domain.Entities;
+using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
 using CivitaBack.Utils;
@@ -145,7 +146,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
     }
     
     /// <summary>
-    /// Modifica un objeto <see cref="Data.BO.Recurso"/> en memoria, sumando las cantidades de las recompensas.
+    /// Modifica un objeto <see cref="Recurso"/> en memoria, sumando las cantidades de las recompensas.
     /// </summary>
     /// <param name="recursoPartida">El objeto Recurso a modificar.</param>
     /// <param name="recompensas">La lista de recompensas (Condicion) a aplicar.</param>

@@ -1,26 +1,24 @@
-﻿using CivitaBack.Domain.Entities;
+﻿using AutoMapper;
+using CivitaBack.Data.BO;
+using CivitaBack.Domain.Entidades;
 using CivitaBack.Data.EF;
+using CivitaBack.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Data.Repositorio;
-public class RecursoRepositorio : IRecursoRepositorio
+
+public class RecursoRepositorio 
+    : GenericoRepositorio<Recurso, RecursoEF>, IRecursoRepositorio
 {
-    private readonly AppDbContext _context;
+    public RecursoRepositorio (AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
-    public RecursoRepositorio(AppDbContext context)
+    public async Task<Recurso?> ObtenerPorId(int id)
     {
-        _context = context;
-    }
-
-    public async Task Actualizar(Recurso entidad)
-    {
-        entidad.Editado = DateTime.UtcNow;
-        _context.Recurso.Update(entidad);
-    }
-    public Task Eliminar(int id)
-    {
-        throw new NotImplementedException();
+        RecursoEF? recursoEf = await _context.Recurso
+            .Where(r => r.PartidaId == id)
+            .FirstOrDefaultAsync();
+        return base.Mapear<Recurso>(recursoEf);
     }
 
     public Task Guardar(Recurso entidad)
@@ -28,42 +26,11 @@ public class RecursoRepositorio : IRecursoRepositorio
         throw new NotImplementedException();
     }
 
-    public Task Agregar(Recurso entidad)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task AgregarVarios(List<Recurso> entidades)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Guardar()
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task GuardarRecurso(Recurso recurso)
-    {
-        await _context.Recurso.AddAsync(recurso);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task<Recurso?> ObtenerPorId(int id)
-    {
-        return await _context.Recurso
-            .Where(r => r.PartidaId == id)
-            .FirstOrDefaultAsync();
-    }
-
     public async Task<Recurso> ObtenerRecursosPartida(int idPartida)
     {
-        return await _context.Recurso
+        RecursoEF? recursoEf = await _context.Recurso
             .FirstOrDefaultAsync(r => r.PartidaId == idPartida);
+        return base.Mapear<Recurso>(recursoEf);
     }
-
-    public Task<List<Recurso>> ObtenerTodos()
-    {
-        throw new NotImplementedException();
-    }
+    
 }
