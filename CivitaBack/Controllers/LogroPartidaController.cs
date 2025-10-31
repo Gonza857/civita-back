@@ -1,20 +1,24 @@
-﻿using CivitaBack.Data.BO;
+﻿using AutoMapper;
+using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
 
 [Route("api/Partida")]
-[ApiController]
-public class LogroPartidaController : ControllerBase
+public class LogroPartidaController : BaseApiController
 {
     private readonly ILogroPartidaLogica _logroPartidaLogica;
     private readonly IPartidaLogica _partidaLogica;
+    protected readonly IMapper _mapper;
 
-    public LogroPartidaController(ILogroPartidaLogica lpl, IPartidaLogica ipl)
+    public LogroPartidaController(ILogroPartidaLogica lpl, IPartidaLogica ipl, IMapper mapper) : base(mapper)
     {
         this._logroPartidaLogica = lpl;
         this._partidaLogica = ipl;
+        this._mapper = mapper;
     }
 
     [HttpGet("{idUsuario}/Reclamar")]
@@ -22,7 +26,7 @@ public class LogroPartidaController : ControllerBase
     {
         try
         {
-            PartidaEF? partida = await this._partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
+            Partida? partida = await this._partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
             await _logroPartidaLogica.ReclamarLogros(partida);
             return Ok();
         }
@@ -37,7 +41,7 @@ public class LogroPartidaController : ControllerBase
     {
         try
         {
-            PartidaEF? partida = await this._partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
+            Partida? partida = await this._partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
 
             var logros = await (status?.ToLower().Trim() switch
             {
@@ -54,7 +58,7 @@ public class LogroPartidaController : ControllerBase
                 _ => throw new ArgumentException($"El status '{status}' no es válido.")
             });
 
-            return Ok(logros);
+            return Ok(base.MapearLista<LogroDTO>(logros));
         }
         catch (ArgumentException ex) // Captura el "churrasco"
         {
@@ -68,5 +72,4 @@ public class LogroPartidaController : ControllerBase
             return Problem("Error al obtener logros");
         }
     }
-
 }

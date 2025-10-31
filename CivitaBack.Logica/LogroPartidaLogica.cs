@@ -1,74 +1,28 @@
 ﻿using System.Reflection;
-using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
-using CivitaBack.Domain.Entidades;
-using CivitaBack.Domain.Interfaces.Repositorios;
-using CivitaBack.Logica.Excepciones;
 using CivitaBack.Utils;
 using Microsoft.Extensions.Logging;
+
+using CivitaBack.Data.BO;
+using CivitaBack.Data.DTO;
+
+using CivitaBack.Logica.Excepciones;
+
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
+using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Logica;
 
 /// <summary>
-/// Define la lógica de negocio para manejar los logros de un jugador dentro de una partida.
-/// </summary>
-public interface ILogroPartidaLogica
-{
-    /// <summary>
-    /// Obtiene una lista de todos los logros que el jugador AÚN NO ha completado en la partida.
-    /// </summary>
-    /// <param name="partida">La partida actual, debe incluir Recursos y EstructuraMapa.</param>
-    /// <returns>Una lista de DTOs de logros incompletos.</returns>
-    Task<List<LogroDTO>> ObtenerLogrosIncompletos(Partida? partida);
-
-    /// <summary>
-    /// Obtiene una lista de todos los logros que el jugador YA ha completado y están registrados.
-    /// </summary>
-    /// <param name="partida">La partida actual, debe incluir Recursos y EstructuraMapa.</param>
-    /// <returns>Una lista de DTOs de logros completados.</returns>
-    Task<List<LogroDTO>> ObtenerLogrosCompletados(Partida? partida);
-
-    /// <summary>
-    /// Obtiene los logros incompletos cuyas condiciones se cumplen AHORA MISMO según el estado de la partida.
-    /// </summary>
-    /// <param name="partida">La partida actual, debe incluir Recursos y EstructuraMapa.</param>
-    /// <returns>Una lista de DTOs de logros que están listos para ser reclamados.</returns>
-    Task<List<LogroDTO>> ObtenerLogrosParaReclamar(Partida? partida);
-
-    /// <summary>
-    /// Procesa el reclamo de TODOS los logros cuyas condiciones se cumplan.
-    /// Aplica las recompensas y guarda los logros como completados.
-    /// </summary>
-    /// <param name="partida">La partida actual, debe incluir Recursos y EstructuraMapa.</param>
-    /// <returns>Una tarea que representa la operación de reclamo.</returns>
-    Task ReclamarLogros(Partida? partida);
-
-    /// <summary>
-    /// Reinicia (borra) el progreso de todos los logros para una partida específica.
-    /// </summary>
-    /// <param name="partidaId">El ID de la partida a reiniciar.</param>
-    /// <returns>Una tarea que representa la operación de reinicio.</returns>
-    Task ReiniciarLogros(int partidaId);
-
-}
-
-/// <summary>
 /// Implementación de la lógica de negocio para <see cref="ILogroPartidaLogica"/>.
 /// </summary>
-public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
+public class LogroPartidaLogica : ILogroPartidaLogica
 {
     private readonly ILogroPartidaRepositorio _repositorioLogroPartida;
     private readonly IRecursoRepositorio _recursoRepositorio;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
     private readonly ILogger<LogroPartidaLogica> _logger;
-
-    /// <summary>
-    /// Inicializa una nueva instancia de la clase <see cref="LogroPartidaLogica"/>.
-    /// </summary>
-    /// <param name="rlp">Repositorio para la entidad de unión LogroPartida.</param>
-    /// <param name="irr">Repositorio para la entidad Recurso.</param>
-    /// <param name="iudt">Repositorio para guardar.</param>
-    /// <param name="logger">Logger.</param>
+    
     public LogroPartidaLogica(
             ILogroPartidaRepositorio rlp, 
             IRecursoRepositorio irr, 
@@ -83,28 +37,25 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
     }
     
     /// <inheritdoc />
-    public async Task<List<LogroDTO>> ObtenerLogrosIncompletos(Partida? partida)
+    public async Task<List<Logro>> ObtenerLogrosIncompletos(Partida? partida)
     {
         this.ValidarPartida(partida);
-        List<Logro> logrosNoCompletos = await _repositorioLogroPartida.ObtenerLogrosIncompletos(partida!.Id);
-        return logrosNoCompletos.Select(l => this.ToDto(l)).ToList();
+        return await _repositorioLogroPartida.ObtenerLogrosIncompletos(partida!.Id);
     }
 
     /// <inheritdoc />
-    public async Task<List<LogroDTO>> ObtenerLogrosCompletados(Partida? partida)
+    public async Task<List<Logro>> ObtenerLogrosCompletados(Partida? partida)
     {
         this.ValidarPartida(partida);
-        List<Logro> logrosCompletados = await _repositorioLogroPartida.ObtenerLogrosCompletos(partida!.Id);
-        return logrosCompletados.Select(l => this.ToDto(l)).ToList();
+        return await _repositorioLogroPartida.ObtenerLogrosCompletos(partida!.Id);
 
     }
    
     /// <inheritdoc />
-    public async Task<List<LogroDTO>> ObtenerLogrosParaReclamar(Partida? partida)
+    public async Task<List<Logro>> ObtenerLogrosParaReclamar(Partida? partida)
     {
         this.ValidarPartida(partida);
-        var logros = await this.ObtenerLogrosParaReclamables(partida!);
-        return this.ListToDto(logros);
+        return await this.ObtenerLogrosParaReclamables(partida!);
     }
 
     /// <inheritdoc />
@@ -250,24 +201,6 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
         return logrosParaReclamar;
     }
     
-
-    /// <summary>
-    /// Convierte una entidad <see cref="LogroEF"/> a su <see cref="LogroDTO"/> correspondiente.
-    /// </summary>
-    /// <param name="entidad">La entidad Logro a convertir.</param>
-    /// <returns>El DTO.</returns>
-    public LogroDTO ToDto(Logro entidad)
-    {
-        return new LogroDTO
-        {
-            Id = entidad.Id,
-            Descripcion = entidad.Descripcion,
-            Tipo = entidad.TipoLogro.Nombre,
-            Titulo = entidad.Titulo,
-            TipoId = entidad.TipoLogro.Id
-        };
-    }
-    
     /// <summary>
     /// Validador privado para asegurar que la partida y sus navegaciones esenciales no sean nulas.
     /// </summary>
@@ -281,16 +214,6 @@ public class LogroPartidaLogica : ILogroPartidaLogica, IParser<Logro, LogroDTO>
         if (partida.Recursos == null || partida.EstructuraMapa == null)
             throw new LogroPartidaExcepcion("Ocurrió un error al obtener los logros del usuario.");
         return partida;
-    }
-
-    /// <summary>
-    /// Helper para convertir una lista de entidades <see cref="LogroEF"/> a DTOs.
-    /// </summary>
-    /// <param name="logros">La lista de entidades.</param>
-    /// <returns>La lista de DTOs.</returns>
-    private List<LogroDTO> ListToDto(List<Logro> logros)
-    {
-        return logros.Select(l => this.ToDto(l)).ToList();
     }
     
 }
