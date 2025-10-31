@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CivitaBack.Data.BO;
+﻿using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
-using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
 using CivitaBack.Utils;
 
@@ -19,7 +15,7 @@ public interface IEstructuraLogica
     Task Eliminar (int idEstructura);
     Task Actualizar (EstructuraDTO estructura, int id);
 }
-public class EstructuraLogica : IEstructuraLogica, IParser<EstructuraEF, EstructuraDTO>
+public class EstructuraLogica : IEstructuraLogica, IParser<Estructura, EstructuraDTO>
 {
     private readonly IEstructuraRepositorio _repositorioEstructura;
     private readonly ITipoEstructuraRepositorio _repositorioTipoEstructura;
@@ -33,7 +29,7 @@ public class EstructuraLogica : IEstructuraLogica, IParser<EstructuraEF, Estruct
     public async Task<EstructuraDTO> ObtenerPorId(int idEstructura)
     {
         if (idEstructura <= 0) throw new EstructuraExcepcion("No se pudo obtener la Estructura"); 
-        EstructuraEF? estructura = await this._repositorioEstructura.ObtenerPorId(idEstructura);
+        Estructura? estructura = await this._repositorioEstructura.ObtenerPorId(idEstructura);
         if (estructura == null) return null;
         return this.ToDto(estructura);
     }
@@ -53,7 +49,7 @@ public class EstructuraLogica : IEstructuraLogica, IParser<EstructuraEF, Estruct
         if (tipoEstructura == null) 
             throw new EstructuraExcepcion("No se pudo crear la Estructura");
 
-        EstructuraEF estructuraNueva = new EstructuraEF
+        Estructura estructuraNueva = new Estructura
         {
             ContaminacionCiclo = estructura.ContaminacionCiclo,
             CostoDinero = estructura.CostoDinero,
@@ -80,7 +76,7 @@ public class EstructuraLogica : IEstructuraLogica, IParser<EstructuraEF, Estruct
     {
         this.Validar(estructura);
         TipoEstructura? tipoEstructuraBuscada = await this._repositorioTipoEstructura.ObtenerPorId(estructura.Tipo.Id);
-        EstructuraEF? estructuraBuscada = await this._repositorioEstructura.ObtenerPorId(id);
+        Estructura? estructuraBuscada = await this._repositorioEstructura.ObtenerPorId(id);
         
         if (tipoEstructuraBuscada == null || estructuraBuscada == null) 
             throw new LogroExcepcion("Ocurrió un error al actualizar la Estructura");
@@ -97,7 +93,7 @@ public class EstructuraLogica : IEstructuraLogica, IParser<EstructuraEF, Estruct
         await this._repositorioEstructura.Actualizar(estructuraBuscada);
     }
 
-    public EstructuraDTO ToDto(EstructuraEF entidad)
+    public EstructuraDTO ToDto(Estructura entidad)
     {
         return new EstructuraDTO
         {

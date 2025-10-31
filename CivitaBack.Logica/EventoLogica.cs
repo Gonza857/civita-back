@@ -1,14 +1,9 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
-using CivitaBack.Data.Repositorio;
+﻿using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Hubs;
+using CivitaBack.Utils;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CivitaBack.Logica
 {
@@ -17,15 +12,18 @@ namespace CivitaBack.Logica
         Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida);
         Task<EventoResueltoDTO> ResolverEventoAsync(int eventoId, bool aceptado);
     }
+
     public class EventoLogica : IEventoLogica
     {
         private readonly IEventoRepositorio _eventoRepositorio;
         private readonly IHubContext<EventoHub> _hubContext;
+        private readonly IUnidadDeTrabajo _unidadDeTrabajo;
 
-        public EventoLogica(IEventoRepositorio eventoRepositorio, IHubContext<EventoHub> hubContext)
+        public EventoLogica(IEventoRepositorio eventoRepositorio, IHubContext<EventoHub> hubContext, IUnidadDeTrabajo unidadDeTrabajo)
         {
             _eventoRepositorio = eventoRepositorio;
             _hubContext = hubContext;
+            _unidadDeTrabajo = unidadDeTrabajo;
         }
 
         public async Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida)
@@ -50,7 +48,7 @@ namespace CivitaBack.Logica
             };
 
             await _eventoRepositorio.CrearEventoAsync(evento);
-            await _eventoRepositorio.GuardarCambiosAsync();
+            await this._unidadDeTrabajo.CommitAsync();
 
             await _hubContext.Clients.Group(idPartida.ToString())
                 .SendAsync("EventoDisparado", new EventoDisparadoDTO
@@ -76,7 +74,6 @@ namespace CivitaBack.Logica
                 FelicidadRechazar = maestro.FelicidadRechazar,
                 ContaminacionRechazar = maestro.ContaminacionRechazar,
             };
-
         }
 
         public async Task<EventoResueltoDTO> ResolverEventoAsync(int eventoId, bool acepto)
@@ -89,18 +86,25 @@ namespace CivitaBack.Logica
 
             // Aplicar efectos según decisión
             partida.Recursos.EcoCoins = Math.Max(0, partida.Recursos.EcoCoins + (acepto ? evento.EcoCoinsAceptar : 0));
-            partida.Recursos.Felicidad = Math.Clamp(partida.Recursos.Felicidad + (acepto ? evento.FelicidadAceptar : evento.FelicidadRechazar), 0, 100);
-            partida.Recursos.Contaminacion = Math.Clamp(partida.Recursos.Contaminacion + (acepto ? evento.ContaminacionAceptar : evento.ContaminacionRechazar), 0, 100);
+            partida.Recursos.Felicidad =
+                Math.Clamp(partida.Recursos.Felicidad + (acepto ? evento.FelicidadAceptar : evento.FelicidadRechazar),
+                    0, 100);
+            partida.Recursos.Contaminacion =
+                Math.Clamp(
+                    partida.Recursos.Contaminacion +
+                    (acepto ? evento.ContaminacionAceptar : evento.ContaminacionRechazar), 0, 100);
 
             evento.Resuelto = true;
 
-            await _eventoRepositorio.GuardarCambiosAsync();
-
+            await this._unidadDeTrabajo.CommitAsync();
+            
             await _hubContext.Clients.Group(evento.PartidaId.ToString())
-                .SendAsync("EventoResuelto", new EventoResueltoDTO { Id = evento.Id, Texto = acepto ? evento.TextoAceptar : evento.TextoRechazar });
+                .SendAsync("EventoResuelto",
+                    new EventoResueltoDTO
+                        { Id = evento.Id, Texto = acepto ? evento.TextoAceptar : evento.TextoRechazar });
 
-            return new EventoResueltoDTO { Id = evento.Id, Texto = acepto ? evento.TextoAceptar : evento.TextoRechazar };
+            return new EventoResueltoDTO
+                { Id = evento.Id, Texto = acepto ? evento.TextoAceptar : evento.TextoRechazar };
         }
-
     }
 }

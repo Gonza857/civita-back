@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
-using CivitaBack.Domain.Entities;
+using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using Microsoft.EntityFrameworkCore;
 

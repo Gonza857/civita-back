@@ -2,7 +2,7 @@
 
 namespace CivitaBack.Domain.Interfaces.Repositorios
 {
-    public interface IPartidaRepositorio
+    public interface IPartidaRepositorio : IRepositorioBase<Partida>
     {
         Task GuardarCambios();
 

@@ -2,7 +2,7 @@
 
 namespace CivitaBack.Domain.Interfaces.Repositorios
 {
-    public interface IEstructuraMapaRepositorio
+    public interface IEstructuraMapaRepositorio : IRepositorioBase<EstructuraMapa>
     {
         void AgregarUnica(EstructuraMapa em);
         void RemoverEliminadas(List<EstructuraMapa> emList);

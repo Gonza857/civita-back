@@ -1,5 +1,6 @@
 ﻿using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;

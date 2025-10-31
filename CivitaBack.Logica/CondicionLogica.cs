@@ -1,6 +1,5 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.Enum;
-using CivitaBack.Domain.Entities;
+﻿using CivitaBack.Data.Enum;
+using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
 using CivitaBack.Utils;
