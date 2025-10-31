@@ -1,6 +1,5 @@
-﻿using CivitaBack.Logica;
+﻿using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Backgrounds;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers

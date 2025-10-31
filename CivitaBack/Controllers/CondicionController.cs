@@ -1,6 +1,5 @@
 ﻿using CivitaBack.Logica;
 using CivitaBack.Logica.Excepciones;
-using CivitaBack.Tests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;

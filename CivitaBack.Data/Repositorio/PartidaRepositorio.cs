@@ -178,6 +178,11 @@ public class PartidaRepositorio
             .ToListAsync();
     }
 
+    public Task Actualizar(Partida partida)
+    {
+        return base.Actualizar(partida);
+    }
+
     public async Task<List<Partida>> ObtenerTodasConEstructurasYRecursosAsync()
     {
         var listaPartidasEF = await _dbSet
@@ -185,7 +190,7 @@ public class PartidaRepositorio
              .Include(p => p.EstructuraMapa)
              .ThenInclude(em => em.Estructura)
              .ThenInclude(e => e.TipoEstructura)
-             .AsNoTracking() // Recomendado para solo lectura
+             .AsNoTracking()
              .ToListAsync();
 
         return MapearLista<Partida>(listaPartidasEF);

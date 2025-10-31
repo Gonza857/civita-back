@@ -4,8 +4,6 @@ using CivitaBack.Data.EF;
 using CivitaBack.Domain.Entities;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using EventoMaestroEF = CivitaBack.Data.BO.EventoMaestroEF; 
 
 namespace CivitaBack.Data.Repositorio
 {

@@ -1,40 +1,40 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.Repositorio;
+﻿using CivitaBack.Domain.Entities;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Utils;
 
 namespace CivitaBack.Logica
 {
-    public interface ICicloLogica
-    {
-        Task<List<PartidaEF>> EjecutarCicloAsync();
-
-    }
     public class CicloLogica : ICicloLogica
     {
 
-        private readonly ICicloRepositorio _cicloRepositorio;
+        private readonly IPartidaRepositorio _partidaRepositorio;
+        private readonly IUnidadDeTrabajo _uow;
 
-        public CicloLogica(ICicloRepositorio cicloRepositorio)
+        public CicloLogica(IPartidaRepositorio partidaRepositorio, IUnidadDeTrabajo uow)
         {
-            _cicloRepositorio = cicloRepositorio;
+            _partidaRepositorio = partidaRepositorio;
+            _uow = uow;
         }
 
-        public async Task<List<PartidaEF>> EjecutarCicloAsync()
+        public async Task<List<Partida>> EjecutarCicloAsync()
         {
-            List<PartidaEF> partidas = await _cicloRepositorio.ObtenerPartidasConEstructuras();
+            List<Partida> partidas = await _partidaRepositorio.ObtenerTodasConEstructurasYRecursosAsync();
 
-            if (partidas == null || partidas.Count == 0) return new List<PartidaEF>();
+            if (partidas == null || partidas.Count == 0) return new List<Partida>();
 
             foreach (var partida in partidas)
             {
                 ProcesarPartida(partida);
+                await _partidaRepositorio.Actualizar(partida);
             }
 
-            await _cicloRepositorio.GuardarCambiosAsync();
+            await _uow.CommitAsync();
+
             return partidas;
         }
 
-        private void ProcesarPartida(PartidaEF partida)
+        private void ProcesarPartida(Partida partida)
         {
             if (partida == null || partida.Recursos == null)
                 throw new Exception();
