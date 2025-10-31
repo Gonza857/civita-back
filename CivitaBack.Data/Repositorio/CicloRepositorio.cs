@@ -14,18 +14,5 @@ namespace CivitaBack.Data.Repositorio
             _context = context;
         }
 
-        public async Task GuardarCambiosAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<List<Partida>> ObtenerPartidasConEstructuras()
-        {
-            return await _context.Partida.Include(p => p.Recursos)
-                .Include(p => p.EstructuraMapa)
-                .ThenInclude(em => em.Estructura)
-                .ThenInclude(e => e.TipoEstructura)
-                .ToListAsync();
-        }
     }
 }

@@ -7,7 +7,6 @@ namespace CivitaBack.Domain.Interfaces.Repositorios
         void AgregarUnica(EstructuraMapa em);
         void RemoverEliminadas(List<EstructuraMapa> emList);
         void AgregarNuevas(List<EstructuraMapa> emList);
-        Task GuardarCambios();
         Task EliminarPorPartidaIdAsync(int partidaId);
         Task AgregarVariasAsync(List<EstructuraMapa> estructuras);
         Task<EstructuraMapa?> ObtenerCoincidenteAsync(

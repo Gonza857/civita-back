@@ -177,4 +177,17 @@ public class PartidaRepositorio
             .Where(e => e.PartidaId == partidaId)
             .ToListAsync();
     }
+
+    public async Task<List<Partida>> ObtenerTodasConEstructurasYRecursosAsync()
+    {
+        var listaPartidasEF = await _dbSet
+             .Include(p => p.Recursos)
+             .Include(p => p.EstructuraMapa)
+             .ThenInclude(em => em.Estructura)
+             .ThenInclude(e => e.TipoEstructura)
+             .AsNoTracking() // Recomendado para solo lectura
+             .ToListAsync();
+
+        return MapearLista<Partida>(listaPartidasEF);
+    }
 }

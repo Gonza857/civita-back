@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CivitaBack.Data.BO
 {
-    public class EventoMaestro : AuditableEF
+    public class EventoMaestroEF : AuditableEF
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

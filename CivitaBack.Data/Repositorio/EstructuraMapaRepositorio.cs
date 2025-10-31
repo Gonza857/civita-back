@@ -1,22 +1,26 @@
-﻿using CivitaBack.Domain.Entities;
+﻿using AutoMapper;
+using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
-using Microsoft.EntityFrameworkCore;
+using CivitaBack.Domain.Common;
+using CivitaBack.Domain.Entities;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace CivitaBack.Data.Repositorio;
 
-public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRepositorio
+public class EstructuraMapaRepositorio : GenericoRepositorio<EstructuraMapa, EstructuraMapaEF>, IEstructuraMapaRepositorio
 {
-    public EstructuraMapaRepositorio(AppDbContext context) : base(context) { }
-
-
+    public EstructuraMapaRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
     public void AgregarUnica(EstructuraMapa em)
     {
-        em.Editado = DateTime.UtcNow;
-        _context.EstructuraMapa.Update(em);
+        if (em is Auditable auditable) auditable.Editado = DateTime.UtcNow;
+
+        var emEF = Mapear<EstructuraMapaEF>(em);
+
+        _dbSet.Update(emEF);
     }
 
     public void RemoverEliminadas(List<EstructuraMapa> emList)
@@ -27,11 +31,6 @@ public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRep
     public void AgregarNuevas(List<EstructuraMapa> emList)
     {
         _context.EstructuraMapa.AddRange(emList);
-    }
-
-    public async Task GuardarCambios()
-    {
-        await base.GuardarCambiosAsync();
     }
 
     public async Task EliminarPorPartidaIdAsync(int partidaId)

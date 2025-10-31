@@ -7,6 +7,5 @@ namespace CivitaBack.Domain.Interfaces.Repositorios
         Task<EventoMaestro?> ObtenerEventoMaestroAsync();
         Task CrearEventoAsync(Evento evento);
         Task<Evento?> ObtenerEventoConPartidaAsync(int eventoId);
-        Task GuardarCambiosAsync();
     }
 }

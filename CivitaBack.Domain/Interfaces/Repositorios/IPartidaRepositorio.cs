@@ -17,5 +17,8 @@ namespace CivitaBack.Domain.Interfaces.Repositorios
         Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId);
         Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId);
         Task<List<EstructuraMapa>> ObtenerEstructurasDeUnMapa(int partidaId);
+
+        Task<List<Partida>> ObtenerTodasConEstructurasYRecursosAsync();
+
     }
 }
