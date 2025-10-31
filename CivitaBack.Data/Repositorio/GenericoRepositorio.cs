@@ -1,4 +1,5 @@
-﻿using CivitaBack.Data.EF;
+﻿using System.Linq.Expressions;
+using CivitaBack.Data.EF;
 using AutoMapper;
 using CivitaBack.Data.BO;
 using Microsoft.EntityFrameworkCore;
@@ -72,14 +73,18 @@ public abstract class GenericoRepositorio<TDominio, TEf> : IRepositorioBase<TDom
     // (Estos pueden ser sobreescritos por las clases hijas si necesitan
     // lógica especial, como los `Include`s)
 
-    public virtual async Task<TDominio?> ObtenerPorId(int id)
+    public virtual async Task<TDominio?> ObtenerPorId(Expression<Func<TEf, bool>> predicado)
     {
-        // Implementación base: solo busca por Id sin Includes
-        var entidadEF = await _dbSet.AsNoTracking()
-            .FirstOrDefaultAsync(e => e.Id == id);
+        var entidadEF = await _dbSet.AsNoTracking().FirstOrDefaultAsync(predicado);
         return _mapper.Map<TDominio>(entidadEF);
     }
-
+    
+    public virtual async Task<List<TDominio>> ObtenerVariosPor(Expression<Func<TEf, bool>> predicado)
+    {
+        var listaEF = await _dbSet.AsNoTracking().Where(predicado).ToListAsync();
+        return _mapper.Map<List<TDominio>>(listaEF);
+    }
+    
     public virtual async Task<List<TDominio>> ObtenerTodos()
     {
         // Implementación base: solo trae todos sin Includes

@@ -12,28 +12,12 @@ public class LogroRepositorio
 {
     public LogroRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
-    public async Task Actualizar(Logro logro)
-    {
-        await base.Actualizar(logro);
-    }
-
-    public async Task Eliminar(int id)
-    {
-        await base.Eliminar(id);
-    }
-    
-
-    public async Task Agregar(Logro entidad)
-    {
-        await base.Agregar(entidad);
-    }
-
     public async Task AgregarVarios(List<Logro> entidades)
     {
         await base.AgregarVarios(entidades);
     }
     
-    public override async Task<Logro?> ObtenerPorId(int id)
+    public async Task<Logro?> ObtenerPorId(int id)
     {
         LogroEF? logro = await _context.Logro
             .Include(tl => tl.TipoLogro)

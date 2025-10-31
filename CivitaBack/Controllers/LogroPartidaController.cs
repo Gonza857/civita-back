@@ -12,13 +12,11 @@ public class LogroPartidaController : BaseApiController
 {
     private readonly ILogroPartidaLogica _logroPartidaLogica;
     private readonly IPartidaLogica _partidaLogica;
-    protected readonly IMapper _mapper;
 
     public LogroPartidaController(ILogroPartidaLogica lpl, IPartidaLogica ipl, IMapper mapper) : base(mapper)
     {
         this._logroPartidaLogica = lpl;
         this._partidaLogica = ipl;
-        this._mapper = mapper;
     }
 
     [HttpGet("{idUsuario}/Reclamar")]

@@ -1,18 +1,22 @@
-﻿using CivitaBack.Data.DTO;
+﻿using AutoMapper;
+using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-public class TipoEstructuraController : ControllerBase
+public class TipoEstructuraController : BaseApiController
 {
     private readonly ITipoEstructuraLogica _tipoEstructuraLogica;
+    private readonly ILogger<TipoEstructuraController> _logger;
 
-    public TipoEstructuraController(ITipoEstructuraLogica tel)
+    public TipoEstructuraController(ITipoEstructuraLogica tel, IMapper mapper, ILogger<TipoEstructuraController> logger) : base(mapper)
     {
         this._tipoEstructuraLogica = tel;
+        this._logger = logger;
     }
     
     [HttpGet]
@@ -21,10 +25,11 @@ public class TipoEstructuraController : ControllerBase
         try
         {
             var tiposEstructura = await this._tipoEstructuraLogica.Listado();
-            return Ok(tiposEstructura);
+            return Ok(base.MapearLista<EstructuraDTO>(tiposEstructura));
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener el listado de Tipos de Estructura");
         }
     }
@@ -37,11 +42,12 @@ public class TipoEstructuraController : ControllerBase
 
         try
         {
-            TipoEstructuraDTO guardado = await _tipoEstructuraLogica.Crear(nuevoTipoEstructura);
-            return Ok(guardado);
+            var guardado = await _tipoEstructuraLogica.Crear(base.Mapear<TipoEstructura>(nuevoTipoEstructura));
+            return Ok(base.Mapear<TipoEstructuraDTO>(guardado));
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar el Tipo de Estructura");
 
         }
@@ -57,6 +63,7 @@ public class TipoEstructuraController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al eliminar el Tipo de Estructura");
         }
     }
@@ -67,10 +74,11 @@ public class TipoEstructuraController : ControllerBase
         try
         {
             var tipoEstructura = await this._tipoEstructuraLogica.ObtenerPorId(id);
-            return Ok(tipoEstructura);
+            return Ok(base.Mapear<TipoEstructuraDTO>(tipoEstructura));
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener el Tipo de Estructura");
         }
     }
@@ -79,15 +87,16 @@ public class TipoEstructuraController : ControllerBase
     public async Task<IActionResult> Actualizar([FromBody] TipoEstructuraDTO? tipoEstructuraDto, int id)
     {
         if (tipoEstructuraDto == null)
-            return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
+            return BadRequest("Los datos recibidos son inválidos");
         
         try
         {
-            await this._tipoEstructuraLogica.Actualizar(tipoEstructuraDto, id);
+            await this._tipoEstructuraLogica.Actualizar(base.Mapear<TipoEstructura>(tipoEstructuraDto), id);
             return Ok();
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al actualizar el Tipo de Estructura");
         }
     }

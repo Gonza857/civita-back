@@ -1,4 +1,5 @@
 ﻿using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Excepciones;
 using Microsoft.AspNetCore.Mvc;

@@ -1,28 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
-using CivitaBack.Data.Repositorio;
+﻿using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
 
 namespace CivitaBack.Logica;
 
-public interface ITipoLogroLogica
-{
-    Task<TipoLogroDTO> ObtenerPorId(int Id);
-    Task<TipoLogroDTO> Guardar(TipoLogroDTO nuevoTipologro);
-
-    Task Actualizar(TipoLogroDTO tipoLogro, int idTipoLogro);
-
-    Task<List<TipoLogroDTO>> ObtenerTiposLogro();
-
-    Task Eliminar(int id);
-}
 public class TipoLogroLogica : ITipoLogroLogica
 {
     private readonly ITipoLogroRepositorio repositorioTipoLogro;
@@ -32,18 +15,18 @@ public class TipoLogroLogica : ITipoLogroLogica
         repositorioTipoLogro = rtl;
     }
 
-    private void ValidarTipoLogro(TipoLogroDTO tipoLogroDTO, int idTipoLogro)
+    private void ValidarTipoLogro(TipoLogro TipoLogro, int idTipoLogro)
     {
-        if (tipoLogroDTO == null || idTipoLogro <= 0) 
+        if (TipoLogro == null || idTipoLogro <= 0) 
             throw new TipoLogroException("Ocurrió un error al actualizar el Tipo de Logro");
     }
 
     /// <summary>
     /// Actualiza un Tipo de Logro
     /// </summary>
-    /// <param name="tipoLogro">TipoLogroDTO</param>
+    /// <param name="tipoLogro">TipoLogro</param>
     /// <param name="idTipoLogro">Id de Tipo Logro</param>
-    public async Task Actualizar(TipoLogroDTO tipoLogro, int idTipoLogro)
+    public async Task Actualizar(TipoLogro tipoLogro, int idTipoLogro)
     {
         this.ValidarTipoLogro(tipoLogro, idTipoLogro);
         var tipoLogroBuscado = await this.repositorioTipoLogro.ObtenerPorId(idTipoLogro);
@@ -68,14 +51,14 @@ public class TipoLogroLogica : ITipoLogroLogica
     /// <summary>
     /// Guarda un Tipo de logro
     /// </summary>
-    /// <param name="tipoLogroDto">TipoLogroDTO</param>
-    public async Task<TipoLogroDTO> Guardar(TipoLogroDTO tipoLogroDto)
+    /// <param name="TipoLogro">TipoLogro</param>
+    public async Task<TipoLogro> Guardar(TipoLogro TipoLogro)
     {
-        this.ValidarTipoLogro(tipoLogroDto, tipoLogroDto.Id);
+        this.ValidarTipoLogro(TipoLogro, TipoLogro.Id);
         
         var tipoLogro = new TipoLogro
         {
-            Nombre = tipoLogroDto.Nombre
+            Nombre = TipoLogro.Nombre
         }; 
         
         await this.repositorioTipoLogro.Agregar(tipoLogro);
@@ -86,7 +69,7 @@ public class TipoLogroLogica : ITipoLogroLogica
     /// Obtiene un Tipo de Logro por Id
     /// </summary>
     /// <param name="id">Id de Tipo Logro</param>
-    public async Task<TipoLogroDTO> ObtenerPorId(int id)
+    public async Task<TipoLogro> ObtenerPorId(int id)
     {
         var tipoLogro = await this.repositorioTipoLogro.ObtenerPorId(id);
         if (tipoLogro == null) 
@@ -97,7 +80,7 @@ public class TipoLogroLogica : ITipoLogroLogica
     /// <summary>
     /// Obtiene listado de Tipos de Logro
     /// </summary>
-    public async Task<List<TipoLogroDTO>> ObtenerTiposLogro()
+    public async Task<List<TipoLogro>> ObtenerTiposLogro()
     {
         var tiposDeLogros = await this.repositorioTipoLogro.ObtenerTodos();
         return tiposDeLogros
@@ -109,9 +92,9 @@ public class TipoLogroLogica : ITipoLogroLogica
     /// Convierte entidad de dominio a DTO
     /// </summary>
     /// <param name="entidad">Tipo Logro</param>
-    private TipoLogroDTO TipoLogroToDTO(TipoLogro entidad)
+    private TipoLogro TipoLogroToDTO(TipoLogro entidad)
     {
-        return new TipoLogroDTO
+        return new TipoLogro
         {
             Id = entidad.Id,
             Nombre = entidad.Nombre,

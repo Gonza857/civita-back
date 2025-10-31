@@ -18,6 +18,6 @@ namespace CivitaBack.Data.BO
         public int ContaminacionAceptar { get; set; }
         public int FelicidadRechazar { get; set; }
         public int ContaminacionRechazar { get; set; }
-        public List<Evento>? Evento { get; set; }
+        public List<EventoEF>? Evento { get; set; }
     }
 }

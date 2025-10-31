@@ -1,48 +1,36 @@
 ﻿using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Excepciones;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica
 {
-
-    public interface ITipsLogica
-    {
-        Task<List<TipDTO>> ObtenerMsjPorIdTipo(int id);
-        Task<List<TipDTO>> Listado();
-        Task Crear(TipDTO tip);
-        Task Actualizar (TipDTO tip, int id);
-        
-        Task<TipDTO?> ObtenerPorIdTipo(int id);
-    }
-    public class TipsLogica : ITipsLogica, IParser<Tip, TipDTO>
+    public class TipLogica : ITipLogica
     {
         private readonly ITipsRepositorio _tipsRepositorio;
         private readonly ITipoTipRepositorio _tiposTipRepositorio;
         private readonly IUnidadDeTrabajo _unidadDeTrabajo;
 
-        public TipsLogica(ITipsRepositorio itr, ITipoTipRepositorio ittr, IUnidadDeTrabajo iudt)
+        public TipLogica(ITipsRepositorio itr, ITipoTipRepositorio ittr, IUnidadDeTrabajo iudt)
         {
             _tipsRepositorio = itr;
             _tiposTipRepositorio = ittr;
             _unidadDeTrabajo = iudt;
         }
 
-        public async Task<List<TipDTO>> ObtenerMsjPorIdTipo(int id)
+        public async Task<List<Tip>> ObtenerMsjPorIdTipo(int id)
         {
-                List<Tip> listadoTipsSegunTipo = await _tipsRepositorio.ObtenerMsjPorIdTipo(id);
-                return listadoTipsSegunTipo
-                    .Select(t=> this.ToDto(t)).ToList();
+            return await _tipsRepositorio.ObtenerMsjPorIdTipo(id);
         }
 
-        public async Task<List<TipDTO>> Listado()
+        public async Task<List<Tip>> Listado()
         {
-            var listado = await _tipsRepositorio.ObtenerTodos();
-            return listado.Select(l => this.ToDto(l)).ToList();
+            return await _tipsRepositorio.ObtenerTodos();
         }
 
-        public async Task Crear(TipDTO tip)
+        public async Task Crear(Tip tip)
         {
             var tipoTip = await this._tiposTipRepositorio.ObtenerPorId(tip.TipoId);
             if (tipoTip == null)
@@ -66,10 +54,9 @@ namespace CivitaBack.Logica
             {
                 throw new ErrorInternoExcepction("Ocurrió un error al crear un Tip");
             }
-            
         }
 
-        public async Task Actualizar(TipDTO tip, int id)
+        public async Task Actualizar(Tip tip, int id)
         {
             var tipoTip = await this._tiposTipRepositorio.ObtenerPorId(tip.TipoId);
             if (tipoTip == null)
@@ -84,7 +71,7 @@ namespace CivitaBack.Logica
             tipDb.ElementoAdicional = tip.ElementoAdicional;
             tipDb.Mensaje = tip.Mensaje;
             tipDb.EfectoFiltro = tip.EfectoFiltro;
-            
+
             try
             {
                 await this._tipsRepositorio.Actualizar(tipDb);
@@ -96,24 +83,9 @@ namespace CivitaBack.Logica
             }
         }
 
-        public async Task<TipDTO?> ObtenerPorIdTipo(int id)
+        public async Task<Tip?> ObtenerPorIdTipo(int id)
         {
-            var tipoTip = await this._tipsRepositorio.ObtenerPorId(id);
-            if (tipoTip == null) return null;
-            return this.ToDto(tipoTip);
-        }
-
-        public TipDTO ToDto(Tip entidad)
-        {
-            TipDTO tipDTO = new TipDTO();
-            tipDTO.Id = entidad.Id;
-            tipDTO.Mensaje = entidad.Mensaje;
-            tipDTO.TipoId = entidad.TipoId;
-            //tipDTO.TipoTipDescripcion = entidad.TipoTip.Descripcion;
-            tipDTO.ElementoAdicional = entidad.ElementoAdicional;
-            tipDTO.Expresion =  entidad.Expresion;
-            tipDTO.EfectoFiltro = entidad.EfectoFiltro; 
-            return tipDTO;
+            return await this._tipsRepositorio.ObtenerPorId(id);
         }
     }
 }

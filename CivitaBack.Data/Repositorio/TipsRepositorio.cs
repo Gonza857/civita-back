@@ -21,7 +21,7 @@ public class TipsRepositorio
         return base.MapearLista<Tip>(tipEf);
     }
 
-    public override async Task<Tip?> ObtenerPorId(int id)
+    public async Task<Tip?> ObtenerPorId(int id)
     {
         var tipEf = await _context.Tip
             .Where(t => t.Id == id)

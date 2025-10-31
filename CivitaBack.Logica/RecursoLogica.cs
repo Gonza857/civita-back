@@ -1,32 +1,25 @@
 ﻿using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
 
-public interface IRecursoLogica
+public class RecursoLogica : IRecursoLogica
 {
-    Task ConfigurarInicial(PartidaEF partida);
-
-    Task<RecursoDTO> ObtenerRecursos(int idPartida);
-    Task ModificarEnergia(int idPartida, int cantidad);
-    
-}
-
-public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
-{
-
     private readonly IRecursoRepositorio _repositorioRecurso;
+    private readonly IUnidadDeTrabajo _unidadDeTrabajo;
 
-    public RecursoLogica(IRecursoRepositorio rr)
+    public RecursoLogica(IRecursoRepositorio rr, IUnidadDeTrabajo unidadDeTrabajo)
     {
         _repositorioRecurso = rr;
+        _unidadDeTrabajo = unidadDeTrabajo;
     }
 
-    public async Task ConfigurarInicial(PartidaEF partida)
+    public async Task ConfigurarInicial(Partida partida)
     {
         if (partida == null) throw new PartidaExcepcion("No se proporcionó Partida");
         Recurso recurso = new Recurso
@@ -38,32 +31,21 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
             Contaminacion = 60,
         };
         await this._repositorioRecurso.Agregar(recurso);
+        await this._unidadDeTrabajo.CommitAsync();
     }
 
-    public async Task<RecursoDTO> ObtenerRecursos(int idPartida)
+    public async Task<Recurso> ObtenerRecursos(int idPartida)
     {
         Recurso recursoPartida = await this._repositorioRecurso.ObtenerRecursosPartida(idPartida);
 
         // Si no hay recursos o son menos de 4, error
         if (recursoPartida == null)
             throw new PartidaExcepcion("No se encontraron recursos para la partida especificada.");
-        
-        return new RecursoDTO
-        {
-            Energia = recursoPartida.Energia,
-            Felicidad = recursoPartida.Felicidad,
-            EcoCoins = recursoPartida.EcoCoins,
-            Contaminacion = recursoPartida.Contaminacion,
-        };
+
+        return recursoPartida;
     }
-
-    public RecursoDTO ToDto(Recurso entidad)
-    {
-        return new();
-    }
-
-
-public async Task ModificarEnergia(int idPartida, int cantidad)
+    
+    public async Task ModificarEnergia(int idPartida, int cantidad)
     {
         // Buscamos el recurso "Energía" de la partida
         Recurso recurso = await _repositorioRecurso.ObtenerRecursosPartida(idPartida);
@@ -80,5 +62,6 @@ public async Task ModificarEnergia(int idPartida, int cantidad)
 
         // Guardamos los cambios
         await _repositorioRecurso.Actualizar(recurso);
+        await this._unidadDeTrabajo.CommitAsync();
     }
 }

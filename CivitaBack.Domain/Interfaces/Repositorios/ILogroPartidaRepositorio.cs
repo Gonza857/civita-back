@@ -11,7 +11,6 @@ namespace CivitaBack.Domain.Interfaces.Repositorios
         Task<List<Logro>> ObtenerLogrosParaReclamarQueNoEstenCumplidos(List<int> idsLogros);
 
         Task<List<Logro>> ObtenerLogrosNoCumplidos(int idPartida);
-
-        Task AgregarVarios(List<LogroPartida> entidades);
+        
     }
 }

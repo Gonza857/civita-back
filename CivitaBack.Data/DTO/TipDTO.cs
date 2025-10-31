@@ -1,4 +1,4 @@
-﻿using CivitaBack.Data.BO;
+﻿using CivitaBack.Domain.Entidades;
 
 namespace CivitaBack.Data.DTO
 {

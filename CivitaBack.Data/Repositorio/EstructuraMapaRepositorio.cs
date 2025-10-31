@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
-public class EstructuraMapaRepositorio : GenericoRepositorio<EstructuraMapa, EstructuraMapaEF>, IEstructuraMapaRepositorio
+public class EstructuraMapaRepositorio 
+    : GenericoRepositorio<EstructuraMapa, EstructuraMapaEF>, IEstructuraMapaRepositorio
 {
     public EstructuraMapaRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
@@ -65,9 +66,12 @@ public class EstructuraMapaRepositorio : GenericoRepositorio<EstructuraMapa, Est
 
     public async Task EliminarAsync(EstructuraMapa entidad)
     {
-        var entidadEF = Mapear<EstructuraMapaEF>(entidad);
-
-        _dbSet.Remove(entidadEF);
+        await base.Eliminar(entidad.Id);
     }
 
+    public async Task<EstructuraMapa?> ObtenerPorId(int id)
+    {
+        var em = await base.ObtenerPorId(e => e.Id == id);
+        return base.Mapear<EstructuraMapa>(em);
+    }
 }

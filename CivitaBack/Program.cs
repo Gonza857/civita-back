@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Hubs;
 using CivitaBack.Domain.Interfaces.Repositorios;
 
@@ -73,7 +74,7 @@ builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 builder.Services.AddScoped<ICicloRepositorio, CicloRepositorio>();
 builder.Services.AddScoped<ICicloLogica, CicloLogica>();
 
-builder.Services.AddScoped<ITipsLogica, TipsLogica>();
+builder.Services.AddScoped<ITipsLogica, TipLogica>();
 builder.Services.AddScoped<ITipsRepositorio, TipsRepositorio>();
 
 builder.Services.AddScoped<ITipoTipLogica, TipoTipLogica>();
@@ -91,8 +92,12 @@ builder.Services.AddScoped<IEventoRepositorio, EventoRepositorio>();
 builder.Services.AddSingleton<BackgroundCicloLogica>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundCicloLogica>());
 
-
-
+builder.Services.AddAutoMapper(cfg => 
+{
+    // Aquí adentro podrías agregar configuraciones globales
+    // si las necesitaras, pero para tu caso, lo dejamos vacío.
+    
+}, typeof(Program));
 
 builder.Services.AddSignalR();
 builder.Services.AddScoped<ICondicionRepositorio, CondicionRepositorio>();

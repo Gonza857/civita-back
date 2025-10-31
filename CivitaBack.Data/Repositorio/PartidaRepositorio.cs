@@ -41,14 +41,10 @@ public class PartidaRepositorio
         return partida;
     }
 
-    public Task<List<Partida>> ObtenerPartidas()
+    public async Task<Partida?> ObtenerPorId(int id)
     {
-        throw new NotImplementedException();
-    }
-
-    public void Guardar(Partida partida)
-    {
-        throw new NotImplementedException();
+        var partida = await base.ObtenerPorId(e => e.Id == id);
+        return base.Mapear<Partida>(partida);
     }
 
     public override async Task<List<Partida>> ObtenerTodos()
@@ -59,11 +55,7 @@ public class PartidaRepositorio
             .ToListAsync();
         return base.MapearLista<Partida>(partidas);
     }
-
-    public Task GuardarCambios()
-    {
-        throw new NotImplementedException();
-    }
+    
 
     public async Task<Partida?> ObtenerPorUsuarioId(int idUsuario)
     {
@@ -169,11 +161,7 @@ public class PartidaRepositorio
             .ToListAsync();
         return base.MapearLista<EstructuraMapa>(estructuraMapaEf);
     }
-
-    public Task Actualizar(Partida partida)
-    {
-        return base.Actualizar(partida);
-    }
+    
 
     public async Task<List<Partida>> ObtenerTodasConEstructurasYRecursosAsync()
     {

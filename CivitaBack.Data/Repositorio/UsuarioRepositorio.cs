@@ -31,5 +31,10 @@ public class UsuarioRepositorio
         await base.Agregar(usuario);
         return usuario;
     }
-    
+
+    public async Task<Usuario?> ObtenerPorId(int id)
+    {
+        var usuario = await base.ObtenerPorId(e => e.Id == id);
+        return base.Mapear<Usuario>(usuario);
+    }
 }

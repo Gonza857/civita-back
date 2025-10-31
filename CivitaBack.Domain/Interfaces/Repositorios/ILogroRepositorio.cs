@@ -6,6 +6,5 @@ namespace CivitaBack.Domain.Interfaces.Repositorios
     {
         Task<bool> ExisteLogroEnCumplidos(int idLogro);
         Task<Logro?> ObtenerPorId(int id);
-        Task<List<Logro>> ObtenerTodos();
     }
 }

@@ -11,7 +11,7 @@ public class CondicionRepositorio : GenericoRepositorio<Condicion, CondicionEF>,
 {
     public CondicionRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
-    public override async Task<Condicion?> ObtenerPorId(int id)
+    public async Task<Condicion?> ObtenerPorId(int id)
     {
         var entidadEF = await _dbSet
             .Include(c => c.Estructura) 

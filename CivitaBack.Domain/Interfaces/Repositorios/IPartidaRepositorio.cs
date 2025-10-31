@@ -4,13 +4,8 @@ namespace CivitaBack.Domain.Interfaces.Repositorios
 {
     public interface IPartidaRepositorio : IRepositorioBase<Partida>
     {
-        Task GuardarCambios();
-
-        Task<Partida?> ObtenerPorUsuarioId(int IdUsuario);
+        Task<Partida?> ObtenerPorUsuarioId(int idUsuario);
         Task<Partida> CrearPartida(int idUsuario);
-        Task<List<Partida>> ObtenerPartidas();
-        void Guardar(Partida partida);
-
         Task<bool> ActualizarMapaAsync(Partida partida);
         
         Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId);

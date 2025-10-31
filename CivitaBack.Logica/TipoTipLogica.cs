@@ -1,20 +1,12 @@
 ﻿using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
 
-public interface ITipoTipLogica
-{
-    Task<List<TipoTipDTO>> Listado();
-    Task Eliminar(int id);
-    Task Guardar(TipoTipDTO tipoTipDto);
-    Task<TipoTipDTO> ObtenerPorId(int id);
-    Task Actualizar(TipoTipDTO tipoTipDto, int id);
-}
-
-public class TipoTipLogica : ITipoTipLogica, IParser<TipoTip, TipoTipDTO>
+public class TipoTipLogica : ITipoTipLogica
 {
     
     private readonly ITipoTipRepositorio _repositorioTipoTip;
@@ -25,12 +17,9 @@ public class TipoTipLogica : ITipoTipLogica, IParser<TipoTip, TipoTipDTO>
     }
 
 
-    public async Task<List<TipoTipDTO>> Listado()
+    public async Task<List<TipoTip>> Listado()
     {
-        var tiposTip = await this._repositorioTipoTip.ObtenerTodos();
-        return tiposTip
-            .Select(tt => this.ToDto(tt))
-            .ToList();
+        return await this._repositorioTipoTip.ObtenerTodos(); 
     }
 
     public async Task Eliminar(int id)
@@ -41,7 +30,7 @@ public class TipoTipLogica : ITipoTipLogica, IParser<TipoTip, TipoTipDTO>
         await this._repositorioTipoTip.Eliminar(id);
     }
 
-    public async Task Guardar(TipoTipDTO tipoTipDto)
+    public async Task Guardar(TipoTip tipoTipDto)
     {
         TipoTip nuevo = new TipoTip
         {
@@ -50,15 +39,15 @@ public class TipoTipLogica : ITipoTipLogica, IParser<TipoTip, TipoTipDTO>
         await this._repositorioTipoTip.Agregar(nuevo);
     }
 
-    public async Task<TipoTipDTO> ObtenerPorId(int id)
+    public async Task<TipoTip> ObtenerPorId(int id)
     {
         TipoTip? buscado = await this._repositorioTipoTip.ObtenerPorId(id);
         if (buscado == null) 
             throw new Exception($"Tipo de tipo no encontrado: {id}");
-        return this.ToDto(buscado);
+        return buscado;
     }
 
-    public async Task Actualizar(TipoTipDTO tipoTipDto, int id)
+    public async Task Actualizar(TipoTip tipoTipDto, int id)
     {
         TipoTip? buscado = await this._repositorioTipoTip.ObtenerPorId(id);
         if (buscado == null) 
@@ -68,13 +57,5 @@ public class TipoTipLogica : ITipoTipLogica, IParser<TipoTip, TipoTipDTO>
         
         await this._repositorioTipoTip.Actualizar(buscado);
     }
-
-    public TipoTipDTO ToDto(TipoTip entidad)
-    {
-        return new TipoTipDTO
-        {
-            Id = entidad.Id,
-            Descripcion = entidad.Descripcion,
-        };
-    }
+    
 }

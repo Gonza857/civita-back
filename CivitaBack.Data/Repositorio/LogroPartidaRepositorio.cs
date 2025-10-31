@@ -72,7 +72,7 @@ public class LogroPartidaRepositorio
 
     public async Task<LogroPartida?> ObtenerPorId(int id)
     {
-        var lpEf = await base.ObtenerPorId(id);
+        var lpEf = await base.ObtenerPorId(e => e.PartidaId == id);
         return base.Mapear<LogroPartida>(lpEf);
     }
 
@@ -82,37 +82,6 @@ public class LogroPartidaRepositorio
         return base.MapearLista<LogroPartida>(listaLogroPartidaEf);
     }
 
-    public Task Actualizar(LogroPartida entidad)
-    {
-        this.ActualizarEditado(entidad);
-        base.Actualizar(entidad);
-        return Task.CompletedTask;
-    }
-
-    public Task Eliminar(int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Guardar(LogroPartida entidad)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task Agregar(LogroPartida entidad)
-    {
-        this.ActualizarCreado(entidad);
-        var entidadParaGuardar = base.Mapear<LogroPartidaEF>(entidad);
-        await _context.LogroPartida.AddAsync(entidadParaGuardar);
-    }
-
-    public async Task AgregarVarios(List<LogroPartida> entidades)
-    {
-        foreach (var e in entidades) this.ActualizarCreado(e);
-        await base.AgregarVarios(entidades);
-    }
-    
-    private void ActualizarEditado(LogroPartida entidad) => entidad.Editado = DateTime.UtcNow;
-    private void ActualizarCreado(LogroPartida entidad) => entidad.Creado = DateTime.UtcNow;
+ 
     
 }
