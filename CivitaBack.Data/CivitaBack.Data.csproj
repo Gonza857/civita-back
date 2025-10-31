@@ -34,4 +34,8 @@
 	  <ProjectReference Include="..\CivitaBack.Utils\CivitaBack.Utils.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Interfaces\" />
+	</ItemGroup>
+
 </Project>
