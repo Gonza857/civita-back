@@ -18,7 +18,7 @@ public interface IPartidaLogica
     // 🆕 Métodos de mapa
     Task ActualizarMapaDePartidaAsync(GuardarMapaDTO dto);
     
-    Task ReclamarLogros(Partida partida, List<LogroDTO> logros);
+    Task ReclamarLogros(Partida partida, List<Logro> logros);
     Task<Partida?> ObtenerMapaAsync(int partidaId);
 }
 
@@ -198,14 +198,14 @@ public class PartidaLogica : IPartidaLogica
             await this._unidadDeTrabajo.CommitAsync();
         }
     }
-    public async Task ReclamarLogros(Partida partida, List<LogroDTO> logrosDto)
+    public async Task ReclamarLogros(Partida partida, List<Logro> logros)
     {
         if (partida == null) throw new PartidaExcepcion("Ocurrió un error al reclamar los logros");
 
         var logrosDb = await this._logroRepositorio.ObtenerTodos();
 
         var logrosCoincidentes = logrosDb
-            .Where(l => logrosDto.Any(dto => dto.Id == l.Id))
+            .Where(l => logros.Any(dto => dto.Id == l.Id))
             .ToList();
 
         List<Condicion> recompensas = logrosCoincidentes
@@ -237,6 +237,8 @@ public class PartidaLogica : IPartidaLogica
         }
 
         await this._recursoRepositorio.Actualizar(recursoPartida);
+
+        await this._unidadDeTrabajo.CommitAsync();
     }
 
 

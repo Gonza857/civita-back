@@ -3,7 +3,6 @@ using CivitaBack.Utils;
 using Microsoft.Extensions.Logging;
 
 using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
 
 using CivitaBack.Logica.Excepciones;
 

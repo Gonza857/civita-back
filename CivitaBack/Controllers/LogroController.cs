@@ -1,4 +1,7 @@
-﻿using CivitaBack.Data.DTO;
+﻿using AutoMapper;
+using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Excepciones;
 using Microsoft.AspNetCore.Mvc;
@@ -8,14 +11,17 @@ namespace CivitaBack.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class LogroController : ControllerBase
+public class LogroController : BaseApiController
 {
     private readonly ILogroLogica _logroLogica;
     private readonly IPartidaLogica _partidaLogica;
-    public LogroController(ILogroLogica ill, IPartidaLogica ipl)
+    protected readonly IMapper _mapper;
+
+    public LogroController(ILogroLogica ill, IPartidaLogica ipl, IMapper mapper) : base(mapper)
     {
         this._logroLogica = ill;
         this._partidaLogica = ipl;
+        this._mapper = mapper;
     }
 
     [HttpGet]
@@ -24,7 +30,7 @@ public class LogroController : ControllerBase
         try
         {
             var logros = await _logroLogica.ObtenerListado();
-            return Ok(logros);
+            return Ok(base.MapearLista<LogroDTO>(logros));
         }
         catch (LogroExcepcion ex)
         {
@@ -44,7 +50,7 @@ public class LogroController : ControllerBase
             var logros = await _logroLogica.ObtenerListadoInterno();
             var partida = await _partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
             var logrosDisponiblesParaCumplir = await _logroLogica.ComprobarSiCumpleAlgunLogro(partida, logros);
-            return Ok(logrosDisponiblesParaCumplir);
+            return Ok(base.MapearLista<LogroDTO>(logrosDisponiblesParaCumplir));
         }
         catch (LogroExcepcion ex)
         {
@@ -81,13 +87,14 @@ public class LogroController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Guardar([FromBody] LogroDTO? nuevoLogro)
+    public async Task<IActionResult> Guardar([FromBody] LogroDTO? nuevoLogroDTO)
     {
-        if (nuevoLogro == null)
+        if (nuevoLogroDTO == null)
             return BadRequest("Los datos recibidos son inválidos");
         try
         {
-            await _logroLogica.Crear(nuevoLogro);
+            Logro nuevoLogroDominio = base.Mapear<Logro>(nuevoLogroDTO);
+            await _logroLogica.Crear(nuevoLogroDominio);
             return Ok();
         }
         catch (LogroExcepcion ex)
@@ -120,7 +127,7 @@ public class LogroController : ControllerBase
         try
         {
             var logro = await this._logroLogica.ObtenerPorId(id);
-            return Ok(logro);
+            return Ok(base.Mapear<LogroDTO>(logro));
         }
         catch (Exception ex)
         {
@@ -136,7 +143,8 @@ public class LogroController : ControllerBase
         
         try
         {
-            await this._logroLogica.Actualizar(logroDTO, id);
+            Logro logro = base.Mapear<Logro>(logroDTO);
+            await this._logroLogica.Actualizar(logro, id);
             return Ok();
         }
         catch (Exception ex)

@@ -1,5 +1,4 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
+﻿using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
@@ -9,7 +8,7 @@ namespace CivitaBack.Logica;
 
 public interface IRecursoLogica
 {
-    Task ConfigurarInicial(PartidaEF partida);
+    Task ConfigurarInicial(Partida partida);
 
     Task<RecursoDTO> ObtenerRecursos(int idPartida);
     Task ModificarEnergia(int idPartida, int cantidad);
@@ -26,7 +25,7 @@ public class RecursoLogica : IRecursoLogica, IParser<Recurso, RecursoDTO>
         _repositorioRecurso = rr;
     }
 
-    public async Task ConfigurarInicial(PartidaEF partida)
+    public async Task ConfigurarInicial(Partida partida)
     {
         if (partida == null) throw new PartidaExcepcion("No se proporcionó Partida");
         Recurso recurso = new Recurso

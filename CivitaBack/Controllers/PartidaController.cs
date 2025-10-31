@@ -1,6 +1,8 @@
 ﻿using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Excepciones;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +11,7 @@ namespace CivitaBack.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PartidaController : ControllerBase
+    public class PartidaController : BaseApiController
     {
         private readonly IPartidaLogica _partidaLogica;
         private readonly IRecursoLogica _recursoLogica;
@@ -278,7 +280,9 @@ namespace CivitaBack.Api.Controllers
         {
             try
             {
-                await _estructuraMapaLogica.EliminarEstructuraAsync(dto);
+                var estructuraMapa = base.Mapear<EstructuraMapa>(dto);
+
+                await _estructuraMapaLogica.EliminarEstructuraAsync(estructuraMapa);
                 return Ok("Estructura eliminada correctamente");
             }
             catch (InvalidOperationException ex)
