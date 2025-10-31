@@ -2,6 +2,7 @@
 using AutoMapper;
 using CivitaBack.Data.BO;
 using Microsoft.EntityFrameworkCore;
+using CivitaBack.Utils;
 
 namespace CivitaBack.Data.Repositorio;
 

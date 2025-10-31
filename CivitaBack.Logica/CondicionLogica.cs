@@ -1,7 +1,7 @@
 ﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
 using CivitaBack.Data.Enum;
-using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Entities;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
 using CivitaBack.Utils;
 
@@ -20,7 +20,7 @@ public interface ICondicionLogica
     
 }
 
-public class CondicionLogica : ICondicionLogica, IParser<CondicionEF, CondicionDTO>
+public class CondicionLogica : ICondicionLogica, IParser<Condicion, CondicionDTO>
 {
     private readonly ICondicionRepositorio _condicionRepositorio;
     private readonly IEstructuraRepositorio estructuraRepositorio;
@@ -51,11 +51,11 @@ public class CondicionLogica : ICondicionLogica, IParser<CondicionEF, CondicionD
     {
         this.ValidarCondicionDTO(condicionDto);
 
-        var condicion = new CondicionEF();
+        var condicion = new Condicion();
 
         if (condicionDto.EstructuraId.HasValue)
         {
-            EstructuraEF e = await this.estructuraRepositorio.ObtenerPorId(condicionDto.EstructuraId.Value);
+            Estructura e = await estructuraRepositorio.ObtenerPorId(condicionDto.EstructuraId.Value);
             if (e != null)
             {
                 condicion.EstructuraId = e.Id;
@@ -71,7 +71,7 @@ public class CondicionLogica : ICondicionLogica, IParser<CondicionEF, CondicionD
 
         condicion.Cantidad = condicionDto.Cantidad;
 
-        await this._condicionRepositorio.Agregar(condicion);
+        await _condicionRepositorio.Agregar(condicion);
     }
 
     /// <summary>
@@ -106,14 +106,14 @@ public class CondicionLogica : ICondicionLogica, IParser<CondicionEF, CondicionD
 
         this.ValidarCondicionDTO(condicionDto);
 
-        CondicionEF? condicionDb = await this._condicionRepositorio.ObtenerPorId(id);
+        Condicion? condicionDb = await this._condicionRepositorio.ObtenerPorId(id);
         if (condicionDb == null)
             throw new CondicionExcepcion("Ocurrió un error al actualizar la Condicion");
 
 
         if (condicionDto.EstructuraId.HasValue)
         {
-            EstructuraEF e = await this.estructuraRepositorio.ObtenerPorId(condicionDto.EstructuraId.Value);
+            Estructura e = await this.estructuraRepositorio.ObtenerPorId(condicionDto.EstructuraId.Value);
             if (e != null)
             {
                 condicionDb.EstructuraId = e.Id;
@@ -127,7 +127,7 @@ public class CondicionLogica : ICondicionLogica, IParser<CondicionEF, CondicionD
             condicionDb.EstructuraId = null;
         }
         
-        CondicionEF? recompensaDb;
+        Condicion? recompensaDb;
         if (condicionDto.RecompensaId.HasValue)
         {
             recompensaDb = await this._condicionRepositorio.ObtenerPorId(condicionDto.RecompensaId.Value);
@@ -156,11 +156,11 @@ public class CondicionLogica : ICondicionLogica, IParser<CondicionEF, CondicionD
     {
         this.ValidarRecompensaDTO(recompensaDto);
 
-        var recompensa = new CondicionEF();
+        var recompensa = new Condicion();
 
         if (recompensaDto.EstructuraId.HasValue)
         {
-            EstructuraEF? e = await this.estructuraRepositorio.ObtenerPorId(recompensaDto.EstructuraId.Value);
+            Estructura? e = await this.estructuraRepositorio.ObtenerPorId(recompensaDto.EstructuraId.Value);
             if (e != null)
             {
                 recompensa.EstructuraId = e.Id;
@@ -216,7 +216,7 @@ public class CondicionLogica : ICondicionLogica, IParser<CondicionEF, CondicionD
             throw new CondicionExcepcion("La cantidad de la recompensa no puede ser menor a 0");
     }
 
-    private CondicionDTO ToRecompensaDto(CondicionEF recompensa)
+    private CondicionDTO ToRecompensaDto(Condicion recompensa)
     {
         CondicionDTO c = new CondicionDTO
         {
@@ -227,7 +227,7 @@ public class CondicionLogica : ICondicionLogica, IParser<CondicionEF, CondicionD
         return c;
     }
 
-    public CondicionDTO ToDto(CondicionEF entidad)
+    public CondicionDTO ToDto(Condicion entidad)
     {
         var dto = new CondicionDTO
         {

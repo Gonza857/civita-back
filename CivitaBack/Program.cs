@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using CivitaBack.Logica.Hubs;
+using CivitaBack.Domain.Interfaces.Repositorios;
 
 var builder = WebApplication.CreateBuilder(args);
 

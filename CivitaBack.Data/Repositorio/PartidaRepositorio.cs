@@ -169,4 +169,22 @@ public class PartidaRepositorio
             .ToListAsync();
         return base.MapearLista<EstructuraMapa>(estructuraMapaEf);
     }
+
+    public Task Actualizar(Partida partida)
+    {
+        return base.Actualizar(partida);
+    }
+
+    public async Task<List<Partida>> ObtenerTodasConEstructurasYRecursosAsync()
+    {
+        var listaPartidasEF = await _dbSet
+             .Include(p => p.Recursos)
+             .Include(p => p.EstructuraMapa)
+             .ThenInclude(em => em.Estructura)
+             .ThenInclude(e => e.TipoEstructura)
+             .AsNoTracking()
+             .ToListAsync();
+
+        return MapearLista<Partida>(listaPartidasEF);
+    }
 }

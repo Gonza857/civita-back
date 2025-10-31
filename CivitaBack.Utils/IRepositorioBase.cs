@@ -1,4 +1,4 @@
-﻿namespace CivitaBack.Data.Repositorio;
+﻿namespace CivitaBack.Utils;
 
 public interface IRepositorioBase<TDominio> where TDominio : class
 {

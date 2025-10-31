@@ -2,30 +2,23 @@
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Data.BO;
+using AutoMapper;
 
 namespace CivitaBack.Data.Repositorio;
 
-public class EstructuraRepositorio : GenericoRepositorio, IEstructuraRepositorio
+public class EstructuraRepositorio : GenericoRepositorio<Estructura, EstructuraEF>, IEstructuraRepositorio
 {
-    public EstructuraRepositorio(AppDbContext context) : base(context) { }
-    
+    public EstructuraRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
+
     public async Task Actualizar(Estructura entidad)
     {
-        entidad.Editado = DateTime.UtcNow;
-        await _context.Estructura.AddAsync(entidad);
-        await base.GuardarCambiosAsync();
+        await base.Actualizar(entidad);
     }
 
     public async Task Eliminar(int id)
     {
-        var estructura = await _context.Estructura
-            .FirstOrDefaultAsync(tl => tl.Id == id);
-        
-        if (estructura != null)
-        { 
-            _context.Estructura.Remove(estructura);
-            await base.GuardarCambiosAsync();
-        }
+        await base.Eliminar(id);
     }
 
     public Task Guardar(Estructura entidad)
@@ -35,8 +28,7 @@ public class EstructuraRepositorio : GenericoRepositorio, IEstructuraRepositorio
 
     public async Task Agregar(Estructura entidad)
     {
-        await _context.Estructura.AddAsync(entidad);
-        await _context.SaveChangesAsync();
+        await base.Agregar(entidad);
     }
 
     public Task AgregarVarios(List<Estructura> entidades)
@@ -49,17 +41,23 @@ public class EstructuraRepositorio : GenericoRepositorio, IEstructuraRepositorio
         throw new NotImplementedException();
     }
 
-    public async Task<Estructura?> ObtenerPorId(int id)
+    public override async Task<Estructura?> ObtenerPorId(int id)
     {
-        return await _context.Estructura
+        var entidadEF = await _dbSet
             .Include(e => e.TipoEstructura)
+            .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == id);
+
+        return Mapear<Estructura>(entidadEF);
     }
 
-    public async Task<List<Estructura>> ObtenerTodos()
+    public override async Task<List<Estructura>> ObtenerTodos()
     {
-        return await _context.Estructura
+        var estructurasEF = await _dbSet
             .Include(e => e.TipoEstructura)
+            .AsNoTracking()
             .ToListAsync();
+
+        return MapearLista<Estructura>(estructurasEF);
     }
 }

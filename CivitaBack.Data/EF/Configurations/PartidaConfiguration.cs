@@ -30,8 +30,6 @@ namespace CivitaBack.Data.EF.Configurations
             builder.HasMany(p => p.EstructuraMapa)
                    .WithOne(em => em.Partida)
                    .HasForeignKey(em => em.PartidaId);
-
-            // N:N a través de LogroPartida ya está en OnModelCreating o se mueve luego
         }
     }
 }
