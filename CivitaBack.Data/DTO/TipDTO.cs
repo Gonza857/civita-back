@@ -1,4 +1,5 @@
-﻿using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Data.BO;
+using CivitaBack.Domain.Entidades;
 
 namespace CivitaBack.Data.DTO
 {
@@ -11,6 +12,6 @@ namespace CivitaBack.Data.DTO
         public bool EfectoFiltro { get; set; }
         public int TipoId {  get; set; }
         public string? TipoTipDescripcion { get; set; }
-        public List<TipEnPartida>? TipEnPartida { get; set; }
+        public List<TipEnPartidaEF>? TipEnPartida { get; set; }
     }
 }

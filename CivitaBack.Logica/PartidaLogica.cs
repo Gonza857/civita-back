@@ -69,7 +69,7 @@ public class PartidaLogica : IPartidaLogica
         
         try
         {
-            await this._repositorioPartida.GuardarCambios();
+            await this._repositorioPartida.Agregar(partidaBuscada);
             await this._unidadDeTrabajo.CommitAsync();
         }
         catch (Exception ex)
@@ -106,7 +106,7 @@ public class PartidaLogica : IPartidaLogica
     // 📜 OBTENER TODAS LAS PARTIDAS
     public async Task<List<Partida>> ObtenerPartidas()
     {
-        return await this._repositorioPartida.ObtenerPartidas();
+        return await this._repositorioPartida.ObtenerTodos();
     }
 
     public async Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario)
@@ -205,6 +205,8 @@ public class PartidaLogica : IPartidaLogica
         }
 
         await this._recursoRepositorio.Actualizar(recursoPartida);
+
+        await this._unidadDeTrabajo.CommitAsync();
     }
     
 

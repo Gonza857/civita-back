@@ -1,14 +1,15 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Text.RegularExpressions;
-using CivitaBack.Data.DTO;
+﻿using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
 using CivitaBack.Logica.Helpers;
+using CivitaBack.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CivitaBack.Logica
 {
@@ -22,27 +23,19 @@ namespace CivitaBack.Logica
     {
         private readonly IUsuarioRepositorio _repositorioUsuario;
         private readonly IConfiguration _configuration;
+        private readonly IUnidadDeTrabajo _uow;
 
-        public AuthLogica(IUsuarioRepositorio repositorioUsuario, IConfiguration configuration)
+        public AuthLogica(IUsuarioRepositorio repositorioUsuario, IConfiguration configuration, IUnidadDeTrabajo uow)
         {
             _repositorioUsuario = repositorioUsuario;
             _configuration = configuration;
-
+            _uow = uow;
         }
 
         public async Task<RegistroResponse> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password)
         {
-            if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(mail) || string.IsNullOrWhiteSpace(password))
-                throw new ValidacionRegistroException("Todos los campos son obligatorios.");
-
             if (await _repositorioUsuario.ObtenerUsuarioPorMail(mail) != null)
                 throw new ValidacionRegistroException("El correo ya está en uso.");
-
-            if (!Regex.IsMatch(mail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                throw new ValidacionRegistroException("El correo no tiene un formato válido.");
-
-            if (password.Length < 4)
-                throw new ValidacionRegistroException("La contraseña debe tener al menos 4 caracteres.");
 
             var hash = PasswordHelper.HashPassword(password);
 

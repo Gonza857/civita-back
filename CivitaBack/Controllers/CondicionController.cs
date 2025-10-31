@@ -1,4 +1,6 @@
-﻿using CivitaBack.Logica;
+﻿using AutoMapper;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Excepciones;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,13 +8,14 @@ namespace CivitaBack.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CondicionController: ControllerBase
+public class CondicionController: BaseApiController
 {
     private readonly ICondicionLogica _condicionLogica;
-    
-    public CondicionController(ICondicionLogica icl)
+    private readonly IMapper _mapper;
+    public CondicionController(ICondicionLogica icl, IMapper mapper) : base(mapper)
     {
         this._condicionLogica = icl;
+        this._mapper = mapper;
     }
     
     [HttpGet]
@@ -21,7 +24,8 @@ public class CondicionController: ControllerBase
         try
         {
             var condiciones = await _condicionLogica.ObtenerListado();
-            return Ok(condiciones);
+            var condicionesDto = base.MapearLista<CondicionDTO>(condiciones);
+            return Ok(condicionesDto);
         }
         catch (Exception)
         {
@@ -36,7 +40,8 @@ public class CondicionController: ControllerBase
         try
         {
             var recompensas = await _condicionLogica.ObtenerListadoRecompensas();
-            return Ok(recompensas);
+            var recompensasDto = base.MapearLista<CondicionDTO>(recompensas);
+            return Ok(recompensasDto);
         }
         catch (Exception)
         {
@@ -51,7 +56,9 @@ public class CondicionController: ControllerBase
             return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
         try
         {
-            await _condicionLogica.Crear(condicionNueva);
+            var condicionEntidad = base.Mapear<Condicion>(condicionNueva);
+
+            await _condicionLogica.Crear(condicionEntidad);
             return Ok();
         }
         catch (CondicionExcepcion ex)
@@ -71,7 +78,9 @@ public class CondicionController: ControllerBase
             return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
         try
         {
-            await _condicionLogica.CrearRecompensa(recompensaNueva);
+            var recompensaEntidad = base.Mapear<Condicion>(recompensaNueva);
+
+            await _condicionLogica.CrearRecompensa(recompensaEntidad);
             return Ok();
         }
         catch (CondicionExcepcion ex)
@@ -104,7 +113,8 @@ public class CondicionController: ControllerBase
         try
         {
             var condicion = await this._condicionLogica.ObtenerPorId(id);
-            return Ok(condicion);
+            var condicionDto = base.Mapear<CondicionDTO>(condicion);
+            return Ok(condicionDto);
         }
         catch (Exception ex)
         {
@@ -120,7 +130,9 @@ public class CondicionController: ControllerBase
 
         try
         {
-            await this._condicionLogica.Actualizar(condicionDto, id);
+            var condicionEntidad = base.Mapear<Condicion>(condicionDto);
+
+            await this._condicionLogica.Actualizar(condicionEntidad, id);
             return Ok();
         }
         catch (CondicionExcepcion ex)

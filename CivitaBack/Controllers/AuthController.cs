@@ -2,13 +2,12 @@
 using CivitaBack.Data;
 using Microsoft.AspNetCore.Mvc;
 using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Excepciones;
 
 
 namespace CivitaBack.Api.Controllers
 {
-
-    [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {

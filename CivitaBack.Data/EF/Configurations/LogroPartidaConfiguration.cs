@@ -1,4 +1,4 @@
-﻿using CivitaBack.Domain.Entities;
+﻿using CivitaBack.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Reflection.Emit;

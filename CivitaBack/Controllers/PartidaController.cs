@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
-using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
-using CivitaBack.Data.Repositorio;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
@@ -258,24 +256,22 @@ public class PartidaController : BaseApiController
         }
     }
 
-    [HttpDelete("expo/eliminar-estructura")]
-    public async Task<IActionResult> EliminarEstructura([FromBody] EliminarEstructuraDTO dto)
-    {
-        try
+        [HttpDelete("expo/eliminar-estructura")]
+        public async Task<IActionResult> EliminarEstructura([FromBody] EliminarEstructuraDTO dto)
         {
-            await _estructuraMapaLogica.EliminarEstructuraAsync(dto);
-            return Ok("Estructura eliminada correctamente");
+            try
+            {
+                await _estructuraMapaLogica.EliminarEstructuraAsync(base.Mapear<EstructuraMapa>(dto));
+                return Ok("Estructura eliminada correctamente");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Problem("Error eliminando la estructura");
+            }
         }
-        catch (InvalidOperationException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem("Error eliminando la estructura");
-        }
-    }
-
-    
 }

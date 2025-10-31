@@ -42,26 +42,28 @@ namespace CivitaBack.Logica
             Recurso recursosPartida = partida.Recursos;
             int nuevaPoblacion = 0;
 
-            foreach (var estructuraEnMapa in partida.EstructuraMapa)
+            if (partida.EstructuraMapa != null)
             {
+                foreach (var estructuraEnMapa in partida.EstructuraMapa)
+                {
+                    if (estructuraEnMapa.Estructura == null || estructuraEnMapa.Estructura.TipoEstructura == null)
+                        continue;
 
-                if (estructuraEnMapa.Estructura == null || estructuraEnMapa.Estructura.TipoEstructura == null)
-                    continue;
+                    var estructura = estructuraEnMapa.Estructura;
+                    var tipoEstructura = estructura.TipoEstructura;
 
-                var estructura = estructuraEnMapa.Estructura;
-                var tipoEstructura = estructura.TipoEstructura;
+                    recursosPartida.Energia =
+                        ActualizarRecurso(recursosPartida.Energia, tipoEstructura.EnergiaPorCiclo, true);
+                    recursosPartida.EcoCoins =
+                        ActualizarRecurso(recursosPartida.EcoCoins, tipoEstructura.DineroPorCiclo, false);
+                    recursosPartida.Felicidad =
+                        ActualizarRecurso(recursosPartida.Felicidad, estructura.FelicidadCiclo, true);
+                    recursosPartida.Contaminacion =
+                        ActualizarRecurso(recursosPartida.Contaminacion, estructura.ContaminacionCiclo, true);
 
-                recursosPartida.Energia =
-                    ActualizarRecurso(recursosPartida.Energia, tipoEstructura.EnergiaPorCiclo, true);
-                recursosPartida.EcoCoins =
-                    ActualizarRecurso(recursosPartida.EcoCoins, tipoEstructura.DineroPorCiclo, false);
-                recursosPartida.Felicidad =
-                    ActualizarRecurso(recursosPartida.Felicidad, estructura.FelicidadCiclo, true);
-                recursosPartida.Contaminacion =
-                    ActualizarRecurso(recursosPartida.Contaminacion, estructura.ContaminacionCiclo, true);
-
-                if (tipoEstructura.Capacidad > 0)
-                    nuevaPoblacion += tipoEstructura.Capacidad;
+                    if (tipoEstructura.Capacidad > 0)
+                        nuevaPoblacion += tipoEstructura.Capacidad;
+                }
             }
 
             if (recursosPartida.Contaminacion > 70)
