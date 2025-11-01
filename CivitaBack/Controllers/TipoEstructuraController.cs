@@ -25,7 +25,7 @@ public class TipoEstructuraController : BaseApiController
         try
         {
             var tiposEstructura = await this._tipoEstructuraLogica.Listado();
-            return Ok(base.MapearLista<EstructuraDTO>(tiposEstructura));
+            return Ok(base.MapearLista<TipoEstructuraDTO>(tiposEstructura));
         }
         catch (Exception ex)
         {

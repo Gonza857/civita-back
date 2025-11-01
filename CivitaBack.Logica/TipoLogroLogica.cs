@@ -15,9 +15,9 @@ public class TipoLogroLogica : ITipoLogroLogica
         repositorioTipoLogro = rtl;
     }
 
-    private void ValidarTipoLogro(TipoLogro TipoLogro, int idTipoLogro)
+    private void ValidarTipoLogro(TipoLogro tipoLogro)
     {
-        if (TipoLogro == null || idTipoLogro <= 0) 
+        if (tipoLogro == null) 
             throw new TipoLogroException("Ocurrió un error al actualizar el Tipo de Logro");
     }
 
@@ -28,7 +28,7 @@ public class TipoLogroLogica : ITipoLogroLogica
     /// <param name="idTipoLogro">Id de Tipo Logro</param>
     public async Task Actualizar(TipoLogro tipoLogro, int idTipoLogro)
     {
-        this.ValidarTipoLogro(tipoLogro, idTipoLogro);
+        this.ValidarTipoLogro(tipoLogro);
         var tipoLogroBuscado = await this.repositorioTipoLogro.ObtenerPorId(idTipoLogro);
         if (tipoLogroBuscado == null)
             throw new TipoLogroException("Tipo de Logro no encontrado");
@@ -51,18 +51,18 @@ public class TipoLogroLogica : ITipoLogroLogica
     /// <summary>
     /// Guarda un Tipo de logro
     /// </summary>
-    /// <param name="TipoLogro">TipoLogro</param>
-    public async Task<TipoLogro> Guardar(TipoLogro TipoLogro)
+    /// <param name="tipoLogro">tipoLogro</param>
+    public async Task<TipoLogro> Guardar(TipoLogro tipoLogro)
     {
-        this.ValidarTipoLogro(TipoLogro, TipoLogro.Id);
+        this.ValidarTipoLogro(tipoLogro);
         
-        var tipoLogro = new TipoLogro
+        var tl = new TipoLogro
         {
-            Nombre = TipoLogro.Nombre
+            Nombre = tipoLogro.Nombre
         }; 
         
-        await this.repositorioTipoLogro.Agregar(tipoLogro);
-        return this.TipoLogroToDTO(tipoLogro);
+        await this.repositorioTipoLogro.Agregar(tl);
+        return tl;
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class TipoLogroLogica : ITipoLogroLogica
         var tipoLogro = await this.repositorioTipoLogro.ObtenerPorId(id);
         if (tipoLogro == null) 
             throw new TipoLogroException("No se pudo encontrar el Tipo de Logro");
-        return this.TipoLogroToDTO(tipoLogro);
+        return tipoLogro;
     }
     
     /// <summary>
@@ -82,22 +82,8 @@ public class TipoLogroLogica : ITipoLogroLogica
     /// </summary>
     public async Task<List<TipoLogro>> ObtenerTiposLogro()
     {
-        var tiposDeLogros = await this.repositorioTipoLogro.ObtenerTodos();
-        return tiposDeLogros
-          .Select(p => this.TipoLogroToDTO(p))
-          .ToList();
+        return await this.repositorioTipoLogro.ObtenerTodos();
     }
 
-    /// <summary>
-    /// Convierte entidad de dominio a DTO
-    /// </summary>
-    /// <param name="entidad">Tipo Logro</param>
-    private TipoLogro TipoLogroToDTO(TipoLogro entidad)
-    {
-        return new TipoLogro
-        {
-            Id = entidad.Id,
-            Nombre = entidad.Nombre,
-        };
-    }
+ 
 }

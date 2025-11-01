@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251101010630_datos_con_fecha_seed")]
+    partial class datos_con_fecha_seed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -558,128 +561,6 @@ namespace CivitaBack.Data.Migrations
                     b.HasIndex("TipoId");
 
                     b.ToTable("Tip");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = false,
-                            ElementoAdicional = "",
-                            Expresion = "vitaSaluda",
-                            Mensaje = "¡Hola!, soy Vita ",
-                            TipoId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = false,
-                            ElementoAdicional = "",
-                            Expresion = "PulgarArribaVita",
-                            Mensaje = "Te doy la bienvenida a Neocivita ",
-                            TipoId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = false,
-                            ElementoAdicional = "",
-                            Expresion = "vitaPregunta",
-                            Mensaje = "Antes de empezar, ¿cómo te llamás?",
-                            TipoId = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = false,
-                            ElementoAdicional = "",
-                            Expresion = "vitaExplica2",
-                            Mensaje = "En Neocivita aprenderás sobre el impacto ecológico que tienen nuestras decisiones al construir y mantener una ciudad.",
-                            TipoId = 1
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = false,
-                            ElementoAdicional = "",
-                            Expresion = "vitaDecidida",
-                            Mensaje = "¿Creés que podés lograr el equilibrio entre economía, sociedad y ambiente?",
-                            TipoId = 1
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = true,
-                            ElementoAdicional = "ecoCoinBrillante",
-                            Expresion = "vitaExplica2",
-                            Mensaje = "Estas son las EcoCoins, la moneda para adquirir construcciones en tu ciudad.",
-                            TipoId = 1
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = false,
-                            ElementoAdicional = "ecoCoin",
-                            Expresion = "vitaExplica",
-                            Mensaje = "Podés conseguirlas con edificaciones industriales o completando misiones. ¡Acompañame a ver las demás!",
-                            TipoId = 1
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = false,
-                            ElementoAdicional = "energiaCoin",
-                            Expresion = "vitaCansada",
-                            Mensaje = "Te presento la energía eléctrica: podés obtenerla con construcciones específicas que la generen, como un panel solar.",
-                            TipoId = 1
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = false,
-                            ElementoAdicional = "contaminacionCoin",
-                            Expresion = "vitaPensativa",
-                            Mensaje = "Ahora… la CONTAMINACIÓN. Este recurso destruye tu ciudad y el planeta. ¡Tené cuidado!",
-                            TipoId = 1
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = false,
-                            ElementoAdicional = "felicidadCoin",
-                            Expresion = "vitaDecidida",
-                            Mensaje = "La FELICIDAD refleja qué tan saludable y feliz está tu población. ¡Es muy importante!",
-                            TipoId = 1
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = false,
-                            ElementoAdicional = "",
-                            Expresion = "vitaFesteja",
-                            Mensaje = "Ahora que conocés los recursos del juego… ¡acompañame a jugar y empecemos a construir!",
-                            TipoId = 1
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EfectoFiltro = false,
-                            ElementoAdicional = "",
-                            Expresion = "vitaFesteja",
-                            Mensaje = "¡Registrate para empezar a construir nuestra ciudad!",
-                            TipoId = 1
-                        });
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.TipEnPartidaEF", b =>
