@@ -19,7 +19,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica
 {
     private readonly ILogroPartidaRepositorio _repositorioLogroPartida;
     private readonly IRecursoRepositorio _recursoRepositorio;
-    private readonly IUnidadDeTrabajo _unidadDeTrabajo;
+    private readonly IUnidadDeTrabajo _uow;
     private readonly ILogger<LogroPartidaLogica> _logger;
     
     public LogroPartidaLogica(
@@ -31,7 +31,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica
     {
         _repositorioLogroPartida = rlp;
         _recursoRepositorio = irr;
-        _unidadDeTrabajo = iudt;
+        _uow = iudt;
         _logger = logger;
     }
     
@@ -86,15 +86,17 @@ public class LogroPartidaLogica : ILogroPartidaLogica
         
         await this._repositorioLogroPartida.AgregarVarios(logrosCumplidosParaAgregar); // Agrego logros para guardar
         await this._recursoRepositorio.Actualizar(partidaValidada.Recursos!); // Actualizo recuros
-        await this._unidadDeTrabajo.CommitAsync();
+        await this._uow.CommitAsync();
     }
 
     /// <inheritdoc />
     public async Task ReiniciarLogros(int partidaId)
     {
         await _repositorioLogroPartida.ReiniciarLogrosPartida(partidaId);
+
+        await this._uow.CommitAsync();
     }
-    
+
     /// <summary>
     /// Modifica un objeto <see cref="Recurso"/> en memoria, sumando las cantidades de las recompensas.
     /// </summary>
@@ -104,7 +106,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica
     /// Utiliza reflexión de forma optimizada (con un diccionario) para actualizar las propiedades
     /// del objeto Recurso basándose en <c>NombreColumna</c>.
     /// </remarks>
-    private void AplicarRecompensasRecurso(Recurso recursoPartida, List<Condicion> recompensas)
+    private async void AplicarRecompensasRecurso(Recurso recursoPartida, List<Condicion> recompensas)
     {
         // Optimización: Cachear propiedades de Recurso en un diccionario
         var propiedadesIntRecurso = typeof(Recurso)
@@ -131,6 +133,8 @@ public class LogroPartidaLogica : ILogroPartidaLogica
                 Console.WriteLine($"⚠️ Propiedad {recompensa.NombreColumna} no encontrada o no es int/escribible en Recurso");
             }
         }
+
+        await this._uow.CommitAsync();
     }
 
     /// <summary>

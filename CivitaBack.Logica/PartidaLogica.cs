@@ -13,21 +13,21 @@ public class PartidaLogica : IPartidaLogica
     private readonly IRecursoRepositorio _recursoRepositorio;
     private readonly IEstructuraMapaRepositorio _repositorioEstructuraMapa;
     private readonly ILogroRepositorio _logroRepositorio;
-    private readonly IUnidadDeTrabajo _unidadDeTrabajo;
+    private readonly IUnidadDeTrabajo _uow;
     
     public PartidaLogica(
         IPartidaRepositorio rp, 
         IRecursoRepositorio irr, 
         IEstructuraMapaRepositorio em, 
         ILogroRepositorio ilr,
-        IUnidadDeTrabajo unidadDeTrabajo
+        IUnidadDeTrabajo uow
         )
     {
         this._repositorioPartida = rp;
         this._recursoRepositorio = irr;
         this._repositorioEstructuraMapa = em;
         this._logroRepositorio = ilr;
-        this._unidadDeTrabajo = unidadDeTrabajo;
+        this._uow = uow;
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public class PartidaLogica : IPartidaLogica
         try
         {
             await this._repositorioPartida.Agregar(partidaBuscada);
-            await this._unidadDeTrabajo.CommitAsync();
+            await this._uow.CommitAsync();
         }
         catch (Exception ex)
         {
@@ -93,7 +93,7 @@ public class PartidaLogica : IPartidaLogica
         try
         {
             var partida = await this._repositorioPartida.CrearPartida(idUsuario);
-            await this._unidadDeTrabajo.CommitAsync();
+            await this._uow.CommitAsync();
             return partida;
         }
         catch (Exception ex)
@@ -162,7 +162,7 @@ public class PartidaLogica : IPartidaLogica
             _repositorioEstructuraMapa.AgregarNuevas(nuevas);
 
             // 3️⃣ Guardar cambios
-            await this._unidadDeTrabajo.CommitAsync();
+            await this._uow.CommitAsync();
         }
     }
     
@@ -206,7 +206,7 @@ public class PartidaLogica : IPartidaLogica
 
         await this._recursoRepositorio.Actualizar(recursoPartida);
 
-        await this._unidadDeTrabajo.CommitAsync();
+        await this._uow.CommitAsync();
     }
     
 
@@ -225,6 +225,8 @@ public class PartidaLogica : IPartidaLogica
         partida.JsonMapa = mapaReconstruido;
 
         await _repositorioPartida.ActualizarMapaAsync(partida);
+
+        await _uow.CommitAsync();
 
         return partida;
     }

@@ -1,5 +1,4 @@
-﻿using CivitaBack.Data.DTO;
-using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
@@ -10,10 +9,12 @@ public class TipoTipLogica : ITipoTipLogica
 {
     
     private readonly ITipoTipRepositorio _repositorioTipoTip;
+    private readonly IUnidadDeTrabajo _uow;
 
-    public TipoTipLogica(ITipoTipRepositorio rtt)
+    public TipoTipLogica(ITipoTipRepositorio rtt, IUnidadDeTrabajo uow)
     {
         _repositorioTipoTip = rtt;
+        _uow = uow;
     }
 
 
@@ -28,6 +29,7 @@ public class TipoTipLogica : ITipoTipLogica
         if (tipoTipDb == null)
             throw new Exception($"Tipo de tipo no encontrado: {id}");
         await this._repositorioTipoTip.Eliminar(id);
+        await _uow.CommitAsync();
     }
 
     public async Task Guardar(TipoTip tipoTipDto)
@@ -37,6 +39,7 @@ public class TipoTipLogica : ITipoTipLogica
             Descripcion = tipoTipDto.Descripcion,
         };
         await this._repositorioTipoTip.Agregar(nuevo);
+        await _uow.CommitAsync();
     }
 
     public async Task<TipoTip> ObtenerPorId(int id)
@@ -56,6 +59,8 @@ public class TipoTipLogica : ITipoTipLogica
         buscado.Descripcion = tipoTipDto.Descripcion;
         
         await this._repositorioTipoTip.Actualizar(buscado);
+
+        await _uow.CommitAsync();
     }
-    
+
 }

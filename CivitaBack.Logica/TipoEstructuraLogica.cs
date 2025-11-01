@@ -8,12 +8,12 @@ namespace CivitaBack.Logica;
 public class TipoEstructuraLogica : ITipoEstructuraLogica
 {
     private readonly ITipoEstructuraRepositorio _repositorioTipoEstructura;
-    private readonly IUnidadDeTrabajo _unidadDeTrabajo;
+    private readonly IUnidadDeTrabajo _uow;
     
-    public TipoEstructuraLogica(ITipoEstructuraRepositorio rte, IUnidadDeTrabajo unidadDeTrabajo)
+    public TipoEstructuraLogica(ITipoEstructuraRepositorio rte, IUnidadDeTrabajo uow)
     {
         _repositorioTipoEstructura = rte;
-        _unidadDeTrabajo = unidadDeTrabajo;
+        _uow = uow;
     }
 
     private void Validar(TipoEstructura tipoEstructura, int idTipoEstructura)
@@ -41,7 +41,7 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
         tipoEstructuraBuscada.DineroPorCiclo = tipoEstructura.DineroPorCiclo;
         
         await this._repositorioTipoEstructura.Actualizar(tipoEstructuraBuscada);
-        await this._unidadDeTrabajo.CommitAsync();
+        await this._uow.CommitAsync();
     }
     
     /// <summary>
@@ -53,7 +53,7 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
         if (id <= 0) 
             throw new Exception("No se pudo borrar el Tipo de Estructura");
         await this._repositorioTipoEstructura.Eliminar(id);
-        await this._unidadDeTrabajo.CommitAsync();
+        await this._uow.CommitAsync();
     }
     
     /// <summary>
@@ -74,7 +74,7 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
         }; 
         
         await this._repositorioTipoEstructura.Agregar(tipoEstructura);
-        await this._unidadDeTrabajo.CommitAsync();
+        await this._uow.CommitAsync();
         return tipoEstructura;
     }
     

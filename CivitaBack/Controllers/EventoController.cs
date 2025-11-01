@@ -1,8 +1,8 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
+﻿using CivitaBack.Domain.Entidades;
 using CivitaBack.Logica;
-using Microsoft.AspNetCore.Http;
+using CivitaBack.Logica.Hubs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CivitaBack.Api.Controllers
 {
@@ -11,9 +11,12 @@ namespace CivitaBack.Api.Controllers
     public class EventoController : ControllerBase
     {
         private readonly IEventoLogica _eventoLogica;
-        public EventoController(IEventoLogica eventoLogica)
+        private readonly IHubContext<EventoHub> _hubContext;
+
+        public EventoController(IEventoLogica eventoLogica, IHubContext<EventoHub> hubContext)
         {
             _eventoLogica = eventoLogica;
+            _hubContext = hubContext;
         }
 
         [HttpPost("disparar/{partidaId}")]
@@ -22,6 +25,10 @@ namespace CivitaBack.Api.Controllers
             try
             {
                 var eventoDisparado = await _eventoLogica.DispararEventoAsync(partidaId);
+
+                await _hubContext.Clients.Group(partidaId.ToString())
+                .SendAsync("EventoDisparado", eventoDisparado);
+
                 return Ok(eventoDisparado);
             }
             catch (Exception ex)
@@ -37,6 +44,9 @@ namespace CivitaBack.Api.Controllers
             try
             {
                 var resultado = await _eventoLogica.ResolverEventoAsync(eventoId, acepto);
+
+                await _hubContext.Clients.Group(resultado.PartidaId.ToString())
+                .SendAsync("EventoResuelto", resultado);
 
                 return Ok(resultado);
             }
