@@ -1,23 +1,28 @@
-﻿using CivitaBack.Logica;
+﻿using AutoMapper;
+using CivitaBack.Logica;
 using CivitaBack.Data;
 using Microsoft.AspNetCore.Mvc;
 using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Excepciones;
 
 
 namespace CivitaBack.Api.Controllers
 {
-
-    [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseApiController
     {
         private readonly IAuthLogica _authLogica;
         private readonly IPartidaLogica _partidaLogica;
         private readonly IUsuarioLogica _usuarioLogica;
         private readonly IRecursoLogica _recursoLogica;
 
-        public AuthController(IAuthLogica authLogica , IPartidaLogica partidaLogica, IUsuarioLogica usuarioLogica, IRecursoLogica recursoLogica)
+        public AuthController(
+            IAuthLogica authLogica , 
+            IPartidaLogica partidaLogica, 
+            IUsuarioLogica usuarioLogica, 
+            IRecursoLogica recursoLogica,
+            IMapper mapper): base(mapper)
         {
             _authLogica = authLogica;
             _partidaLogica = partidaLogica;

@@ -1,9 +1,7 @@
 using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
+using CivitaBack.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
-using System;
-using System.Linq;
 
 namespace CivitaBack.Tests
 {
@@ -64,7 +62,7 @@ namespace CivitaBack.Tests
             var options = CreateNewContextOptions();
             using var context = new AppDbContext(options);
 
-            var usuario = new Usuario
+            var usuario = new UsuarioEF
             {
                 NombreUsuario = "TestUser",
                 Mail = "test@test.com",
@@ -73,7 +71,7 @@ namespace CivitaBack.Tests
             context.Usuario.Add(usuario);
             context.SaveChanges();
 
-            var partida = new Partida
+            var partida = new PartidaEF
             {
                 UsuarioId = usuario.Id,
                 UltimaVez = DateTime.Now,
@@ -97,7 +95,7 @@ namespace CivitaBack.Tests
             var options = CreateNewContextOptions();
             using var context = new AppDbContext(options);
 
-            var usuario = new Usuario
+            var usuario = new UsuarioEF
             {
                 NombreUsuario = "TestUser2",
                 Mail = "test2@test.com",
@@ -122,7 +120,7 @@ namespace CivitaBack.Tests
             using var context = new AppDbContext(options);
 
             // Get the entity type for LogroPartida
-            var entityType = context.Model.FindEntityType(typeof(LogroPartida));
+            var entityType = context.Model.FindEntityType(typeof(LogroPartidaEF));
 
             // Act
             var primaryKey = entityType?.FindPrimaryKey();
@@ -172,7 +170,7 @@ namespace CivitaBack.Tests
             var options = CreateNewContextOptions();
             using var context = new AppDbContext(options);
 
-            var tipoLogro = new TipoLogro
+            var tipoLogro = new TipoLogroEF
             {
                 Nombre = "Logro de Prueba"
             };
@@ -213,7 +211,7 @@ namespace CivitaBack.Tests
             var options = CreateNewContextOptions();
             using var context = new AppDbContext(options);
 
-            var tipoTip = new TipoTip
+            var tipoTip = new TipoTipEF
             {
                 Descripcion = "Tip de prueba"
             };

@@ -1,56 +1,73 @@
-﻿using CivitaBack.Data.DTO;
+﻿using AutoMapper;
+using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
-using CivitaBack.Logica.Excepciones;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
 
-[Route("api/[controller]")]
-[ApiController]
-public class LogroPartidaController : ControllerBase
+[Route("api/Partida")]
+public class LogroPartidaController : BaseApiController
 {
     private readonly ILogroPartidaLogica _logroPartidaLogica;
+    private readonly IPartidaLogica _partidaLogica;
 
-    public LogroPartidaController(ILogroPartidaLogica lpl)
+    public LogroPartidaController(ILogroPartidaLogica lpl, IPartidaLogica ipl, IMapper mapper) : base(mapper)
     {
         this._logroPartidaLogica = lpl;
+        this._partidaLogica = ipl;
     }
 
-    [HttpGet("Completos/{idUsuario}")]
-    public async Task<IActionResult> ListadoLogrosCompletados(int idUsuario)
+    [HttpGet("{idUsuario}/Reclamar")]
+    public async Task<IActionResult> ReclamarLogros(int idUsuario)
     {
         try
         {
-            List<LogroDTO> logros = await this._logroPartidaLogica.ObtenerLogrosCompletados(idUsuario);
-            return Ok(logros);
+            Partida? partida = await this._partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
+            await _logroPartidaLogica.ReclamarLogros(partida);
+            return Ok();
         }
-        catch (LogroPartidaExcepcion ex)
+        catch (Exception e)
         {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return Problem("Ocurrió un error al obtener los logros completados.");
+            return Problem("Ocurrió un error al reclamar los logros");
         }
     }
 
-    [HttpGet("Incompletos/{idUsuario}")]
-    public async Task<IActionResult> ListadoLogrosIncompletos(int idUsuario)
+    [HttpGet("{idUsuario}/Logros")]
+    public async Task<IActionResult> ObtenerLogrosPartida(int idUsuario, [FromQuery] string? status)
     {
         try
         {
-            List<LogroDTO> logros = await this._logroPartidaLogica.ObtenerLogrosIncompletos(idUsuario);
-            return Ok(logros);
+            Partida? partida = await this._partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
+
+            var logros = await (status?.ToLower().Trim() switch
+            {
+                // 1. No obtenidos
+                "incompletos" => _logroPartidaLogica.ObtenerLogrosIncompletos(partida),
+
+                // 2. Para reclamar (completos pero no cobrados)
+                "para_reclamar" => _logroPartidaLogica.ObtenerLogrosParaReclamar(partida),
+                
+                // 4. Caso por defecto (si status es null o string vacío)
+                null or "" or "reclamados" => _logroPartidaLogica.ObtenerLogrosCompletados(partida),
+
+                // 5. El "Churrasco"
+                _ => throw new ArgumentException($"El status '{status}' no es válido.")
+            });
+
+            return Ok(base.MapearLista<LogroDTO>(logros));
         }
-        catch (LogroPartidaExcepcion ex)
+        catch (ArgumentException ex) // Captura el "churrasco"
         {
-            return BadRequest(ex.Message);
+            // Esto devuelve un 400 Bad Request
+            return BadRequest(new { mensaje = ex.Message });
         }
         catch (Exception ex)
         {
-            return Problem("Ocurrió un error al obtener los logros no completados.");
+            // _logger.LogError(ex, "Error al obtener logros para partida {PartidaId}", partidaId);
+            // Esto devuelve un 500 Internal Server Error
+            return Problem("Error al obtener logros");
         }
     }
-
 }

@@ -1,85 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoMapper;
 using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
 using CivitaBack.Data.EF;
+using CivitaBack.Domain.Common;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
-public interface IEstructuraMapaRepositorio
+public class EstructuraMapaRepositorio 
+    : GenericoRepositorio<EstructuraMapa, EstructuraMapaEF>, IEstructuraMapaRepositorio
 {
-    void AgregarUnica(EstructuraMapa em);
-    void RemoverEliminadas(List<EstructuraMapa> emList);
-    void AgregarNuevas(List<EstructuraMapa> emList);
-    Task GuardarCambios();
-    Task EliminarPorPartidaIdAsync(int partidaId);
-    Task AgregarVariasAsync(List<EstructuraMapa> estructuras);
-    Task<EstructuraMapa?> ObtenerCoincidenteAsync(EliminarEstructuraDTO dto);
-    Task EliminarAsync(EstructuraMapa entidad);
-
-
-}
-
-public class EstructuraMapaRepositorio : GenericoRepositorio, IEstructuraMapaRepositorio
-{
-    public EstructuraMapaRepositorio(AppDbContext context) : base(context) { }
-    
-    
+    public EstructuraMapaRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
     public void AgregarUnica(EstructuraMapa em)
     {
-        em.Editado = DateTime.UtcNow;
-        _context.EstructuraMapa.Update(em);
+        if (em is Auditable auditable) auditable.Editado = DateTime.UtcNow;
+
+        var emEF = Mapear<EstructuraMapaEF>(em);
+
+        _dbSet.Update(emEF);
     }
 
     public void RemoverEliminadas(List<EstructuraMapa> emList)
     {
-        _context.EstructuraMapa.RemoveRange(emList);
+        var eliminadasEF = Mapear<List<EstructuraMapaEF>>(emList);
+
+        _context.EstructuraMapa.RemoveRange(eliminadasEF);
     }
 
-    public void AgregarNuevas(List<EstructuraMapa> emList)
+    public async Task AgregarNuevas(List<EstructuraMapa> emList)
     {
-        _context.EstructuraMapa.AddRange(emList);
-    }
-    
-    public async Task GuardarCambios()
-    {
-        await base.GuardarCambiosAsync();
+        await base.AgregarVarios(emList);
     }
 
     public async Task EliminarPorPartidaIdAsync(int partidaId)
     {
-        var existentes = _context.EstructuraMapa.Where(e => e.PartidaId == partidaId);
-        _context.EstructuraMapa.RemoveRange(existentes);
-        await _context.SaveChangesAsync();
+        var existentesEF = await _dbSet
+            .Where(e => e.PartidaId == partidaId)
+            .ToListAsync();
+
+        _dbSet.RemoveRange(existentesEF);
     }
 
     public async Task AgregarVariasAsync(List<EstructuraMapa> estructuras)
     {
-        await _context.EstructuraMapa.AddRangeAsync(estructuras);
-        await _context.SaveChangesAsync();
+        await base.AgregarVarios(estructuras);
     }
 
-    public async Task<EstructuraMapa?> ObtenerCoincidenteAsync(EliminarEstructuraDTO dto)
+    public async Task<EstructuraMapa?> ObtenerCoincidenteAsync(int partidaId, int estructuraId, int x, int y, int width, int height)
     {
-        return await _context.EstructuraMapa.FirstOrDefaultAsync(e =>
-                e.PartidaId == dto.PartidaId &&
-                e.EstructuraId == dto.EstructuraId &&
-                e.X == dto.X &&
-                e.Y == dto.Y &&
-                e.Width == dto.Width &&
-                e.Height == dto.Height
+        var entidadEF = await _dbSet
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e =>
+                e.PartidaId == partidaId &&
+                e.EstructuraId == estructuraId &&
+                e.X == x &&
+                e.Y == y &&
+                e.Width == width &&
+                e.Height == height
             );
+
+        return Mapear<EstructuraMapa>(entidadEF);
     }
 
     public async Task EliminarAsync(EstructuraMapa entidad)
     {
-        _context.EstructuraMapa.Remove(entidad);
-        await Task.CompletedTask;
+        await base.Eliminar(entidad.Id);
     }
 
+    public async Task<EstructuraMapa?> ObtenerPorId(int id)
+    {
+        var em = await base.ObtenerPorId(e => e.Id == id);
+        return base.Mapear<EstructuraMapa>(em);
+    }
 }

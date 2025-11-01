@@ -1,4 +1,4 @@
-﻿using CivitaBack.Data.BO;
+using CivitaBack.Domain.Entidades;
 
 namespace CivitaBack.Tests;
 
@@ -10,7 +10,7 @@ public static class TestData
         NombreUsuario = "Jugador1",
         Mail = "test@ejemplo.com"
     };
-    
+
     public static Partida CrearPartida(Usuario usuario) => new Partida
     {
         Id = 1,
@@ -31,19 +31,19 @@ public static class TestData
             partida.LogroPartidas.Add(lp);
         }
     }
-    
+
     public static Recurso CrearRecurso(
-        Partida partida, 
+        Partida partida,
         int energiaQty, int felicidadQty, int contaminacionQty, int dineroQty
         ) => new Recurso
-    {
-        Id = 1,
-        Energia = energiaQty,
-        Felicidad = felicidadQty,
-        EcoCoins = dineroQty,
-        Contaminacion = contaminacionQty,
-        Partida = partida
-    };
+        {
+            Id = 1,
+            Energia = energiaQty,
+            Felicidad = felicidadQty,
+            EcoCoins = dineroQty,
+            Contaminacion = contaminacionQty,
+            Partida = partida
+        };
     public static TipoLogro CrearTipoLogro(string tipo) => new TipoLogro
     {
         Id = 1,
@@ -57,6 +57,7 @@ public static class TestData
         TipoLogro = tipo,
         Condicion = condicion,
     };
+
     public static Condicion CrearCondicion(string nombreColumna, int cantidad) => new Condicion
     {
         Id = 1,
@@ -73,8 +74,8 @@ public static class TestData
         EstructuraId = estructuraId,
         EsRecompensa = true,
     };
-    
-    public static CondicionDTO CrearRecompensaDTO(int cantidad, string? columna = null, int? estructuraId = null) => new CondicionDTO
+
+    public static Condicion CrearRecompensaDTO(int cantidad, string? columna = null, int? estructuraId = null) => new Condicion
     {
         Id = 1,
         NombreColumna = columna,

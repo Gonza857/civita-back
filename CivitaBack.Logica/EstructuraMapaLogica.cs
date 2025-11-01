@@ -1,55 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
-using CivitaBack.Data.Repositorio;
+﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
+using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
 
-public interface IEstructuraMapaLogica
-{
-    void Colocar (Estructura e, Partida p);
-
-    Task ReiniciarEstructurasDePartida(int idPartida);
-    Task EliminarEstructuraAsync(EliminarEstructuraDTO dto);
-
-}
 public class EstructuraMapaLogica : IEstructuraMapaLogica
 {
-    private readonly IEstructuraMapaRepositorio estructuraMapaRepositorio;
+    private readonly IEstructuraMapaRepositorio _estructuraMapaRepositorio;
+    private readonly IUnidadDeTrabajo _uow;
 
-    public EstructuraMapaLogica(IEstructuraMapaRepositorio emr)
+    public EstructuraMapaLogica(IEstructuraMapaRepositorio emr, IUnidadDeTrabajo uow)
     {
-        estructuraMapaRepositorio = emr;
+        _estructuraMapaRepositorio = emr;
+        _uow = uow;
     }
-
-    public void Colocar(Estructura e, Partida p)
-    {
-        EstructuraMapa em = new EstructuraMapa
-        {
-           Estructura = e,
-           Partida = p
-        };
-        this.estructuraMapaRepositorio.GuardarCambios();
-    }
-
+    
     public async Task ReiniciarEstructurasDePartida(int idPartida)
     {
-        await this.estructuraMapaRepositorio.EliminarPorPartidaIdAsync(idPartida);
+        await this._estructuraMapaRepositorio.EliminarPorPartidaIdAsync(idPartida);
+
+        await _uow.CommitAsync();
     }
 
-    public async Task EliminarEstructuraAsync(EliminarEstructuraDTO dto)
+    public async Task EliminarEstructuraAsync(EstructuraMapa em)
     {
-        var entidad = await estructuraMapaRepositorio.ObtenerCoincidenteAsync(dto);
+        var entidad = await _estructuraMapaRepositorio.ObtenerCoincidenteAsync(em.PartidaId, em.EstructuraId, em.X, em.Y, em.Width,
+            em.Height);
 
         if (entidad is null)
             throw new InvalidOperationException("No se encontró la estructura a eliminar");
 
-        await estructuraMapaRepositorio.EliminarAsync(entidad);
-        await estructuraMapaRepositorio.GuardarCambios();
+        await _estructuraMapaRepositorio.EliminarAsync(entidad);
+        
+        await this._uow.CommitAsync();
     }
 
 }

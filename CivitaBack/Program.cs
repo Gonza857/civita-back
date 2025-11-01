@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Hubs;
+using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,13 +70,9 @@ builder.Services.AddScoped<ILogroPartidaLogica, LogroPartidaLogica>();
 builder.Services.AddScoped<IEstructuraMapaLogica, EstructuraMapaLogica>();
 builder.Services.AddScoped<IEstructuraMapaRepositorio, EstructuraMapaRepositorio>();
 
-builder.Services.AddScoped<IAuthLogica, AuthLogica>();
-
-builder.Services.AddScoped<ICicloRepositorio, CicloRepositorio>();
-builder.Services.AddScoped<ICicloLogica, CicloLogica>();
-
-builder.Services.AddScoped<ITipsLogica, TipsLogica>();
+builder.Services.AddScoped<ITipLogica, TipLogica>();
 builder.Services.AddScoped<ITipsRepositorio, TipsRepositorio>();
+
 
 builder.Services.AddScoped<ITipoTipLogica, TipoTipLogica>();
 builder.Services.AddScoped<ITipoTipRepositorio, TipoTipRepositorio>();
@@ -87,11 +86,19 @@ builder.Services.AddScoped<ITipoEstructuraLogica, TipoEstructuraLogica>();
 builder.Services.AddScoped<IEventoLogica, EventoLogica>();
 builder.Services.AddScoped<IEventoRepositorio, EventoRepositorio>();
 
+builder.Services.AddScoped<IAuthLogica, AuthLogica>();
+builder.Services.AddScoped<ICicloLogica, CicloLogica>();
+builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
+
 builder.Services.AddSingleton<BackgroundCicloLogica>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundCicloLogica>());
 
-
-
+builder.Services.AddAutoMapper(cfg => 
+{
+    // Aquí adentro podrías agregar configuraciones globales
+    // si las necesitaras, pero para tu caso, lo dejamos vacío.
+    
+}, typeof(Program));
 
 builder.Services.AddSignalR();
 builder.Services.AddScoped<ICondicionRepositorio, CondicionRepositorio>();

@@ -13,17 +13,8 @@
     <Compile Remove="Migrations\20251018153035_test.Designer.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="DTO\mapa_base.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="DTO\mapa_base.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
 	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="15.1.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -39,7 +30,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\CivitaBack.Domain\CivitaBack.Domain.csproj" />
 	  <ProjectReference Include="..\CivitaBack.Utils\CivitaBack.Utils.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Interfaces\" />
 	</ItemGroup>
 
 </Project>

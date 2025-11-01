@@ -1,4 +1,5 @@
 using CivitaBack.Data.BO;
+using CivitaBack.Domain.Entidades;
 using Xunit;
 
 namespace CivitaBack.Tests

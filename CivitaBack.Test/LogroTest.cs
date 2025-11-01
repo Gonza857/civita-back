@@ -1,4 +1,5 @@
 using CivitaBack.Data.BO;
+using CivitaBack.Domain.Entidades;
 using Xunit;
 
 namespace CivitaBack.Tests
@@ -9,7 +10,7 @@ namespace CivitaBack.Tests
         public void Logro_Constructor_InitializesProperties()
         {
             // Act
-            var logro = new Logro();
+            var logro = new LogroEF();
 
             // Assert
             Assert.Equal(0, logro.Id);
@@ -47,7 +48,7 @@ namespace CivitaBack.Tests
         public void Logro_WithNullValues_PropertiesCanBeNull()
         {
             // Arrange
-            var logro = new Logro
+            var logro = new LogroEF
             {
                 Id = 1,
                 Titulo = null,
@@ -68,12 +69,12 @@ namespace CivitaBack.Tests
         public void Logro_DefaultDescripcion_IsEmptyString()
         {
             // Act
-            var logro = new Logro();
+            var logro = new LogroEF();
 
             // Assert
             Assert.Equal(string.Empty, logro.Descripcion);
         }
-        
-        
+
+
     }
 }

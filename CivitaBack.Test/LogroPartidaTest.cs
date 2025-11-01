@@ -9,7 +9,7 @@ namespace CivitaBack.Tests
         public void LogroPartida_Constructor_InitializesProperties()
         {
             // Act
-            var logroPartida = new LogroPartida();
+            var logroPartida = new LogroPartidaEF();
 
             // Assert
             Assert.Equal(0, logroPartida.LogroId);
@@ -22,9 +22,9 @@ namespace CivitaBack.Tests
         public void LogroPartida_SetProperties_ValuesAreSet()
         {
             // Arrange
-            var logroPartida = new LogroPartida();
-            var logro = new Logro { Id = 1 };
-            var partida = new Partida { Id = 1 };
+            var logroPartida = new LogroPartidaEF();
+            var logro = new LogroEF { Id = 1 };
+            var partida = new PartidaEF { Id = 1 };
 
             // Act
             logroPartida.LogroId = 1;
@@ -43,7 +43,7 @@ namespace CivitaBack.Tests
         public void LogroPartida_WithNullValues_PropertiesCanBeNull()
         {
             // Arrange
-            var logroPartida = new LogroPartida
+            var logroPartida = new LogroPartidaEF
             {
                 LogroId = 0,
                 Logro = null,

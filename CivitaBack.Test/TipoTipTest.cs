@@ -1,4 +1,5 @@
 using CivitaBack.Data.BO;
+using CivitaBack.Domain.Entidades;
 using Xunit;
 
 namespace CivitaBack.Tests
@@ -13,7 +14,7 @@ namespace CivitaBack.Tests
 
             // Assert
             Assert.Equal(0, tipoTip.Id);
-            Assert.Null(tipoTip.Descripcion);
+            Assert.Equal("", tipoTip.Descripcion);
             
         }
 

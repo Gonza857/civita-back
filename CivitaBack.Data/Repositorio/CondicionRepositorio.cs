@@ -1,61 +1,75 @@
-﻿using CivitaBack.Data.BO;
+﻿using AutoMapper;
+using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
-public interface ICondicionRepositorio : IRepositorioBase<Condicion>
+public class CondicionRepositorio : GenericoRepositorio<Condicion, CondicionEF>, ICondicionRepositorio
 {
-    Task<List<Condicion>> ObtenerTodasRecompensas();
-}
-public class CondicionRepositorio : GenericoRepositorio, ICondicionRepositorio
-{
-    public CondicionRepositorio(AppDbContext context) : base(context) { }
+    public CondicionRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
     public async Task<Condicion?> ObtenerPorId(int id)
     {
-        return await _context.Condicion
-            .Include(c => c.Estructura)
-            .FirstOrDefaultAsync(tl => tl.Id == id);
+        var entidadEF = await _dbSet
+            .Include(c => c.Estructura) 
+            .AsNoTracking()
+            .FirstOrDefaultAsync(tl => tl.Id == id); 
+
+        return Mapear<Condicion>(entidadEF);
     }
 
-    public async Task<List<Condicion>> ObtenerTodos()
+    public override async Task<List<Condicion>> ObtenerTodos()
     {
-        return await _context.Condicion
+        var listaEF = await _dbSet
             .Where(c => !c.EsRecompensa)
             .Include(c => c.Estructura)
             .Include(c => c.Recompensa)
+            .AsNoTracking()
             .ToListAsync();
+
+        return MapearLista<Condicion>(listaEF);
     }
 
-    public async Task Actualizar(Condicion entidad)
+    public new Task Actualizar(Condicion entidad)
     {
-        entidad.Editado = DateTime.UtcNow;
-        _context.Condicion.Update(entidad);
-        await base.GuardarCambiosAsync();
+        return base.Actualizar(entidad);
     }
 
-    public async Task Eliminar(int id)
+    public new Task Eliminar(int id)
     {
-        var entidad = await _context.Condicion.FirstOrDefaultAsync(tl => tl.Id == id);
-        if (entidad != null)
-        {
-            _context.Condicion.Remove(entidad);
-            await base.GuardarCambiosAsync();
-        }
+        return base.Eliminar(id);
     }
 
-    public async Task Guardar(Condicion entidad)
+    public Task Guardar(Condicion entidad)
     {
-        entidad.Creado = DateTime.UtcNow;
-        await _context.Condicion.AddAsync(entidad);
-        await base.GuardarCambiosAsync();
+        throw new NotImplementedException();
+    }
+
+    public new Task Agregar(Condicion entidad)
+    {
+        return base.Agregar(entidad);
+    }
+
+    public Task AgregarVarios(List<Condicion> entidades)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Guardar()
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<List<Condicion>> ObtenerTodasRecompensas()
     {
-        return await _context.Condicion
+        var listaEF = await _dbSet
             .Where(c => c.EsRecompensa)
+            .AsNoTracking()
             .ToListAsync();
+
+        return MapearLista<Condicion>(listaEF);
     }
 }

@@ -1,89 +1,193 @@
-using CivitaBack.Data.BO;
+using AutoMapper;
+using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica;
+using CivitaBack.Logica.Hubs;
+using CivitaBack.Utils;
+using Microsoft.AspNetCore.SignalR;
+using Moq;
 using Xunit;
 
 namespace CivitaBack.Tests
 {
     public class EventoTest
     {
-        /*[Fact]
-        public void Evento_Constructor_InitializesProperties()
+        private readonly Mock<IEventoRepositorio> _mockEventoRepositorio;
+        private readonly Mock<IUnidadDeTrabajo> _mockUow;
+        private readonly Mock<IMapper> _mockMapper;
+        private readonly IEventoLogica _eventoLogica;
+
+        public EventoTest()
         {
+            // 1. Inicializar los Mocks
+            _mockEventoRepositorio = new Mock<IEventoRepositorio>();
+            _mockUow = new Mock<IUnidadDeTrabajo>();
+            _mockMapper = new Mock<IMapper>();
+            // Si tu EventoLogica usa IHubContext, necesitas mockearlo también.
+
+            // 2. Inicializar el objeto bajo prueba (EventoLogica) con las dependencias.
+            // **Asegúrate de que el orden de los argumentos coincida con el constructor real de EventoLogica.**
+            _eventoLogica = new EventoLogica(
+                _mockEventoRepositorio.Object,
+                _mockUow.Object,
+                _mockMapper.Object
+            );
+        }
+
+        private EventoMaestro CrearMaestro() => new EventoMaestro
+        {
+            Id = 10,
+            Nombre = "Riesgo",
+            TextoDescripcion = "Desc",
+            TextoAceptar = "Aceptado",
+            TextoRechazar = "Rechazado",
+            EcoCoinsAceptar = 10,
+            FelicidadAceptar = 5,
+            ContaminacionAceptar = 5,
+            FelicidadRechazar = -10,
+            ContaminacionRechazar = 10
+        };
+        private Evento CrearEventoBase() => new Evento
+        {
+            Id = 1,
+            TextoAceptar = "Aceptado",
+            TextoRechazar = "Rechazado",
+            EcoCoinsAceptar = 10,
+            FelicidadAceptar = 5,
+            ContaminacionAceptar = 5,
+            FelicidadRechazar = -10,
+            ContaminacionRechazar = 10
+        };
+        private Partida CrearPartida(int id) => new Partida { Id = id, Recursos = new Recurso { EcoCoins = 100, Contaminacion = 50, Felicidad = 50 } };
+
+        [Fact]
+        public async Task DispararEventoAsync_CreacionYCommit_Exito()
+        {
+            // Arrange
+            const int partidaId = 5;
+            var maestroMock = CrearMaestro();
+            var eventoDominioCreado = CrearEventoBase();
+
+            eventoDominioCreado.EventoMaestro = maestroMock;
+            eventoDominioCreado.EventoMaestroId = maestroMock.Id;
+            eventoDominioCreado.Partida = CrearPartida(partidaId);
+
+            // Simula que el repositorio devuelve el EventoMaestro
+            _mockEventoRepositorio
+                .Setup(r => r.ObtenerEventoMaestroAsync())
+                .ReturnsAsync(maestroMock);
+
+            // Simula el mapeo de EventoMaestro -> Evento
+            _mockMapper
+                .Setup(m => m.Map<Evento>(maestroMock))
+                .Returns(eventoDominioCreado);
+
+            // Simula el mapeo de Evento -> EventoDisparadoDTO
+            _mockMapper
+                .Setup(m => m.Map<EventoDisparadoDTO>(It.IsAny<Evento>()))
+                .Returns(new EventoDisparadoDTO { Id = eventoDominioCreado.Id });
+
             // Act
-            var evento = new Evento();
+            var resultado = await _eventoLogica.DispararEventoAsync(partidaId);
 
             // Assert
-            Assert.Equal(0, evento.Id);
-            Assert.Null(evento.DescripcionEvento);
-            Assert.Equal(0, evento.TiempoParaHacerlo);
-            Assert.Equal(0, evento.EventoMaestroId);
-            Assert.Null(evento.EventoMaestro);
-            Assert.Equal(0, evento.PartidaId);
-            Assert.Null(evento.Partida);
+            Assert.NotNull(resultado);
+
+            Assert.Equal(partidaId, eventoDominioCreado.PartidaId);
+            Assert.True(eventoDominioCreado.SeDisparo);
+
+            _mockEventoRepositorio.Verify(
+            r => r.CrearEventoAsync(
+            It.Is<Evento>(e =>
+                e.PartidaId == partidaId &&
+                e.EventoMaestroId == maestroMock.Id && // Asegurar que la FK fue copiada/usada
+                e.EcoCoinsAceptar == 10
+            )
+        ),
+        Times.Once
+    );
+
+            // Verificar que se persistió la transacción
+            _mockUow.Verify(u => u.CommitAsync(), Times.Once);
         }
 
         [Fact]
-        public void Evento_SetProperties_ValuesAreSet()
+        public async Task DispararEventoAsync_SinMaestro_RetornaNull()
         {
             // Arrange
-            var evento = new Evento();
-            var eventoMaestro = new EventoMaestro { Id = 1 };
-            var partida = new Partida { Id = 1 };
+            // Simula que el repositorio devuelve null
+            _mockEventoRepositorio
+                .Setup(r => r.ObtenerEventoMaestroAsync())
+                .ReturnsAsync((EventoMaestro)null);
 
             // Act
-            evento.Id = 1;
-            evento.DescripcionEvento = "Test Event Description";
-            evento.TiempoParaHacerlo = 30;
-            evento.EventoMaestroId = 1;
-            evento.EventoMaestro = eventoMaestro;
-            evento.PartidaId = 1;
+            var resultado = await _eventoLogica.DispararEventoAsync(12);
+
+            // Assert
+            Assert.Null(resultado);
+            // Verificar que NO se intentó guardar nada
+            _mockUow.Verify(u => u.CommitAsync(), Times.Never());
+        }
+
+        [Fact]
+        public async Task ResolverEventoAsync_Aceptado_AplicaEfectosYCommit()
+        {
+            // Arrange
+            const int eventoId = 1;
+            var partida = CrearPartida(100); 
+            var evento = CrearEventoBase();
+            var recursos = partida.Recursos;
+
+            // Configurar los efectos en el evento para el cálculo
+            evento.EcoCoinsAceptar = 50;
+            evento.FelicidadAceptar = 10;
+            evento.ContaminacionAceptar = -5;
             evento.Partida = partida;
 
-            // Assert
-            Assert.Equal(1, evento.Id);
-            Assert.Equal("Test Event Description", evento.DescripcionEvento);
-            Assert.Equal(30, evento.TiempoParaHacerlo);
-            Assert.Equal(1, evento.EventoMaestroId);
-            Assert.Equal(eventoMaestro, evento.EventoMaestro);
-            Assert.Equal(1, evento.PartidaId);
-            Assert.Equal(partida, evento.Partida);
-        }
+            // Simular la obtención del evento con su partida asociada
+            _mockEventoRepositorio
+                .Setup(r => r.ObtenerEventoConPartidaAsync(eventoId))
+                .ReturnsAsync(evento);
 
-        [Fact]
-        public void Evento_WithNullValues_PropertiesCanBeNull()
-        {
-            // Arrange
-            var evento = new Evento
-            {
-                Id = 1,
-                DescripcionEvento = null,
-                TiempoParaHacerlo = 0,
-                EventoMaestroId = 0,
-                EventoMaestro = null,
-                PartidaId = 0,
-                Partida = null
-            };
-
-            // Assert
-            Assert.Equal(1, evento.Id);
-            Assert.Null(evento.DescripcionEvento);
-            Assert.Equal(0, evento.TiempoParaHacerlo);
-            Assert.Equal(0, evento.EventoMaestroId);
-            Assert.Null(evento.EventoMaestro);
-            Assert.Equal(0, evento.PartidaId);
-            Assert.Null(evento.Partida);
-        }
-
-        [Fact]
-        public void Evento_WithNegativeTime_CanHandleNegativeNumbers()
-        {
-            // Arrange
-            var evento = new Evento();
+            // Simular el mapeo de la respuesta
+            _mockMapper
+                .Setup(m => m.Map<EventoResueltoDTO>(It.IsAny<object>()))
+                .Returns(new EventoResueltoDTO { Id = eventoId });
 
             // Act
-            evento.TiempoParaHacerlo = -10;
+            await _eventoLogica.ResolverEventoAsync(eventoId, true); // Aceptar
 
             // Assert
-            Assert.Equal(-10, evento.TiempoParaHacerlo);
-        }*/
+            Assert.Equal(150, partida.Recursos.EcoCoins);
+            Assert.Equal(60, partida.Recursos.Felicidad);
+            Assert.Equal(45, partida.Recursos.Contaminacion);
+            Assert.True(evento.Resuelto);
+
+            _mockUow.Verify(u => u.CommitAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task ResolverEventoAsync_YaResuelto_LanzaExcepcion()
+        {
+            // Arrange
+            const int eventoId = 2;
+            var partida = CrearPartida(100);
+            var eventoYaResuelto = CrearEventoBase();
+            eventoYaResuelto.Resuelto = true; // Marcarlo como resuelto
+            eventoYaResuelto.Partida = partida;
+
+            _mockEventoRepositorio
+                .Setup(r => r.ObtenerEventoConPartidaAsync(eventoId))
+                .ReturnsAsync(eventoYaResuelto);
+
+            // Act & Assert
+            // Se espera que lance una excepción (tu servicio lanza Exception genérica)
+            await Assert.ThrowsAsync<Exception>(() => _eventoLogica.ResolverEventoAsync(eventoId, true));
+
+            // Verificar que NO se intentó guardar
+            _mockUow.Verify(u => u.CommitAsync(), Times.Never());
+        }
     }
+
 }
