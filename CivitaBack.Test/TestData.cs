@@ -1,4 +1,3 @@
-﻿using CivitaBack.Data.BO;
 using CivitaBack.Domain.Entidades;
 
 namespace CivitaBack.Tests;
@@ -11,7 +10,7 @@ public static class TestData
         NombreUsuario = "Jugador1",
         Mail = "test@ejemplo.com"
     };
-    
+
     public static Partida CrearPartida(Usuario usuario) => new Partida
     {
         Id = 1,
@@ -19,11 +18,11 @@ public static class TestData
         LogroPartidas = new List<LogroPartida>()
     };
 
-    public static void LlenarPartidaConLogros(PartidaEF partida, List<LogroEF> logrosCompletados)
+    public static void LlenarPartidaConLogros(Partida partida, List<Logro> logrosCompletados)
     {
-        foreach (LogroEF logro in logrosCompletados)
+        foreach (Logro logro in logrosCompletados)
         {
-            LogroPartidaEF lp = new LogroPartidaEF
+            LogroPartida lp = new LogroPartida
             {
                 PartidaId = partida.Id,
                 LogroId = logro.Id,
@@ -32,19 +31,19 @@ public static class TestData
             partida.LogroPartidas.Add(lp);
         }
     }
-    
+
     public static Recurso CrearRecurso(
-        Partida partida, 
+        Partida partida,
         int energiaQty, int felicidadQty, int contaminacionQty, int dineroQty
         ) => new Recurso
-    {
-        Id = 1,
-        Energia = energiaQty,
-        Felicidad = felicidadQty,
-        EcoCoins = dineroQty,
-        Contaminacion = contaminacionQty,
-        Partida = partida
-    };
+        {
+            Id = 1,
+            Energia = energiaQty,
+            Felicidad = felicidadQty,
+            EcoCoins = dineroQty,
+            Contaminacion = contaminacionQty,
+            Partida = partida
+        };
     public static TipoLogro CrearTipoLogro(string tipo) => new TipoLogro
     {
         Id = 1,
@@ -58,7 +57,7 @@ public static class TestData
         TipoLogro = tipo,
         Condicion = condicion,
     };
-    
+
     public static Condicion CrearCondicion(string nombreColumna, int cantidad) => new Condicion
     {
         Id = 1,
@@ -75,8 +74,8 @@ public static class TestData
         EstructuraId = estructuraId,
         EsRecompensa = true,
     };
-    
-    public static CondicionDTO CrearRecompensaDTO(int cantidad, string? columna = null, int? estructuraId = null) => new CondicionDTO
+
+    public static Condicion CrearRecompensaDTO(int cantidad, string? columna = null, int? estructuraId = null) => new Condicion
     {
         Id = 1,
         NombreColumna = columna,

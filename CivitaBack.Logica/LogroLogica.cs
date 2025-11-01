@@ -13,7 +13,6 @@ public class LogroLogica : ILogroLogica
     private readonly ITipoLogroRepositorio repositorioTipoLogro;
     private readonly ICondicionRepositorio _condicionRepositorio;
     private readonly ILogroPartidaRepositorio _logroPartidaRepositorio;
-    private readonly IMapper _mapper;
     private IUnidadDeTrabajo _uow;
 
     private readonly List<string> recursos = new List<string> { "Energia", "Contaminacion", "EcoCoins", "Felicidad" };
@@ -23,7 +22,6 @@ public class LogroLogica : ILogroLogica
         ITipoLogroRepositorio itlr, 
         ICondicionRepositorio icr,
         ILogroPartidaRepositorio ilpr,
-        IMapper mapper,
         IUnidadDeTrabajo uow
         )
     {
@@ -31,7 +29,6 @@ public class LogroLogica : ILogroLogica
         repositorioTipoLogro = itlr;
         _condicionRepositorio = icr;
         _logroPartidaRepositorio = ilpr;
-        _mapper = mapper;
         _uow = uow;
     }
 

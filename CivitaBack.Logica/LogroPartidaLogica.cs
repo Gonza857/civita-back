@@ -133,8 +133,6 @@ public class LogroPartidaLogica : ILogroPartidaLogica
                 Console.WriteLine($"⚠️ Propiedad {recompensa.NombreColumna} no encontrada o no es int/escribible en Recurso");
             }
         }
-
-        await this._uow.CommitAsync();
     }
 
     /// <summary>
