@@ -69,7 +69,7 @@ public class PartidaLogica : IPartidaLogica
         
         try
         {
-            await this._repositorioPartida.Agregar(partidaBuscada);
+            await this._repositorioPartida.Actualizar(partidaBuscada);
             await this._uow.CommitAsync();
         }
         catch (Exception ex)
@@ -131,7 +131,7 @@ public class PartidaLogica : IPartidaLogica
     /// <param name="dto">GuardarMapaDTO</param>
     public async Task ActualizarMapaDePartidaAsync(int partidaId, string jsonMapa, List<EstructuraMapa>? estructuras)
     {
-        if (jsonMapa == null || partidaId <= 0 ||  estructuras == null || estructuras.Count == 0)
+        if (jsonMapa == null || partidaId <= 0 ||  estructuras == null)
             throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: Datos inválidos.");
 
         var partida = await _repositorioPartida.ObtenerPartidaConMapaAsync(partidaId);
@@ -158,10 +158,13 @@ public class PartidaLogica : IPartidaLogica
                 Height = e.Height
             }).ToList();
 
-            this._repositorioEstructuraMapa.AgregarNuevas(nuevas);
-            _repositorioEstructuraMapa.AgregarNuevas(nuevas);
+            await _repositorioEstructuraMapa.AgregarNuevas(nuevas);
 
             // 3️⃣ Guardar cambios
+            await this._uow.CommitAsync();
+        }
+        else
+        {
             await this._uow.CommitAsync();
         }
     }
