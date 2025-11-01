@@ -165,7 +165,6 @@ public class CondicionLogica : ICondicionLogica
         recompensa.EsRecompensa = true;
 
         await this._condicionRepositorio.Agregar(recompensa);
-
         await _uow.CommitAsync();
     }
 

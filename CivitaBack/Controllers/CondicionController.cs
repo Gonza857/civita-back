@@ -6,16 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
 public class CondicionController: BaseApiController
 {
     private readonly ICondicionLogica _condicionLogica;
-    private readonly IMapper _mapper;
-    public CondicionController(ICondicionLogica icl, IMapper mapper) : base(mapper)
+    private readonly ILogger<CondicionController> _logger;
+    public CondicionController(ICondicionLogica icl, IMapper mapper, ILogger<CondicionController> logger) : base(mapper)
     {
         this._condicionLogica = icl;
-        this._mapper = mapper;
+        this._logger = logger;
     }
     
     [HttpGet]
@@ -27,8 +26,9 @@ public class CondicionController: BaseApiController
             var condicionesDto = base.MapearLista<CondicionDTO>(condiciones);
             return Ok(condicionesDto);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener el listado de Condiciones.");
         }
     }
@@ -43,8 +43,9 @@ public class CondicionController: BaseApiController
             var recompensasDto = base.MapearLista<CondicionDTO>(recompensas);
             return Ok(recompensasDto);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener el listado de Recompensas.");
         }
     }
@@ -67,6 +68,7 @@ public class CondicionController: BaseApiController
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar la Condicion");
         }
     }
@@ -75,13 +77,12 @@ public class CondicionController: BaseApiController
     public async Task<IActionResult> CrearRecompensa([FromBody] CondicionDTO? recompensaNueva)
     {
         if (recompensaNueva == null)
-            return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
+            return BadRequest("Los datos recibidos son inválidos");
         try
         {
             var recompensaEntidad = base.Mapear<Condicion>(recompensaNueva);
-
             await _condicionLogica.CrearRecompensa(recompensaEntidad);
-            return Ok();
+            return Created();
         }
         catch (CondicionExcepcion ex)
         {
@@ -89,6 +90,7 @@ public class CondicionController: BaseApiController
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar la Recompensa");
         }
     }
@@ -103,6 +105,7 @@ public class CondicionController: BaseApiController
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al eliminar la Condicion.");
         }
     }
@@ -118,6 +121,7 @@ public class CondicionController: BaseApiController
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener la Condición.");
         }
     }
@@ -141,6 +145,7 @@ public class CondicionController: BaseApiController
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al actualizar la Condición");
         }
     }
