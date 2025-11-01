@@ -1,12 +1,12 @@
-﻿using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Data.BO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CivitaBack.Data.EF.Configurations
 {
-    public class EstructuraMapaConfiguration : IEntityTypeConfiguration<EstructuraMapa>
+    public class EstructuraMapaConfiguration : IEntityTypeConfiguration<EstructuraMapaEF>
     {
-        public void Configure(EntityTypeBuilder<EstructuraMapa> builder)
+        public void Configure(EntityTypeBuilder<EstructuraMapaEF> builder)
         {
             builder.HasKey(em => em.Id);
             builder.Property(em => em.Id).ValueGeneratedOnAdd();

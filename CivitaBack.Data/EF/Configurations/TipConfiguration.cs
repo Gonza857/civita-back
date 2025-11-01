@@ -1,12 +1,12 @@
-﻿using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Data.BO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CivitaBack.Data.EF.Configurations
 {
-    public class TipConfiguration : IEntityTypeConfiguration<Tip>
+    public class TipConfiguration : IEntityTypeConfiguration<TipEF>
     {
-        public void Configure(EntityTypeBuilder<Tip> builder)
+        public void Configure(EntityTypeBuilder<TipEF> builder)
         {
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Id).ValueGeneratedOnAdd();

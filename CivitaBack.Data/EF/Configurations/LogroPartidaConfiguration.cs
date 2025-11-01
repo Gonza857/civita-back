@@ -2,12 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Reflection.Emit;
+using CivitaBack.Data.BO;
 
 namespace CivitaBack.Data.EF.Configurations
 {
-    public class LogroPartidaConfiguration : IEntityTypeConfiguration<LogroPartida>
+    public class LogroPartidaConfiguration : IEntityTypeConfiguration<LogroPartidaEF>
     {
-        public void Configure(EntityTypeBuilder<LogroPartida> builder)
+        public void Configure(EntityTypeBuilder<LogroPartidaEF> builder)
         {
             // PK compuesta
             builder.HasKey(lp => new { lp.LogroId, lp.PartidaId });

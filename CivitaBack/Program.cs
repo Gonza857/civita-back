@@ -10,6 +10,7 @@ using System.Text;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Hubs;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +88,7 @@ builder.Services.AddScoped<IEventoRepositorio, EventoRepositorio>();
 
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 builder.Services.AddScoped<ICicloLogica, CicloLogica>();
+builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 
 builder.Services.AddSingleton<BackgroundCicloLogica>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundCicloLogica>());

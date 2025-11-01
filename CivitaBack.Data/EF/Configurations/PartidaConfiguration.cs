@@ -1,12 +1,12 @@
-﻿using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Data.BO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CivitaBack.Data.EF.Configurations
 {
-    public class PartidaConfiguration : IEntityTypeConfiguration<Partida>
+    public class PartidaConfiguration : IEntityTypeConfiguration<PartidaEF>
     {
-        public void Configure(EntityTypeBuilder<Partida> builder)
+        public void Configure(EntityTypeBuilder<PartidaEF> builder)
         {
             builder.HasKey(p => p.Id);
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
@@ -17,13 +17,13 @@ namespace CivitaBack.Data.EF.Configurations
             // Relación con Usuario
             builder.HasOne(p => p.Usuario)
             .WithOne(u => u.Partida)      
-            .HasForeignKey<Partida>(p => p.UsuarioId) 
+            .HasForeignKey<PartidaEF>(p => p.UsuarioId) 
             .OnDelete(DeleteBehavior.Cascade);
 
             // Recurso 1:1 opcional
             builder.HasOne(p => p.Recursos)
                    .WithOne(r => r.Partida)
-                   .HasForeignKey<Recurso>(r => r.PartidaId)
+                   .HasForeignKey<RecursoEF>(r => r.PartidaId)
                    .OnDelete(DeleteBehavior.Cascade);
 
             // 1:N con EstructuraMapa

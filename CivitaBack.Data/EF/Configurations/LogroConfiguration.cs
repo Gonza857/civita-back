@@ -1,12 +1,13 @@
-﻿using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Data.BO;
+using CivitaBack.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CivitaBack.Data.EF.Configurations
 {
-    public class LogroConfiguration : IEntityTypeConfiguration<Logro>
+    public class LogroConfiguration : IEntityTypeConfiguration<LogroEF>
     {
-        public void Configure(EntityTypeBuilder<Logro> builder)
+        public void Configure(EntityTypeBuilder<LogroEF> builder)
         {
             builder.HasKey(l => l.Id);
             builder.Property(l => l.Id).ValueGeneratedOnAdd();

@@ -1,12 +1,13 @@
-﻿using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Data.BO;
+using CivitaBack.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CivitaBack.Data.EF.Configurations
 {
-    public class EventoConfiguration : IEntityTypeConfiguration<Evento>
+    public class EventoConfiguration : IEntityTypeConfiguration<EventoEF>
     {
-        public void Configure(EntityTypeBuilder<Evento> builder)
+        public void Configure(EntityTypeBuilder<EventoEF> builder)
         {
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Id).ValueGeneratedOnAdd();

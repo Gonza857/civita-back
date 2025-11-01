@@ -8,9 +8,8 @@ namespace CivitaBack.Data.BO;
 
 public class LogroPartidaEF : AuditableEF
 {
-    private DateTime FechaCompletado {  get; set; }
-
-    // Relaciones
+    public DateTime FechaCompletado {  get; set; }
+    
     public int LogroId { get; set; }
     public LogroEF? Logro { get; set; }
 

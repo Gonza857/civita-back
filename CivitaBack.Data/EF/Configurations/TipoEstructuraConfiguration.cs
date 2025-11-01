@@ -1,12 +1,12 @@
-﻿using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Data.BO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CivitaBack.Data.EF.Configurations;
 
-public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructura>
+public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructuraEF>
 {
-    public void Configure(EntityTypeBuilder<TipoEstructura> builder)
+    public void Configure(EntityTypeBuilder<TipoEstructuraEF> builder)
     {
         builder.HasKey(te => te.Id);
         builder.Property(te => te.Id).ValueGeneratedOnAdd();
@@ -14,7 +14,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
 
         // 1:N con Estructura
         builder.HasMany(te => te.Estructura)
-               .WithOne(e => e.TipoEstructura)
-               .HasForeignKey(e => e.TipoEstructuraId);
+            .WithOne(e => e.TipoEstructura)
+            .HasForeignKey(e => e.TipoEstructuraId);
     }
 }
