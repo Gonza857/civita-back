@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 
@@ -8,6 +9,8 @@ public class PartidaProfile : Profile
 {
     public PartidaProfile()
     {
+        CreateMap<Partida, PartidaEF>();
+        CreateMap<PartidaEF, Partida>();
         CreateMap<Partida, PartidaDTO>()
             
             // --- Aplanamiento de Recursos ---

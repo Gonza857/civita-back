@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CivitaBack.Data.DTO
 {
-    public class LoginResponse
+    public class LoginDTO
     {
         public string Token { get; set; }
         public string NombreUsuario { get; set; }

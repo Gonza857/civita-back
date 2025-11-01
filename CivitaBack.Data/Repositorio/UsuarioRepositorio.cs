@@ -12,7 +12,7 @@ public class UsuarioRepositorio
 {
     public UsuarioRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
     
-    public async Task<Usuario> ObtenerUsuarioPorMail(string mail)
+    public async Task<Usuario?> ObtenerUsuarioPorMail(string mail)
     {
         var usuarioEf = await _context.Usuario.AsNoTracking().FirstOrDefaultAsync(u => u.Mail == mail);
         return base.Mapear<Usuario>(usuarioEf);

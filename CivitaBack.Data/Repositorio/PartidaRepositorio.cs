@@ -12,7 +12,18 @@ public class PartidaRepositorio
     : GenericoRepositorio<Partida, PartidaEF>, IPartidaRepositorio
 {
     public PartidaRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
-    
+
+
+    public async Task<Partida?> ObtenerPorUsuarioCorreo(string correo)
+    {
+        var partida = await _context.Partida
+            .Include(p => p.Usuario)
+            .Where(p => p.Usuario.Mail == correo)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+        return base.Mapear<Partida>(partida);
+        
+    }
 
     public async Task<Partida> CrearPartida(int idUsuario)
     {

@@ -73,7 +73,6 @@ builder.Services.AddScoped<IEstructuraMapaRepositorio, EstructuraMapaRepositorio
 builder.Services.AddScoped<ITipLogica, TipLogica>();
 builder.Services.AddScoped<ITipsRepositorio, TipsRepositorio>();
 
-
 builder.Services.AddScoped<ITipoTipLogica, TipoTipLogica>();
 builder.Services.AddScoped<ITipoTipRepositorio, TipoTipRepositorio>();
 
@@ -87,6 +86,7 @@ builder.Services.AddScoped<IEventoLogica, EventoLogica>();
 builder.Services.AddScoped<IEventoRepositorio, EventoRepositorio>();
 
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
+builder.Services.AddScoped<IInicialLogica, InicialLogica>();
 builder.Services.AddScoped<ICicloLogica, CicloLogica>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 

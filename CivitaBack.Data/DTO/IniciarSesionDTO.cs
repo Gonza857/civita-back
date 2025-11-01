@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace CivitaBack.Data.DTO
 {
-    public class LoginRequest
+    public class IniciarSesionDTO
     {
         public string Mail { get; set; }
-        public string Password { get; set; }
+        public string Contrasena { get; set; }
     }
 }
