@@ -9,7 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace CivitaBack.Logica
 {
@@ -50,6 +49,8 @@ namespace CivitaBack.Logica
             
             if (usuarioCreado == null)
                 throw new ValidacionRegistroException("Error al crear el usuario.");
+
+            await _uow.CommitAsync();
 
             return new RegistroResponse
             {

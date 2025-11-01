@@ -14,7 +14,7 @@ public class LogroLogica : ILogroLogica
     private readonly ICondicionRepositorio _condicionRepositorio;
     private readonly ILogroPartidaRepositorio _logroPartidaRepositorio;
     private readonly IMapper _mapper;
-    private IUnidadDeTrabajo _unidadDeTrabajo;
+    private IUnidadDeTrabajo _uow;
 
     private readonly List<string> recursos = new List<string> { "Energia", "Contaminacion", "EcoCoins", "Felicidad" };
 
@@ -24,7 +24,7 @@ public class LogroLogica : ILogroLogica
         ICondicionRepositorio icr,
         ILogroPartidaRepositorio ilpr,
         IMapper mapper,
-        IUnidadDeTrabajo unidadDeTrabajo
+        IUnidadDeTrabajo uow
         )
     {
         _repositorioLogro = rtl;
@@ -32,7 +32,7 @@ public class LogroLogica : ILogroLogica
         _condicionRepositorio = icr;
         _logroPartidaRepositorio = ilpr;
         _mapper = mapper;
-        _unidadDeTrabajo = unidadDeTrabajo;
+        _uow = uow;
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public class LogroLogica : ILogroLogica
 
         await this._repositorioLogro.Actualizar(logroBuscado);
 
-        await this._unidadDeTrabajo.CommitAsync();
+        await this._uow.CommitAsync();
     }
 
     public async Task<List<Logro>> ObtenerListadoInterno()
@@ -84,7 +84,7 @@ public class LogroLogica : ILogroLogica
             throw new LogroExcepcion("No se pudo borrar el Logro");
         await this._repositorioLogro.Eliminar(id);
 
-        await this._unidadDeTrabajo.CommitAsync();
+        await this._uow.CommitAsync();
 
     }
 
@@ -114,7 +114,7 @@ public class LogroLogica : ILogroLogica
         
         await this._repositorioLogro.Agregar(logro);
 
-        await this._unidadDeTrabajo.CommitAsync();
+        await this._uow.CommitAsync();
 
     }
 
@@ -235,6 +235,8 @@ public class LogroLogica : ILogroLogica
                 await this._logroPartidaRepositorio.Agregar(new LogroPartida { Partida = partida, Logro = logroDB });
             }
         }
+
+        await _uow.CommitAsync();
     }
 
     public async Task<List<Logro>> ObtenerLogrosParaObtenerRecompensa(int partidaId)

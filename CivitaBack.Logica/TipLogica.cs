@@ -1,5 +1,4 @@
-﻿using CivitaBack.Data.DTO;
-using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
@@ -11,13 +10,13 @@ namespace CivitaBack.Logica
     {
         private readonly ITipsRepositorio _tipsRepositorio;
         private readonly ITipoTipRepositorio _tiposTipRepositorio;
-        private readonly IUnidadDeTrabajo _unidadDeTrabajo;
+        private readonly IUnidadDeTrabajo _uow;
 
         public TipLogica(ITipsRepositorio itr, ITipoTipRepositorio ittr, IUnidadDeTrabajo iudt)
         {
             _tipsRepositorio = itr;
             _tiposTipRepositorio = ittr;
-            _unidadDeTrabajo = iudt;
+            _uow = iudt;
         }
 
         public async Task<List<Tip>> ObtenerMsjPorIdTipo(int id)
@@ -48,7 +47,7 @@ namespace CivitaBack.Logica
             try
             {
                 await this._tipsRepositorio.Agregar(nuevoTip);
-                await this._unidadDeTrabajo.CommitAsync();
+                await this._uow.CommitAsync();
             }
             catch (Exception ex)
             {
@@ -75,7 +74,7 @@ namespace CivitaBack.Logica
             try
             {
                 await this._tipsRepositorio.Actualizar(tipDb);
-                await this._unidadDeTrabajo.CommitAsync();
+                await this._uow.CommitAsync();
             }
             catch (Exception ex)
             {

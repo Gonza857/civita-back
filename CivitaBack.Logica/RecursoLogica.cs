@@ -1,6 +1,4 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
-using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
@@ -11,12 +9,12 @@ namespace CivitaBack.Logica;
 public class RecursoLogica : IRecursoLogica
 {
     private readonly IRecursoRepositorio _repositorioRecurso;
-    private readonly IUnidadDeTrabajo _unidadDeTrabajo;
+    private readonly IUnidadDeTrabajo _uow;
 
-    public RecursoLogica(IRecursoRepositorio rr, IUnidadDeTrabajo unidadDeTrabajo)
+    public RecursoLogica(IRecursoRepositorio rr, IUnidadDeTrabajo uow)
     {
         _repositorioRecurso = rr;
-        _unidadDeTrabajo = unidadDeTrabajo;
+        _uow = uow;
     }
 
     public async Task ConfigurarInicial(Partida partida)
@@ -31,7 +29,7 @@ public class RecursoLogica : IRecursoLogica
             Contaminacion = 60,
         };
         await this._repositorioRecurso.Agregar(recurso);
-        await this._unidadDeTrabajo.CommitAsync();
+        await this._uow.CommitAsync();
     }
 
     public async Task<Recurso> ObtenerRecursos(int idPartida)
@@ -62,6 +60,6 @@ public class RecursoLogica : IRecursoLogica
 
         // Guardamos los cambios
         await _repositorioRecurso.Actualizar(recurso);
-        await this._unidadDeTrabajo.CommitAsync();
+        await this._uow.CommitAsync();
     }
 }

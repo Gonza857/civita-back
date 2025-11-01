@@ -1,5 +1,4 @@
-﻿using CivitaBack.Data.DTO;
-using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
@@ -9,17 +8,19 @@ namespace CivitaBack.Logica;
 public class EstructuraMapaLogica : IEstructuraMapaLogica
 {
     private readonly IEstructuraMapaRepositorio _estructuraMapaRepositorio;
-    private readonly IUnidadDeTrabajo _unidadDeTrabajo;
+    private readonly IUnidadDeTrabajo _uow;
 
-    public EstructuraMapaLogica(IEstructuraMapaRepositorio emr, IUnidadDeTrabajo unidadDeTrabajo)
+    public EstructuraMapaLogica(IEstructuraMapaRepositorio emr, IUnidadDeTrabajo uow)
     {
         _estructuraMapaRepositorio = emr;
-        _unidadDeTrabajo = unidadDeTrabajo;
+        _uow = uow;
     }
     
     public async Task ReiniciarEstructurasDePartida(int idPartida)
     {
         await this._estructuraMapaRepositorio.EliminarPorPartidaIdAsync(idPartida);
+
+        await _uow.CommitAsync();
     }
 
     public async Task EliminarEstructuraAsync(EstructuraMapa em)
@@ -31,7 +32,8 @@ public class EstructuraMapaLogica : IEstructuraMapaLogica
             throw new InvalidOperationException("No se encontró la estructura a eliminar");
 
         await _estructuraMapaRepositorio.EliminarAsync(entidad);
-        await this._unidadDeTrabajo.CommitAsync();
+        
+        await this._uow.CommitAsync();
     }
 
 }

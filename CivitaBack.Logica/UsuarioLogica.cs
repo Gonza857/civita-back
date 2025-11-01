@@ -1,15 +1,9 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 
 namespace CivitaBack.Logica
 {
-
-    public interface IUsuarioLogica
-    {
-        Task<Usuario> ObtenerPorId(int id);
-        Task<Usuario?> ObtenerUsuarioPorNombre(string nombre);
-
-    }
     public class UsuarioLogica : IUsuarioLogica
     {
         private readonly IUsuarioRepositorio _repositorioUsuario;

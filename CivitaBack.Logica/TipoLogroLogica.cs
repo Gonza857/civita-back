@@ -1,18 +1,20 @@
-﻿using CivitaBack.Data.DTO;
-using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Excepciones;
+using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
 
 public class TipoLogroLogica : ITipoLogroLogica
 {
     private readonly ITipoLogroRepositorio repositorioTipoLogro;
+    private readonly IUnidadDeTrabajo _uow;
 
-    public TipoLogroLogica(ITipoLogroRepositorio rtl)
+    public TipoLogroLogica(ITipoLogroRepositorio rtl, IUnidadDeTrabajo uow)
     {
         repositorioTipoLogro = rtl;
+        _uow = uow;
     }
 
     private void ValidarTipoLogro(TipoLogro TipoLogro, int idTipoLogro)
@@ -35,6 +37,8 @@ public class TipoLogroLogica : ITipoLogroLogica
         
         tipoLogroBuscado.Nombre = tipoLogro.Nombre;
         await this.repositorioTipoLogro.Actualizar(tipoLogroBuscado);
+
+        await _uow.CommitAsync();
     }
 
     /// <summary>
@@ -46,6 +50,8 @@ public class TipoLogroLogica : ITipoLogroLogica
         if (id <= 0) 
             throw new TipoLogroException("No se pudo borrar el Tipo de Logro");
         await this.repositorioTipoLogro.Eliminar(id);
+
+        await _uow.CommitAsync();
     }
 
     /// <summary>
@@ -62,6 +68,9 @@ public class TipoLogroLogica : ITipoLogroLogica
         }; 
         
         await this.repositorioTipoLogro.Agregar(tipoLogro);
+
+        await _uow.CommitAsync();
+
         return this.TipoLogroToDTO(tipoLogro);
     }
 

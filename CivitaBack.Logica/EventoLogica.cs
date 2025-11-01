@@ -2,9 +2,7 @@
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Repositorios;
-using CivitaBack.Logica.Hubs;
 using CivitaBack.Utils;
-using Microsoft.AspNetCore.SignalR;
 
 namespace CivitaBack.Logica
 {
@@ -12,20 +10,19 @@ namespace CivitaBack.Logica
     {
         Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida);
         Task<EventoResueltoDTO> ResolverEventoAsync(int eventoId, bool aceptado);
+
     }
 
     public class EventoLogica : IEventoLogica
     {
         private readonly IEventoRepositorio _eventoRepositorio;
-        private readonly IHubContext<EventoHub> _hubContext;
-        private readonly IUnidadDeTrabajo _unidadDeTrabajo;
+        private readonly IUnidadDeTrabajo _uow;
         private readonly IMapper _mapper;
 
-        public EventoLogica(IEventoRepositorio eventoRepositorio, IHubContext<EventoHub> hubContext, IUnidadDeTrabajo unidadDeTrabajo, IMapper mapper)
+        public EventoLogica(IEventoRepositorio eventoRepositorio, IUnidadDeTrabajo uow, IMapper mapper)
         {
             _eventoRepositorio = eventoRepositorio;
-            _hubContext = hubContext;
-            _unidadDeTrabajo = unidadDeTrabajo;
+            _uow = uow;
             _mapper = mapper;
         }
 
@@ -34,29 +31,17 @@ namespace CivitaBack.Logica
             var maestro = await _eventoRepositorio.ObtenerEventoMaestroAsync(); // Por ahora traigo el primero
             if (maestro == null) return null;
 
-            var evento = new Evento
-            {
-                PartidaId = idPartida,
-                EventoMaestroId = maestro.Id,
-                TextoDescripcion = maestro.TextoDescripcion,
-                TextoAceptar = maestro.TextoAceptar,
-                TextoRechazar = maestro.TextoRechazar,
-                EcoCoinsAceptar = maestro.EcoCoinsAceptar,
-                FelicidadAceptar = maestro.FelicidadAceptar,
-                ContaminacionAceptar = maestro.ContaminacionAceptar,
-                FelicidadRechazar = maestro.FelicidadRechazar,
-                ContaminacionRechazar = maestro.ContaminacionRechazar,
-                SeDisparo = true,
-                Resuelto = false
-            };
+            var evento = _mapper.Map<Evento>(maestro);
+
+            evento.PartidaId = idPartida;
+            evento.SeDisparo = true;
+            evento.Resuelto = false;
 
             await _eventoRepositorio.CrearEventoAsync(evento);
-            await this._unidadDeTrabajo.CommitAsync();
+
+            await this._uow.CommitAsync();
 
             var respuestaDTO = _mapper.Map<EventoDisparadoDTO>(evento);
-
-            await _hubContext.Clients.Group(idPartida.ToString())
-                .SendAsync("EventoDisparado", respuestaDTO);
 
             return respuestaDTO;
         }
@@ -81,16 +66,14 @@ namespace CivitaBack.Logica
 
             evento.Resuelto = true;
 
-            await this._unidadDeTrabajo.CommitAsync();
+            await this._uow.CommitAsync();
 
             var resultado = new
             {
                 evento.Id,
                 Texto = acepto ? evento.TextoAceptar : evento.TextoRechazar,
+                PartidaId = partida.Id,
             };
-
-            await _hubContext.Clients.Group(evento.PartidaId.ToString())
-                .SendAsync("EventoResuelto", resultado);
 
             return _mapper.Map<EventoResueltoDTO>(resultado);
         }
