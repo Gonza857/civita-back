@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 using CivitaBack.Data.BO;
 
-using CivitaBack.Logica.Excepciones;
+using CivitaBack.Domain.Excepciones;
 
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
