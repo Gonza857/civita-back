@@ -1,7 +1,7 @@
 ﻿using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
-using CivitaBack.Logica.Excepciones;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;

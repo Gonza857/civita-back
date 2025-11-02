@@ -2,7 +2,7 @@
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
-using CivitaBack.Logica.Excepciones;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Logica.Helpers;
 using CivitaBack.Utils;
 using Microsoft.Extensions.Configuration;

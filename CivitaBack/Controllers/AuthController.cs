@@ -4,7 +4,7 @@ using CivitaBack.Data;
 using Microsoft.AspNetCore.Mvc;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Interfaces.Logica;
-using CivitaBack.Logica.Excepciones;
+using CivitaBack.Domain.Excepciones;
 
 
 namespace CivitaBack.Api.Controllers
