@@ -234,6 +234,9 @@ public class PartidaLogica : IPartidaLogica
         return partida;
     }
 
-    
+    public async Task<Partida?> ObtenerPorId(int idPartida)
+    {
+        return await this._repositorioPartida.ObtenerPorId(idPartida);
+    }
 }
 

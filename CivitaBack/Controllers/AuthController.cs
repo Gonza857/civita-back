@@ -46,6 +46,7 @@ public class AuthController : BaseApiController
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al realizar el registro.");
         }
     }
@@ -76,6 +77,7 @@ public class AuthController : BaseApiController
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al iniciar sesión");
         }
     }
@@ -87,6 +89,4 @@ public class AuthController : BaseApiController
         var existe = await _usuarioLogica.ObtenerUsuarioPorNombre(nombre) != null;
         return Ok(new { existe });
     }
-}
-
 }

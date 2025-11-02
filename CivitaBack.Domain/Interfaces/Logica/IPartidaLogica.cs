@@ -15,4 +15,6 @@ public interface IPartidaLogica
     
     Task ReclamarLogros(Partida partida, List<Logro> logros);
     Task<Partida?> ObtenerMapaAsync(int partidaId);
+    
+    Task<Partida?> ObtenerPorId(int idPartida);
 }

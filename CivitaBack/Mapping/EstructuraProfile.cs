@@ -21,5 +21,7 @@ public class EstructuraProfile : Profile
                 dto => dto.Tipo, // Para la propiedad "Tipo" del DTO...
                 opt => opt.MapFrom(dominio => dominio.TipoEstructura) // ...usá el valor de "TipoEstructura" del Dominio.
             );
+        
+        CreateMap<Estructura, EstructuraCondicionDTO>();
     }
 }

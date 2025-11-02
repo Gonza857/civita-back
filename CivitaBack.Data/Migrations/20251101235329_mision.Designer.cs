@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251101235329_mision")]
+    partial class mision
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -435,10 +438,10 @@ namespace CivitaBack.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("Disponible")
-                        .HasColumnType("boolean");
-
                     b.Property<DateTime?>("Editado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("FechaVencimiento")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Tipo")
@@ -454,44 +457,6 @@ namespace CivitaBack.Data.Migrations
                     b.HasIndex("CondicionId");
 
                     b.ToTable("Mision", (string)null);
-                });
-
-            modelBuilder.Entity("CivitaBack.Data.BO.MisionPartidaEF", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("FechaCompletado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("FechaEntrega")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("MisionId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PartidaId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("Reclamado")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MisionId");
-
-                    b.HasIndex("PartidaId");
-
-                    b.ToTable("MisionPartida");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.PartidaEF", b =>
@@ -1102,25 +1067,6 @@ namespace CivitaBack.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Condicion");
-                });
-
-            modelBuilder.Entity("CivitaBack.Data.BO.MisionPartidaEF", b =>
-                {
-                    b.HasOne("CivitaBack.Data.BO.MisionEF", "Mision")
-                        .WithMany()
-                        .HasForeignKey("MisionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CivitaBack.Data.BO.PartidaEF", "Partida")
-                        .WithMany()
-                        .HasForeignKey("PartidaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Mision");
-
-                    b.Navigation("Partida");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.PartidaEF", b =>

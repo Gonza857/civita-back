@@ -30,4 +30,6 @@ public interface IRepositorioBase<TDominio> where TDominio : class
     /// las instancias de las entidades de dominio a borrar.
     /// </remarks>
     Task EliminarVarios(ICollection<TDominio> entidades);
+    
+    Task ActualizarVarios(ICollection<TDominio> entidades);
 }

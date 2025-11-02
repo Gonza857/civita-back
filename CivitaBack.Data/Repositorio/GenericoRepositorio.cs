@@ -69,6 +69,17 @@ public abstract class GenericoRepositorio<TDominio, TEf> : IRepositorioBase<TDom
         return Task.CompletedTask;
     }
     
+    public Task ActualizarVarios(ICollection<TDominio> entidades)
+    {
+        // 1. Mapea la lista de Dominio -> EF
+        var entidadesEF = _mapper.Map<IEnumerable<TEf>>(entidades);
+    
+        // 2. Le dice a EF que TODAS estas entidades están "Modificadas"
+        _dbSet.UpdateRange(entidadesEF);
+    
+        return Task.CompletedTask;
+    }
+    
     // --- MÉTODOS "VIRTUALES" ---
     // (Estos pueden ser sobreescritos por las clases hijas si necesitan
     // lógica especial, como los `Include`s)

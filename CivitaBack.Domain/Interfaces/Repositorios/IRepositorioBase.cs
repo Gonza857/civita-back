@@ -8,4 +8,7 @@ public interface IRepositorioBase<T> where T : class
     Task AgregarVarios(ICollection<T> entidades);
     Task Actualizar(T entidad);
     Task Eliminar(int id);
+    
+    Task ActualizarVarios(ICollection<T> entidades);
+
 }

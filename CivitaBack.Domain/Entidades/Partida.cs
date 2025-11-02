@@ -19,4 +19,6 @@ public class Partida : Auditable
     public List<TipEnPartida>? TipEnPartida { get; set; }
 
     public List<LogroPartida> LogroPartidas { get; set; } = new();
+    public List<MisionPartida> MisionPartidas { get; set; } = new();
+
 }

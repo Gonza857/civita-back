@@ -68,8 +68,7 @@ public class CondicionLogica : ICondicionLogica
     /// </summary>
     public async Task<List<Condicion>> ObtenerListado()
     {
-        var condiciones = await this._condicionRepositorio.ObtenerTodos();
-        return condiciones;
+        return await this._condicionRepositorio.ObtenerTodos();
     }
 
     /// <summary>
