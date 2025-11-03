@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
-using CivitaBack.Logica.Excepciones;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;

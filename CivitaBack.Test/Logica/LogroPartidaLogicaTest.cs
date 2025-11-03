@@ -1,9 +1,8 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
-using CivitaBack.Logica.Excepciones;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Utils;
 using Microsoft.Extensions.Logging;
 using Moq;
