@@ -26,5 +26,6 @@ namespace CivitaBack.Data.BO
         public List<TipEnPartidaEF>? TipEnPartida { get; set; }
         // Relación N:N
         public List<LogroPartidaEF> LogroPartidas { get; set; }
+        public List<MisionPartidaEF> MisionPartidas { get; set; }
     }
 }

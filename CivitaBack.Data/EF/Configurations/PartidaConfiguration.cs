@@ -30,6 +30,16 @@ namespace CivitaBack.Data.EF.Configurations
             builder.HasMany(p => p.EstructuraMapa)
                    .WithOne(em => em.Partida)
                    .HasForeignKey(em => em.PartidaId);
+
+            // Relación N:N con LogroPartida
+            builder.HasMany(p => p.LogroPartidas)
+                   .WithOne(lp => lp.Partida)
+                   .HasForeignKey(lp => lp.PartidaId);
+
+            // Relación N:N con MisionPartida
+            builder.HasMany(p => p.MisionPartidas)
+                   .WithOne(mp => mp.Partida)
+                   .HasForeignKey(mp => mp.PartidaId);
         }
     }
 }

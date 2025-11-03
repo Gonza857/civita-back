@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 
@@ -8,7 +9,8 @@ namespace CivitaBack.Api.Mapping
     {
         public TiendaProfile()
         {
-
+            CreateMap<Tienda, TiendaEF>();
+            CreateMap<TiendaEF, Tienda>();
             // Mapeo: Entidad de Dominio (Estructura) -> DTO de Salida (TiendaItemDTO)
             CreateMap<Estructura, TiendaDTO>()
 
