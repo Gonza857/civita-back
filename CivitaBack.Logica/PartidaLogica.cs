@@ -234,9 +234,12 @@ public class PartidaLogica : IPartidaLogica
         return partida;
     }
 
-    public async Task<Partida?> ObtenerPorId(int idPartida)
+    public async Task<Partida> ObtenerPorId(int idPartida)
     {
-        return await this._repositorioPartida.ObtenerPorId(idPartida);
+        var partida = await this._repositorioPartida.ObtenerPorId(idPartida);
+        if (partida == null)
+            throw new PartidaExcepcion("Partida no encontrada");
+        return partida;
     }
 }
 

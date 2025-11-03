@@ -42,8 +42,8 @@ Console.WriteLine($"Perfil DEV_PROFILE: {devProfile ?? "no definido"}");
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    //.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-    .AddJsonFile($"appsettings.{devProfile}.json", optional: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    // .AddJsonFile($"appsettings.{devProfile}.json", optional: true)
     .AddEnvironmentVariables();
 
 // Configurar DbContext
@@ -108,12 +108,14 @@ builder.Services.AddScoped<ICondicionLogica, CondicionLogica>();
 builder.Services.AddScoped<IMisionLogica, MisionLogica>();
 builder.Services.AddScoped<IMisionRepositorio, MisionRepositorio>();
 
+builder.Services.AddScoped<IMisionPartidaLogica, MisionPartidaLogica>();
 builder.Services.AddScoped<IMisionPartidaRepositorio, MisionPartidaRepositorio>();
 
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 builder.Services.AddScoped<IInicialLogica, InicialLogica>();
 builder.Services.AddScoped<ICicloLogica, CicloLogica>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
+builder.Services.AddScoped<IRecompensaLogica, RecompensaLogica>();
 
 builder.Services.AddSingleton<BackgroundCicloLogica>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundCicloLogica>());
@@ -155,16 +157,24 @@ using (var scope = app.Services.CreateScope())
 using (var scope = app.Services.CreateScope())
 {
     var recurringJobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
-
-    // Usamos Job.FromExpression<T> para que Hangfire
-    // resuelva tu servicio (ej. IMisionLogica) usando Inyección de Dependencias.
     
-    // Reemplazá 'IMisionLogica' por la interfaz del servicio que quieras,
-    // y 'TuMetodoDePrueba()' por el método que quieras ejecutar.
     recurringJobs.AddOrUpdate(
-        "test-job",
+        "mision-diaria",
         Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Diaria)),
+        // Cron.Daily(0, 0)
         "*/30 * * * * *" // <--- Modificado a 30 segundos
+    );
+    
+    recurringJobs.AddOrUpdate(
+        "mision-semanal",
+        Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Semanal)),
+        Cron.Weekly(DayOfWeek.Monday, 0, 0)
+    );
+    
+    recurringJobs.AddOrUpdate(
+        "mision-mensual",
+        Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Mensual)),
+        Cron.Monthly(1, 0, 0)
     );
 }
 
