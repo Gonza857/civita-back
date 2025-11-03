@@ -149,6 +149,21 @@ var app = builder.Build();
 // Aquí, después de construir la app, aseguramos que la DB exista
 using (var scope = app.Services.CreateScope())
 {
+    // --- INICIO DE CÓDIGO DE DEBUG (¡BORRAR DESPUÉS!) ---
+    var services = scope.ServiceProvider;
+    var config = services.GetRequiredService<IConfiguration>();
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
+    // 1. Obtenemos el connection string que Azure está leyendo
+    var connectionString = config.GetConnectionString("DefaultConnection");
+
+    // 2. Lo imprimimos a la consola (Log Stream)
+    var logMessage = $"--- DEBUGGING CONNECTION STRING --- \n 'DefaultConnection' = '{connectionString ?? "¡ES NULL O VACÍO!"}' \n --- FIN DEBUG ---";
+    
+    Console.WriteLine(logMessage);
+    logger.LogWarning(logMessage); // También lo mandamos al logger por si acaso
+    // --- FIN DE CÓDIGO DE DEBUG ---
+    
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     context.Database.Migrate(); // Aplica solo las migraciones pendientes
 }
