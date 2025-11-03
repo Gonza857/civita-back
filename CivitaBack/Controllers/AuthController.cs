@@ -46,9 +46,9 @@ public class AuthController : BaseApiController
             var response = new LoginDTO
             {
                 Token = token,
-                NombreUsuario = usuario.NombreUsuario!,
-                Mail = usuario.Mail!,
-                IdUsuario = usuario.Id!,
+                NombreUsuario = usuarioPartida.NombreUsuario!,
+                Mail = usuarioPartida.Mail!,
+                IdUsuario = usuarioPartida.Id!,
                 IdPartida = partida.Id
             };
 
