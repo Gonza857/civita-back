@@ -38,7 +38,21 @@ public class AuthController : BaseApiController
         {
             Usuario usuario = await _authLogica.CrearUsuario(request.NombreUsuario, request.Mail, request.Password);
             await this._inicialLogica.IniciarPartida(usuario);
-            return Ok(new { mensaje = "Usuario registrado correctamente!", usuario });
+            Usuario usuarioPartida = await _usuarioLogica.ObtenerPorCorreo(request.Mail);
+            Partida partida = usuarioPartida.Partida;
+
+            string token = await _authLogica.IniciarSesion(request.Mail, request.Password);
+
+            var response = new LoginDTO
+            {
+                Token = token,
+                NombreUsuario = usuario.NombreUsuario!,
+                Mail = usuario.Mail!,
+                IdUsuario = usuario.Id!,
+                IdPartida = partida.Id
+            };
+
+            return Ok(new { mensaje = "Usuario registrado correctamente!", response });
         }
         catch (ValidacionRegistroException ex)
         {

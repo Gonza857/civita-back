@@ -11,9 +11,6 @@ namespace CivitaBack.Data.EF.Configurations
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Id).ValueGeneratedOnAdd();
 
-            builder.Property(t => t.NombreArticulo).HasMaxLength(200);
-            builder.Property(t => t.CodigoArticulo).HasMaxLength(100);
-
             // Relación con Partida
             builder.HasOne(t => t.Partida)
                    .WithMany(p => p.Tienda)

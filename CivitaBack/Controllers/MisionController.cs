@@ -4,7 +4,6 @@ using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using Microsoft.AspNetCore.Mvc;
-using LogroExcepcion = CivitaBack.Logica.Excepciones.LogroExcepcion;
 
 namespace CivitaBack.Api.Controllers;
 
