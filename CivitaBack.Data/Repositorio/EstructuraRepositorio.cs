@@ -10,7 +10,7 @@ namespace CivitaBack.Data.Repositorio;
 public class EstructuraRepositorio : GenericoRepositorio<Estructura, EstructuraEF>, IEstructuraRepositorio
 {
     public EstructuraRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
-    
+
     public async Task<Estructura?> ObtenerPorId(int id)
     {
         var entidadEF = await _dbSet
