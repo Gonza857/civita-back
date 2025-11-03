@@ -9,15 +9,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using CivitaBack.Domain.Interfaces.Logica;
 
 namespace CivitaBack.Logica
 {
-    public interface IAuthLogica
-    {
-        Task<RegistroResponse> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password);
-        Task<LoginResponse> LoginAsync(LoginRequest request);
-
-    }
     public class AuthLogica : IAuthLogica
     {
         private readonly IUsuarioRepositorio _repositorioUsuario;
@@ -31,52 +26,49 @@ namespace CivitaBack.Logica
             _uow = uow;
         }
 
-        public async Task<RegistroResponse> RegistrarUsuarioAsync(string nombreUsuario, string mail, string password)
+        public async Task<Usuario> CrearUsuario(string nombreUsuario, string mail, string password)
         {
-            if (await _repositorioUsuario.ObtenerUsuarioPorMail(mail) != null)
-                throw new ValidacionRegistroException("El correo ya está en uso.");
-
-            var hash = PasswordHelper.HashPassword(password);
-
+            await this.ValidarExistenciaCorreo(mail);
+            
             var usuario = new Usuario
             {
                 NombreUsuario = nombreUsuario,
                 Mail = mail,
-                HashDeContrasena = hash
+                HashDeContrasena = PasswordHelper.HashPassword(password)
             };
 
-            var usuarioCreado = await _repositorioUsuario.CrearUsuario(usuario);
-            
-            if (usuarioCreado == null)
-                throw new ValidacionRegistroException("Error al crear el usuario.");
-
-            await _uow.CommitAsync();
-
-            return new RegistroResponse
-            {
-                Id = usuarioCreado.Id,
-                NombreUsuario = usuarioCreado.NombreUsuario,
-                Mail = usuarioCreado.Mail
-            };
-
+            return usuario;
         }
 
-        public async Task<LoginResponse> LoginAsync(LoginRequest request)
+        public async Task<string> IniciarSesion(string mail, string contrasena)
         {
-            var usuario = await _repositorioUsuario.ObtenerUsuarioPorMail(request.Mail);
+            this.ValidarUsuarioIniciarSesion(mail, contrasena);
+            Usuario? usuario = await _repositorioUsuario.ObtenerUsuarioPorMail(mail);
+            this.ValidarUsuarioAndContrasena(contrasena, usuario);
+            return this.GenerarToken(usuario!);
+        }
 
-            if (usuario == null || !PasswordHelper.VerifyPassword(request.Password, usuario.HashDeContrasena))
+        private void ValidarUsuarioIniciarSesion(string mail, string contrasena)
+        {
+            if (string.IsNullOrWhiteSpace(mail)) 
+                throw new AutenticacionException("El nombre de usuario no puede estar vacio");
+            if (string.IsNullOrWhiteSpace(contrasena)) 
+                throw new AutenticacionException("La contrasena no puede estar vacia");
+        }
+
+        private void ValidarUsuarioAndContrasena(string inputContrasena, Usuario? usuario)
+        {
+            if (usuario == null)
                 throw new AutenticacionException("Usuario o contraseña incorrectos.");
+            
+            if (!PasswordHelper.VerifyPassword(inputContrasena, usuario.HashDeContrasena!))
+                throw new AutenticacionException("Usuario o contraseña incorrectos.");
+        }
 
-            var token = GenerarToken(usuario);
-
-            return new LoginResponse
-            {
-                Token = token,
-                NombreUsuario = usuario.NombreUsuario,
-                Mail = usuario.Mail,
-                IdUsuario = usuario.Id
-            };
+        private async Task ValidarExistenciaCorreo(string correo)
+        {
+            if (await _repositorioUsuario.ObtenerUsuarioPorMail(correo) != null)
+                throw new ValidacionRegistroException("El correo ya está en uso.");
         }
 
         private string GenerarToken(Usuario usuario)

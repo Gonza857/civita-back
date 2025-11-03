@@ -4,6 +4,7 @@ namespace CivitaBack.Domain.Entidades;
 
 public class LogroPartida : Auditable
 {
+    
     public DateTime FechaCompletado { get; private set; }
 
     // Relaciones

@@ -7,10 +7,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using CivitaBack.Domain.Enum;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Hubs;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
+using Hangfire;
+using Hangfire.PostgreSql;
+using Hangfire.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,16 +42,29 @@ Console.WriteLine($"Perfil DEV_PROFILE: {devProfile ?? "no definido"}");
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    //.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-    .AddJsonFile($"appsettings.{devProfile}.json", optional: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    // .AddJsonFile($"appsettings.{devProfile}.json", optional: true)
     .AddEnvironmentVariables();
 
 // Configurar DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseNpgsql(connectionString);
+    options.UseNpgsql(connectionString)
+        .EnableSensitiveDataLogging(false) // opcional: evita mostrar valores de parámetros
+        .EnableDetailedErrors(false);
+
 });
+
+builder.Services.AddHangfire((sp, config) =>
+{
+    config.UsePostgreSqlStorage(options =>
+    {
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        options.UseNpgsqlConnection(connectionString);
+    });
+});
+builder.Services.AddHangfireServer();
 
 builder.Services.AddScoped<IPartidaLogica, PartidaLogica>();
 builder.Services.AddScoped<IPartidaRepositorio, PartidaRepositorio>();
@@ -73,7 +90,6 @@ builder.Services.AddScoped<IEstructuraMapaRepositorio, EstructuraMapaRepositorio
 builder.Services.AddScoped<ITipLogica, TipLogica>();
 builder.Services.AddScoped<ITipsRepositorio, TipsRepositorio>();
 
-
 builder.Services.AddScoped<ITipoTipLogica, TipoTipLogica>();
 builder.Services.AddScoped<ITipoTipRepositorio, TipoTipRepositorio>();
 
@@ -86,24 +102,32 @@ builder.Services.AddScoped<ITipoEstructuraLogica, TipoEstructuraLogica>();
 builder.Services.AddScoped<IEventoLogica, EventoLogica>();
 builder.Services.AddScoped<IEventoRepositorio, EventoRepositorio>();
 
+builder.Services.AddScoped<ICondicionRepositorio, CondicionRepositorio>();
+builder.Services.AddScoped<ICondicionLogica, CondicionLogica>();
+
+builder.Services.AddScoped<IMisionLogica, MisionLogica>();
+builder.Services.AddScoped<IMisionRepositorio, MisionRepositorio>();
+
+builder.Services.AddScoped<IMisionPartidaLogica, MisionPartidaLogica>();
+builder.Services.AddScoped<IMisionPartidaRepositorio, MisionPartidaRepositorio>();
+
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
+builder.Services.AddScoped<IInicialLogica, InicialLogica>();
 builder.Services.AddScoped<ICicloLogica, CicloLogica>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
+builder.Services.AddScoped<IRecompensaLogica, RecompensaLogica>();
 
 builder.Services.AddSingleton<BackgroundCicloLogica>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundCicloLogica>());
 
-builder.Services.AddAutoMapper(cfg => 
+builder.Services.AddAutoMapper(cfg =>
 {
     // Aquí adentro podrías agregar configuraciones globales
     // si las necesitaras, pero para tu caso, lo dejamos vacío.
-    
+
 }, typeof(Program));
 
 builder.Services.AddSignalR();
-builder.Services.AddScoped<ICondicionRepositorio, CondicionRepositorio>();
-builder.Services.AddScoped<ICondicionLogica, CondicionLogica>();
-
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -125,15 +149,74 @@ var app = builder.Build();
 // Aquí, después de construir la app, aseguramos que la DB exista
 using (var scope = app.Services.CreateScope())
 {
+    // --- INICIO DE CÓDIGO DE DEBUG (¡BORRAR DESPUÉS!) ---
+    var services = scope.ServiceProvider;
+    var config = services.GetRequiredService<IConfiguration>();
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
+    // 1. Obtenemos el connection string que Azure está leyendo
+    var connectionString = config.GetConnectionString("DefaultConnection");
+
+    // 2. Lo imprimimos a la consola (Log Stream)
+    var logMessage = $"--- DEBUGGING CONNECTION STRING --- \n 'DefaultConnection' = '{connectionString ?? "¡ES NULL O VACÍO!"}' \n --- FIN DEBUG ---";
+    
+    Console.WriteLine(logMessage);
+    logger.LogWarning(logMessage); // También lo mandamos al logger por si acaso
+    // --- FIN DE CÓDIGO DE DEBUG ---
+    
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     context.Database.Migrate(); // Aplica solo las migraciones pendientes
 }
+
+// 🔹 Job cada 30 segundos (para probar tu servicio)
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    
+    recurringJobs.AddOrUpdate(
+        "mision-diaria",
+        Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Diaria)),
+        // Cron.Daily(0, 0)
+        "*/30 * * * * *" // <--- Modificado a 30 segundos
+    );
+    
+    recurringJobs.AddOrUpdate(
+        "mision-semanal",
+        Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Semanal)),
+        Cron.Weekly(DayOfWeek.Monday, 0, 0)
+    );
+    
+    recurringJobs.AddOrUpdate(
+        "mision-mensual",
+        Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Mensual)),
+        Cron.Monthly(1, 0, 0)
+    );
+}
+
+//RecurringJob.AddOrUpdate<MisionService>(
+//    "misiones-diarias",
+//    service => service.RenovarMisionesDiarias(),
+//    Cron.Daily(0, 0)); // todos los días a medianoche
+
+//RecurringJob.AddOrUpdate<MisionService>(
+//    "misiones-semanales",
+//    service => service.RenovarMisionesSemanales(),
+//    Cron.Weekly(DayOfWeek.Monday, 0, 0)); // cada lunes a medianoche
+
+//RecurringJob.AddOrUpdate<MisionService>(
+//    "misiones-mensuales",
+//    service => service.RenovarMisionesMensuales(),
+//    Cron.Monthly(1, 0, 0)); // primer día de cada mes a medianoche
+
+
+
 
 // Pipeline 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseHangfireDashboard();
 }
 
 app.MapHub<CicloHub>("/cicloHub");

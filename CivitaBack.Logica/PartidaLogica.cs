@@ -77,7 +77,7 @@ public class PartidaLogica : IPartidaLogica
             throw new ErrorInternoExcepction("Ocurrió un error al Actualizar un la Partida");
         }
     }
-
+    
     /// <summary>
     /// Crea una partida nueva para un usuario
     /// </summary>
@@ -234,6 +234,12 @@ public class PartidaLogica : IPartidaLogica
         return partida;
     }
 
-    
+    public async Task<Partida> ObtenerPorId(int idPartida)
+    {
+        var partida = await this._repositorioPartida.ObtenerPorId(idPartida);
+        if (partida == null)
+            throw new PartidaExcepcion("Partida no encontrada");
+        return partida;
+    }
 }
 

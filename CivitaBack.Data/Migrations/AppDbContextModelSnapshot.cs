@@ -417,6 +417,83 @@ namespace CivitaBack.Data.Migrations
                     b.ToTable("LogroPartida");
                 });
 
+            modelBuilder.Entity("CivitaBack.Data.BO.MisionEF", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CondicionId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("Creado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Disponible")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("Editado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CondicionId");
+
+                    b.ToTable("Mision", (string)null);
+                });
+
+            modelBuilder.Entity("CivitaBack.Data.BO.MisionPartidaEF", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Creado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Editado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("FechaCompletado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("FechaEntrega")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MisionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PartidaId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("Reclamado")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MisionId");
+
+                    b.HasIndex("PartidaId");
+
+                    b.ToTable("MisionPartida");
+                });
+
             modelBuilder.Entity("CivitaBack.Data.BO.PartidaEF", b =>
                 {
                     b.Property<int>("Id")
@@ -1012,6 +1089,36 @@ namespace CivitaBack.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Logro");
+
+                    b.Navigation("Partida");
+                });
+
+            modelBuilder.Entity("CivitaBack.Data.BO.MisionEF", b =>
+                {
+                    b.HasOne("CivitaBack.Data.BO.CondicionEF", "Condicion")
+                        .WithMany()
+                        .HasForeignKey("CondicionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Condicion");
+                });
+
+            modelBuilder.Entity("CivitaBack.Data.BO.MisionPartidaEF", b =>
+                {
+                    b.HasOne("CivitaBack.Data.BO.MisionEF", "Mision")
+                        .WithMany()
+                        .HasForeignKey("MisionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CivitaBack.Data.BO.PartidaEF", "Partida")
+                        .WithMany()
+                        .HasForeignKey("PartidaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mision");
 
                     b.Navigation("Partida");
                 });

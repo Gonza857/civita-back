@@ -1,4 +1,5 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 
@@ -17,6 +18,14 @@ namespace CivitaBack.Logica
         {
             Task<Usuario?> usuario = this._repositorioUsuario.ObtenerPorId(id);
             if (usuario == null) throw new Exception("No se encontró el usuario");
+            return usuario;
+        }
+
+        public async Task<Usuario> ObtenerPorCorreo(string correo)
+        {
+            var usuario = await this._repositorioUsuario.ObtenerUsuarioPorMail(correo);
+            if (usuario == null)
+                throw new UsuarioExcepcion("No se encontró el usuario");
             return usuario;
         }
 

@@ -4,10 +4,14 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>2730cba5-60ed-4a7b-914f-26c7ed97f43b</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="15.1.0" />
+    <PackageReference Include="Hangfire" Version="1.8.21" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.21" />
+    <PackageReference Include="Hangfire.PostgreSql" Version="1.20.12" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
       <PrivateAssets>all</PrivateAssets>

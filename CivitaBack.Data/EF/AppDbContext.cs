@@ -21,7 +21,11 @@ public partial class AppDbContext : DbContext
     public DbSet<TipoLogroEF> TipoLogro { get; set; }
     public DbSet<LogroEF> Logro { get; set; }
     public DbSet<LogroPartidaEF> LogroPartida { get; set; }
-
+    
+    public DbSet<MisionEF> Mision { get; set; }
+    
+    public DbSet<MisionPartidaEF> MisionPartida { get; set; }
+    
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

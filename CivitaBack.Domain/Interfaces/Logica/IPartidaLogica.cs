@@ -4,7 +4,7 @@ namespace CivitaBack.Domain.Interfaces.Logica;
 
 public interface IPartidaLogica
 {
-    Task<Partida> ObtenerPorUsuarioId(int IdUsuario);
+    Task<Partida> ObtenerPorUsuarioId(int idUsuario);
     Task<Partida> CrearPartida(int idUsuario);
     Task Actualizar(Partida partida, Usuario usuario);
     Task<List<Partida>> ObtenerPartidas();
@@ -15,4 +15,6 @@ public interface IPartidaLogica
     
     Task ReclamarLogros(Partida partida, List<Logro> logros);
     Task<Partida?> ObtenerMapaAsync(int partidaId);
+    
+    Task<Partida> ObtenerPorId(int idPartida);
 }

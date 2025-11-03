@@ -5,6 +5,7 @@ namespace CivitaBack.Domain.Interfaces.Repositorios
     public interface IPartidaRepositorio : IRepositorioBase<Partida>
     {
         Task<Partida?> ObtenerPorUsuarioId(int idUsuario);
+        Task<Partida?> ObtenerPorUsuarioCorreo(string correo);
         Task<Partida> CrearPartida(int idUsuario);
         Task<bool> ActualizarMapaAsync(Partida partida);
         

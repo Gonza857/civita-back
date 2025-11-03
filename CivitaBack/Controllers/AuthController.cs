@@ -1,95 +1,92 @@
 ﻿using AutoMapper;
-using CivitaBack.Logica;
-using CivitaBack.Data;
-using Microsoft.AspNetCore.Mvc;
 using CivitaBack.Data.DTO;
-using CivitaBack.Domain.Interfaces.Logica;
+using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Excepciones;
+using CivitaBack.Domain.Interfaces.Logica;
+using Microsoft.AspNetCore.Mvc;
 
+namespace CivitaBack.Api.Controllers;
 
-namespace CivitaBack.Api.Controllers
+[Route("api/[controller]")]
+public class AuthController : BaseApiController
 {
-    [Route("api/[controller]")]
-    public class AuthController : BaseApiController
+    private readonly IAuthLogica _authLogica;
+    private readonly IPartidaLogica _partidaLogica;
+    private readonly IUsuarioLogica _usuarioLogica;
+    private readonly IInicialLogica _inicialLogica;
+    private readonly ILogger _logger;
+
+    public AuthController(
+        IAuthLogica authLogica,
+        IPartidaLogica partidaLogica,
+        IUsuarioLogica usuarioLogica,
+        IInicialLogica inicialLogica,
+        ILogger<AuthController> logger,
+        IMapper mapper) : base(mapper)
     {
-        private readonly IAuthLogica _authLogica;
-        private readonly IPartidaLogica _partidaLogica;
-        private readonly IUsuarioLogica _usuarioLogica;
-        private readonly IRecursoLogica _recursoLogica;
+        _authLogica = authLogica;
+        _partidaLogica = partidaLogica;
+        _usuarioLogica = usuarioLogica;
+        _inicialLogica = inicialLogica;
+        _logger = logger;
+    }
 
-        public AuthController(
-            IAuthLogica authLogica , 
-            IPartidaLogica partidaLogica, 
-            IUsuarioLogica usuarioLogica, 
-            IRecursoLogica recursoLogica,
-            IMapper mapper): base(mapper)
+    [HttpPost("registro")]
+    public async Task<IActionResult> Registrar([FromBody] RegistroDTO request)
+    {
+        try
         {
-            _authLogica = authLogica;
-            _partidaLogica = partidaLogica;
-            _usuarioLogica = usuarioLogica;
-            _recursoLogica = recursoLogica;
+            Usuario usuario = await _authLogica.CrearUsuario(request.NombreUsuario, request.Mail, request.Password);
+            await this._inicialLogica.IniciarPartida(usuario);
+            return Ok(new { mensaje = "Usuario registrado correctamente!", usuario });
         }
-
-        [HttpPost("registro")]
-        public async Task<IActionResult> Registrar([FromBody] RegistroDTO request)
+        catch (ValidacionRegistroException ex)
         {
-            try
-            {
-                var usuario = await _authLogica.RegistrarUsuarioAsync(request.NombreUsuario, request.Mail, request.Password);
-
-                var partida = await _partidaLogica.CrearPartida(usuario.Id);
-                
-               await _recursoLogica.ConfigurarInicial(partida);
-
-                return Ok(new { mensaje = "Usuario registrado correctamente!", usuario });
-            }
-            catch (ValidacionRegistroException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Error interno del servidor.", detalle = ex.Message });
-            }
+            return BadRequest(ex.Message);
         }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        catch (Exception ex)
         {
-            try
-            {
-                var resultado = await _authLogica.LoginAsync(request);
-
-                var partidaDTO = _partidaLogica.ObtenerPorUsuarioId(resultado.IdUsuario);
-
-                var response = new LoginResponse
-                {
-                    Token = resultado.Token,
-                    NombreUsuario = resultado.NombreUsuario,
-                    Mail = resultado.Mail,
-                    IdUsuario = resultado.IdUsuario,
-                    IdPartida = partidaDTO.Id
-                };
-
-                return Ok(response);
-            } catch (AutenticacionException ex)
-            {
-                return Unauthorized(new { error = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { error = "Error interno del servidor." });
-            }
-          
-        }
-
-        [HttpGet("existeNombre")]
-        public async Task<IActionResult> ExisteNombre([FromQuery] string? nombre)
-        {
-            if (nombre == null) return BadRequest("El nombre del usuario no puede ser nulo.");
-            var existe = await _usuarioLogica.ObtenerUsuarioPorNombre(nombre) != null;
-            return Ok(new { existe });
+            _logger.LogError(ex.Message);
+            return Problem("Ocurrió un error al realizar el registro.");
         }
     }
 
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] IniciarSesionDTO iniciarSesionDto)
+    {
+        try
+        {
+            string token = await _authLogica.IniciarSesion(iniciarSesionDto.Mail, iniciarSesionDto.Contrasena);
+            Usuario usuario = await _usuarioLogica.ObtenerPorCorreo(iniciarSesionDto.Mail);
+            Partida partida = await _partidaLogica.ObtenerPorUsuarioId(usuario.Id);
+
+            var response = new LoginDTO
+            {
+                Token = token,
+                NombreUsuario = usuario.NombreUsuario!,
+                Mail = usuario.Mail!,
+                IdUsuario = usuario.Id!,
+                IdPartida = partida.Id
+            };
+
+            return Ok(response);
+        }
+        catch (AutenticacionException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return Problem("Ocurrió un error al iniciar sesión");
+        }
+    }
+
+    [HttpGet("existeNombre")]
+    public async Task<IActionResult> ExisteNombre([FromQuery] string? nombre)
+    {
+        if (nombre == null) return BadRequest("El nombre del usuario no puede ser nulo.");
+        var existe = await _usuarioLogica.ObtenerUsuarioPorNombre(nombre) != null;
+        return Ok(new { existe });
+    }
 }
