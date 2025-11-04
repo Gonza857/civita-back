@@ -15,6 +15,7 @@ public class TipoEstructuraRepositorio
     public async Task<TipoEstructura?> ObtenerPorId(int id)
     {
         var estructura = await _context.TipoEstructura
+                .AsNoTracking()
                 .FirstOrDefaultAsync(tl => tl.Id == id);
         return base.Mapear<TipoEstructura>(estructura);
     }

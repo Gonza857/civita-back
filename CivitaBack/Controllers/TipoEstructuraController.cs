@@ -91,7 +91,8 @@ public class TipoEstructuraController : BaseApiController
         
         try
         {
-            await this._tipoEstructuraLogica.Actualizar(base.Mapear<TipoEstructura>(tipoEstructuraDto), id);
+            var estructura = base.Mapear<TipoEstructura>(tipoEstructuraDto);
+            await this._tipoEstructuraLogica.Actualizar(estructura, id);
             return Ok();
         }
         catch (Exception ex)

@@ -73,7 +73,7 @@ public class PartidaLogica : IPartidaLogica
         }
         catch (Exception ex)
         {
-            throw new ErrorInternoExcepction("Ocurrió un error al Actualizar un la Partida");
+            throw new ErrorInternoException("Ocurrió un error al Actualizar un la Partida");
         }
     }
     
@@ -97,7 +97,7 @@ public class PartidaLogica : IPartidaLogica
         }
         catch (Exception ex)
         {
-            throw new ErrorInternoExcepction("Ocurrió un error al Actualizar un la Partida");
+            throw new ErrorInternoException("Ocurrió un error al Actualizar un la Partida");
         }
         
     }

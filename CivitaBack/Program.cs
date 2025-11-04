@@ -92,7 +92,7 @@ builder.Services.AddScoped<IEstructuraMapaLogica, EstructuraMapaLogica>();
 builder.Services.AddScoped<IEstructuraMapaRepositorio, EstructuraMapaRepositorio>();
 
 builder.Services.AddScoped<ITipLogica, TipLogica>();
-builder.Services.AddScoped<ITipsRepositorio, TipsRepositorio>();
+builder.Services.AddScoped<ITipsRepositorio, TipRepositorio>();
 
 builder.Services.AddScoped<ITipoTipLogica, TipoTipLogica>();
 builder.Services.AddScoped<ITipoTipRepositorio, TipoTipRepositorio>();

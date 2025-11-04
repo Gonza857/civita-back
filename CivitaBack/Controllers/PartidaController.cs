@@ -47,7 +47,7 @@ public class PartidaController : BaseApiController
         {
             return BadRequest(ex.Message);
         }
-        catch (ErrorInternoExcepction ex)
+        catch (ErrorInternoException ex)
         {
             _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar la partida.");
@@ -83,7 +83,7 @@ public class PartidaController : BaseApiController
         {
             return BadRequest(ex.Message);
         }
-        catch (ErrorInternoExcepction ex)
+        catch (ErrorInternoException ex)
         {
             _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar la partida.");

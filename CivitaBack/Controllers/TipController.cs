@@ -38,8 +38,6 @@ namespace CivitaBack.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerPorId(int id)
         {
-            if (id <= 0)
-                return BadRequest("No se proporcionó id");
             try
             {
                 var tip = await this._tipLogica.ObtenerPorIdTipo(id);
@@ -56,11 +54,10 @@ namespace CivitaBack.Api.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> Actualizar([FromBody] TipDTO? tipDto, int id)
         {
-            if (tipDto == null || id <= 0)
-                return BadRequest("No se proporcionó Tip");
             try
             {
-                await this._tipLogica.Actualizar(base.Mapear<Tip>(tipDto), id);
+                var tip = base.Mapear<Tip>(tipDto);
+                await this._tipLogica.Actualizar(tip, id);
                 return Ok();
             }
             catch (Exception ex)

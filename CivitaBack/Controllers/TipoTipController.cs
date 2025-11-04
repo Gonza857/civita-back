@@ -13,8 +13,8 @@ public class TipoTipController : BaseApiController
 {
     private readonly ITipoTipLogica _tipoTipLogica;
     private readonly ILogger<TipoLogroController> _logger;
-    
-    public TipoTipController(ITipoTipLogica ttl, IMapper mapper, ILogger<TipoLogroController> logger) : base (mapper)
+
+    public TipoTipController(ITipoTipLogica ttl, IMapper mapper, ILogger<TipoLogroController> logger) : base(mapper)
     {
         this._tipoTipLogica = ttl;
         this._logger = logger;
@@ -33,9 +33,8 @@ public class TipoTipController : BaseApiController
             _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener el listado de Tipos de Tips");
         }
-
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> Guardar([FromBody] TipoTipDTO? nuevoTipTipDto)
     {
@@ -52,11 +51,10 @@ public class TipoTipController : BaseApiController
             _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar el Tipo de Tip");
         }
-        
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Eliminar(int id) 
+    public async Task<IActionResult> Eliminar(int id)
     {
         try
         {
@@ -76,6 +74,7 @@ public class TipoTipController : BaseApiController
         try
         {
             var tipoTip = await this._tipoTipLogica.ObtenerPorId(id);
+            if (tipoTip == null) return NotFound();
             return Ok(base.Mapear<TipoTip>(tipoTip));
         }
         catch (Exception ex)
@@ -90,7 +89,7 @@ public class TipoTipController : BaseApiController
     {
         if (tipoTipDto == null)
             return BadRequest("Los datos recibidos son inválidos");
-        
+
         try
         {
             await this._tipoTipLogica.Actualizar(base.Mapear<TipoTip>(tipoTipDto), id);
@@ -103,5 +102,3 @@ public class TipoTipController : BaseApiController
         }
     }
 }
-    
-
