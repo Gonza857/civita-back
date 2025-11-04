@@ -22,7 +22,7 @@ namespace CivitaBack.Data.BO
         public RecursoEF? Recursos { get; set; }
         public List<EventoEF>? Evento { get; set; }
         public List<TiendaEF>? Tienda { get; set; }
-        public List<EstructuraMapaEF>? EstructuraMapa { get; set; }
+        public List<EstructuraMapaEF> EstructuraMapa { get; set; } = new List<EstructuraMapaEF>();
         public List<TipEnPartidaEF>? TipEnPartida { get; set; }
         // Relación N:N
         public List<LogroPartidaEF> LogroPartidas { get; set; }
