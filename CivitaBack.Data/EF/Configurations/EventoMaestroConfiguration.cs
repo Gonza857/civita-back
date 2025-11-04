@@ -20,5 +20,23 @@ public class EventoMaestroConfiguration : IEntityTypeConfiguration<EventoMaestro
                .WithOne(e => e.EventoMaestro)
                .HasForeignKey(e => e.EventoMaestroId)
                .OnDelete(DeleteBehavior.Cascade);
+
+        var seedDate = new DateTime(2025, 11, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        builder.HasData(
+                new EventoMaestroEF
+                {
+                    Id = 1, // ¡Id manual es obligatorio!
+                    Nombre = "Separación de residuos",
+                    TextoDescripcion = "Los vecinos solicitan un sistema de reciclaje en la ciudad debido a la alta contaminación.",
+                    TextoAceptar = "En Argentina, solo el 3% de los residuos se reciclan. Separar la basura reduce rellenos sanitarios y emisiones de metano.",
+                    TextoRechazar = "Cuando no se recicla, los rellenos sanitarios crecen y emiten metano, un gas 28 veces peor que el CO₂ para el clima.",
+                    EcoCoinsAceptar = -100,
+                    FelicidadAceptar = 10,
+                    ContaminacionAceptar = -10,
+                    FelicidadRechazar = -10,
+                    ContaminacionRechazar = 20,
+                    Creado = seedDate,
+                });
     }
 }
