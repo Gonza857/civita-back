@@ -26,12 +26,16 @@ builder.Services.AddSwaggerGen();
 // CORS para Vite Dev
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowViteDev", policy =>
+    // 1. Cambiá el nombre de la política (más claro)
+    options.AddPolicy("AllowSpecificOrigins", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // credenciales
+        policy.WithOrigins(
+                "http://localhost:5173",           // Tu localhost de Vite (Desarrollo)
+                "https://front-civita.vercel.app"  // ¡LA SOLUCIÓN! (Producción Vercel)
+            ) 
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); 
     });
 });
 
@@ -122,9 +126,7 @@ builder.Services.AddHostedService(provider => provider.GetRequiredService<Backgr
 
 builder.Services.AddAutoMapper(cfg =>
 {
-    // Aquí adentro podrías agregar configuraciones globales
-    // si las necesitaras, pero para tu caso, lo dejamos vacío.
-
+    
 }, typeof(Program));
 
 builder.Services.AddSignalR();
@@ -146,26 +148,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
-// Aquí, después de construir la app, aseguramos que la DB exista
 using (var scope = app.Services.CreateScope())
 {
-    // --- INICIO DE CÓDIGO DE DEBUG (¡BORRAR DESPUÉS!) ---
-    var services = scope.ServiceProvider;
-    var config = services.GetRequiredService<IConfiguration>();
-    var logger = services.GetRequiredService<ILogger<Program>>();
-
-    // 1. Obtenemos el connection string que Azure está leyendo
-    var connectionString = config.GetConnectionString("DefaultConnection");
-
-    // 2. Lo imprimimos a la consola (Log Stream)
-    var logMessage = $"--- DEBUGGING CONNECTION STRING --- \n 'DefaultConnection' = '{connectionString ?? "¡ES NULL O VACÍO!"}' \n --- FIN DEBUG ---";
-    
-    Console.WriteLine(logMessage);
-    logger.LogWarning(logMessage); // También lo mandamos al logger por si acaso
-    // --- FIN DE CÓDIGO DE DEBUG ---
-    
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.Migrate(); // Aplica solo las migraciones pendientes
+    context.Database.Migrate(); 
 }
 
 // 🔹 Job cada 30 segundos (para probar tu servicio)
@@ -193,25 +179,6 @@ using (var scope = app.Services.CreateScope())
     );
 }
 
-//RecurringJob.AddOrUpdate<MisionService>(
-//    "misiones-diarias",
-//    service => service.RenovarMisionesDiarias(),
-//    Cron.Daily(0, 0)); // todos los días a medianoche
-
-//RecurringJob.AddOrUpdate<MisionService>(
-//    "misiones-semanales",
-//    service => service.RenovarMisionesSemanales(),
-//    Cron.Weekly(DayOfWeek.Monday, 0, 0)); // cada lunes a medianoche
-
-//RecurringJob.AddOrUpdate<MisionService>(
-//    "misiones-mensuales",
-//    service => service.RenovarMisionesMensuales(),
-//    Cron.Monthly(1, 0, 0)); // primer día de cada mes a medianoche
-
-
-
-
-// Pipeline 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -222,7 +189,7 @@ if (app.Environment.IsDevelopment())
 app.MapHub<CicloHub>("/cicloHub");
 app.MapHub<EventoHub>("/eventoHub");
 app.UseHttpsRedirection();
-app.UseCors("AllowViteDev");
+app.UseCors("AllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
