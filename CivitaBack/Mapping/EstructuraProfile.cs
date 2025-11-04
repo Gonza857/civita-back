@@ -29,5 +29,6 @@ public class EstructuraProfile : Profile
             );;
         
         CreateMap<Estructura, EstructuraCondicionDTO>();
+
     }
 }

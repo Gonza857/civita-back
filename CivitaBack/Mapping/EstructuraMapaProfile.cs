@@ -16,6 +16,7 @@ namespace CivitaBack.Api.Mapping
             CreateMap<EstructuraMapa, EstructuraMapaEF>().ReverseMap();
             CreateMap<EstructuraMapa, EstructuraMapaDTO>();
             CreateMap<EstructuraMapaEF, EstructuraMapa>();
+            CreateMap<EliminarEstructuraDTO, EstructuraMapa>();
         }
     }
 }

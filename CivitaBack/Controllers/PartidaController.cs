@@ -259,10 +259,11 @@ public class PartidaController : BaseApiController
         {
             try
             {
-                await _estructuraMapaLogica.EliminarEstructuraAsync(base.Mapear<EstructuraMapa>(dto));
+                var estructurasEliminar = base.Mapear<EstructuraMapa>(dto); 
+                await _estructuraMapaLogica.EliminarEstructuraAsync(estructurasEliminar);
                 return Ok("Estructura eliminada correctamente");
             }
-            catch (InvalidOperationException ex)
+            catch (EstructuraMapaException ex)
             {
                 return NotFound(ex.Message);
             }

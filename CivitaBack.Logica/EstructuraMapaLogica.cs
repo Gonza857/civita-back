@@ -1,4 +1,5 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
@@ -25,14 +26,14 @@ public class EstructuraMapaLogica : IEstructuraMapaLogica
 
     public async Task EliminarEstructuraAsync(EstructuraMapa em)
     {
-        var entidad = await _estructuraMapaRepositorio.ObtenerCoincidenteAsync(em.PartidaId, em.EstructuraId, em.X, em.Y, em.Width,
-            em.Height);
+        var entidad = await _estructuraMapaRepositorio.ObtenerCoincidenteAsync(
+            em.PartidaId, em.EstructuraId, em.X, em.Y, em.Width, em.Height
+            );
 
         if (entidad is null)
-            throw new InvalidOperationException("No se encontró la estructura a eliminar");
+            throw new EstructuraMapaException("No se encontró la estructura a eliminar");
 
         await _estructuraMapaRepositorio.EliminarAsync(entidad);
-        
         await this._uow.CommitAsync();
     }
 
