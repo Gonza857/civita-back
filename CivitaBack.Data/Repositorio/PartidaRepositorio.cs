@@ -54,7 +54,11 @@ public class PartidaRepositorio
 
     public async Task<Partida?> ObtenerPorId(int id)
     {
-        var partida = await base.ObtenerPorId(e => e.Id == id);
+        var partida = await _context.Partida
+            .Include(p => p.Recursos)
+            .Where(p => p.Id == id)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
         return base.Mapear<Partida>(partida);
     }
 

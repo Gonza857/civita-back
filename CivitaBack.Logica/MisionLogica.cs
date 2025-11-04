@@ -25,21 +25,6 @@ public class MisionLogica : IMisionLogica
         this._unidadDeTrabajo = unidadDeTrabajo;
         this._misionPartidaRepositorio = impr;
     }
-    
-    public async Task<List<Mision>> ObtenerMisionesDia(int idUsuario)
-    {
-        return await this._misionRepositorio.ObtenerMisionesDia(idUsuario);
-    }
-
-    public async Task<List<Mision>> ObtenerMisionesSemana(int idUsuario)
-    {
-        return await this._misionRepositorio.ObtenerMisionesSemana(idUsuario);
-    }
-
-    public async Task<List<Mision>> ObtenerMisionesMes(int idUsuario)
-    {
-        return await this._misionRepositorio.ObtenerMisionesMes(idUsuario);
-    }
 
     public async Task ResetMisiones(TipoMision tipoMision)
     {
@@ -105,11 +90,18 @@ public class MisionLogica : IMisionLogica
         return mision;
     }
 
-    public async Task<List<Mision>> ObtenerMisionesActivas(Partida? partida)
+    
+    // retorna listado de misiones (disponibles) otorgadas a una partida (diarias, semanales y mensuales)
+    public async Task<List<Mision>> ObtenerMisionesActivasParaPartida(Partida partida)
     {
         this.ValidarPartida(partida);
         var misionesPartidas = await this._misionPartidaRepositorio.ObtenerMisionesPartida(partida.Id);
         return misionesPartidas.Select(mp => mp.Mision).ToList();
+    }
+    
+    public async Task<List<Mision>> ObtenerMisionesDisponibles()
+    {
+        return await this._misionRepositorio.ListadoActivo();
     }
 
     public async Task AsignarMisiones(Partida? partida)
@@ -118,9 +110,9 @@ public class MisionLogica : IMisionLogica
         var misiones = await this._misionRepositorio.ListadoActivo();
         await this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida!);
         await this._unidadDeTrabajo.CommitAsync();
-
     }
     
+
     private void ValidarPartida(Partida? partida)
     {
         if (partida == null) throw new MisionExcepcion("No se encontró la partida");

@@ -48,6 +48,18 @@ public class MisionPartidaRepositorio
 
     }
 
+    public async Task<MisionPartida> ObtenerUnaMisionDePartida(int idPartida, int idMision)
+    {
+        var misionPartida = await this.ObtenerMisionDePartidaBase(idPartida, idMision);
+        return base.Mapear<MisionPartida>(misionPartida);
+    }
+
+    public async Task<Mision> ObtenerMisionPartidaPorId(int idPartida, int idMision)
+    {
+        var misionPartida = await this.ObtenerMisionDePartidaBase(idPartida, idMision);
+        return base.Mapear<Mision>(misionPartida.Mision);
+    }
+
     public async Task<List<MisionPartida>> Listado()
     {
         return await base.ObtenerTodos();
@@ -60,5 +72,48 @@ public class MisionPartidaRepositorio
             .Where(mp => mp.Mision.Tipo == tipoMision)
             .ToListAsync();
         return base.MapearLista<MisionPartida>(misiones);
+    }
+
+    private async Task<MisionPartidaEF> ObtenerMisionDePartidaBase(int idPartida, int idMision)
+    {
+        return await _context.MisionPartida
+            .Include(mp => mp.Mision)
+            .ThenInclude(m => m.Condicion)
+            .ThenInclude(c => c.Recompensa)
+            .Where(mp => mp.PartidaId == idPartida && mp.MisionId == idMision)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+    }
+    
+    private async Task<List<Mision>> ObtenerMisionesSegunFecha(int idUsuario, DateTime limite)
+    {
+        var misiones = await _context.MisionPartida
+            .Include(mp => mp.Partida)
+            .ThenInclude(p => p.Usuario)
+            .Where(e => e.Partida.Usuario.Id == idUsuario && e.FechaEntrega > limite)
+            .Select(mp => mp.Mision)
+            .ToListAsync();
+        return base.MapearLista<Mision>(misiones);
+    }
+
+    public async Task<List<Mision>> ObtenerMisionesDia(int idUsuario)
+    {
+        // Doy por sentado que ya le asigné todas las misiones
+        DateTime limite = DateTime.UtcNow.AddDays(-1); 
+        return await this.ObtenerMisionesSegunFecha(idUsuario, limite);
+    }
+
+    public async Task<List<Mision>> ObtenerMisionesSemana(int idUsuario)
+    {
+        // Doy por sentado que ya le asigné todas las misiones
+        DateTime limite = DateTime.UtcNow.AddDays(-7); 
+        return await this.ObtenerMisionesSegunFecha(idUsuario, limite);
+    }
+
+    public async Task<List<Mision>> ObtenerMisionesMes(int idUsuario)
+    {
+        // Doy por sentado que ya le asigné todas las misiones
+        DateTime limite = DateTime.UtcNow.AddDays(-30); 
+        return await this.ObtenerMisionesSegunFecha(idUsuario, limite);
     }
 }
