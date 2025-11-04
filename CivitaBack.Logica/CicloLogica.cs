@@ -26,6 +26,15 @@ namespace CivitaBack.Logica
             foreach (var partida in partidas)
             {
                 ProcesarPartida(partida);
+
+                partida.EstructuraMapa = null;
+                partida.Evento = null;
+                partida.Tienda = null;
+                partida.LogroPartidas = null;
+                partida.MisionPartidas = null;
+                partida.TipEnPartida = null;
+                partida.Usuario = null;
+
                 await _partidaRepositorio.Actualizar(partida);
             }
 

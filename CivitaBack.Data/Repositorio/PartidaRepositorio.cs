@@ -182,11 +182,11 @@ public class PartidaRepositorio
     public async Task<List<Partida>> ObtenerTodasConEstructurasYRecursosAsync()
     {
         var listaPartidasEF = await _dbSet
+             .AsNoTracking()
              .Include(p => p.Recursos)
              .Include(p => p.EstructuraMapa)
              .ThenInclude(em => em.Estructura)
              .ThenInclude(e => e.TipoEstructura)
-             .AsNoTracking()
              .ToListAsync();
 
         return MapearLista<Partida>(listaPartidasEF);
