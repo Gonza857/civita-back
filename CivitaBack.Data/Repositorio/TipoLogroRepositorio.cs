@@ -1,56 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoMapper;
 using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
-public interface ITipoLogroRepositorio : IRepositorioBase<TipoLogro>
+public class TipoLogroRepositorio 
+    : GenericoRepositorio<TipoLogro, TipoLogroEF>, ITipoLogroRepositorio 
 {
-
-}
-
-public class TipoLogroRepositorio : GenericoRepositorio, ITipoLogroRepositorio
-{
-    public TipoLogroRepositorio(AppDbContext context) : base(context) { }
-    
-    public async Task Actualizar(TipoLogro entidad)
-    {
-        entidad.Editado = DateTime.UtcNow;
-        _context.TipoLogro.Update(entidad);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task Eliminar(int id)
-    {
-        var tipoLogro = await _context.TipoLogro
-            .FirstOrDefaultAsync(tl => tl.Id == id);
-        
-        if (tipoLogro != null)
-        { 
-            _context.TipoLogro.Remove(tipoLogro);
-            await _context.SaveChangesAsync();
-        }
-    }
-    
-    public async Task Guardar(TipoLogro tipoLogro)
-    {
-        await _context.TipoLogro.AddAsync(tipoLogro);
-        await _context.SaveChangesAsync();
-    }
+    public TipoLogroRepositorio (AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
     public async Task<TipoLogro?> ObtenerPorId(int id)
     {
-        return await _context.TipoLogro
+        var tipoLogroEf = await _context.TipoLogro
             .FirstOrDefaultAsync(tl => tl.Id == id);
+        return base.Mapear<TipoLogro>(tipoLogroEf);
     }
     
-    public async Task<List<TipoLogro>> ObtenerTodos()
-    {
-        return await _context.TipoLogro.ToListAsync();
-    }
 }

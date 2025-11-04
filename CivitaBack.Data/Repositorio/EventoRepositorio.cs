@@ -1,46 +1,39 @@
-﻿using CivitaBack.Data.BO;
+﻿using AutoMapper;
+using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CivitaBack.Data.Repositorio
 {
-
-    public interface IEventoRepositorio
+    public class EventoRepositorio : GenericoRepositorio<Evento,EventoEF>, IEventoRepositorio
     {
-        Task<EventoMaestro?> ObtenerEventoMaestroAsync();
-        Task CrearEventoAsync(Evento evento);
-        Task<Evento?> ObtenerEventoConPartidaAsync(int eventoId);
-        Task GuardarCambiosAsync();
-    }
-    public class EventoRepositorio : GenericoRepositorio, IEventoRepositorio
-    {
-        public EventoRepositorio(AppDbContext context) : base(context) { }
+        public EventoRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
         public async Task<EventoMaestro?> ObtenerEventoMaestroAsync()
-        {
-            return await _context.EventoMaestro.FirstOrDefaultAsync();
+        {           
+            var eventoMaestroEF = await _context.EventoMaestro
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            return Mapear<EventoMaestro>(eventoMaestroEF);
         }
 
         public async Task CrearEventoAsync(Evento evento)
         {
-            await _context.Evento.AddAsync(evento);
+            await base.Agregar(evento);
         }
 
         public async Task<Evento?> ObtenerEventoConPartidaAsync(int eventoId)
         {
-            return await _context.Evento
-                    .Include(e => e.Partida).ThenInclude(p => p.Recursos)
-                    .FirstOrDefaultAsync(e => e.Id == eventoId);
-        }
+            var eventoEF = await _context.Evento 
+                 .Include(e => e.Partida).ThenInclude(p => p.Recursos)
+                 .Where(e => e.Id == eventoId)
+                 .AsNoTracking()
+                 .FirstOrDefaultAsync();
 
-        public async Task GuardarCambiosAsync()
-        {
-            await _context.SaveChangesAsync();
+            return Mapear<Evento>(eventoEF);
         }
     }
 }

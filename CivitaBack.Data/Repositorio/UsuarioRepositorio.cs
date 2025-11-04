@@ -1,64 +1,40 @@
-﻿using CivitaBack.Data.BO;
+﻿using AutoMapper;
+using CivitaBack.Data.BO;
 using CivitaBack.Data.EF;
-using CivitaBack.Data.Repositorio;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using Microsoft.EntityFrameworkCore;
 
-namespace CivitaBack.Data.Repositorio
+namespace CivitaBack.Data.Repositorio;
+
+public class UsuarioRepositorio
+    : GenericoRepositorio<Usuario, UsuarioEF>, IUsuarioRepositorio
 {
-    public interface IUsuarioRepositorio
+    public UsuarioRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
+    
+    public async Task<Usuario?> ObtenerUsuarioPorMail(string mail)
     {
-        Task<Usuario> ObtenerUsuarioPorMail(string mail);
-        Task<Usuario?> ObtenerUsuarioPorNombre(string nombreUsuario);
-        Task<Usuario> CrearUsuario(Usuario usuario);
-
-        Task<Usuario> ObtenerPorId(int id);
-        Task<List<Usuario>> ObtenerTodosLosUsuarios();
-
+        var usuarioEf = await _context.Usuario.Include(u => u.Partida).AsNoTracking().FirstOrDefaultAsync(u => u.Mail == mail);
+        return base.Mapear<Usuario>(usuarioEf);
     }
 
-    public class UsuarioRepositorio : IUsuarioRepositorio
+    public async Task<Usuario?> ObtenerUsuarioPorNombre(string nombreUsuario)
     {
-        private readonly AppDbContext _context;
-       
+        var usuarioEf = await _context.Usuario
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
+        return base.Mapear<Usuario>(usuarioEf);
+    }
 
-        public UsuarioRepositorio(AppDbContext context)
-        {
-            _context = context;
-        }
+    public async Task<Usuario> CrearUsuario(Usuario usuario)
+    {
+        await base.Agregar(usuario);
+        return usuario;
+    }
 
-        public async Task<Usuario> ObtenerUsuarioPorMail(string mail)
-        {
-            return await _context.Usuario.AsNoTracking().FirstOrDefaultAsync(u => u.Mail == mail);
-        }
-
-        public async Task<Usuario?> ObtenerUsuarioPorNombre(string nombreUsuario)
-        {
-            return await _context.Usuario
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
-        }
-
-        public async Task<Usuario> CrearUsuario(Usuario usuario)
-        {
-            _context.Usuario.Add(usuario);
-            await _context.SaveChangesAsync();
-            return usuario;
-        }
-
-        public Task<Usuario> ObtenerPorId(int id)
-        {
-            return _context.Usuario.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
-        }
-        
-        public async Task<List<Usuario>> ObtenerTodosLosUsuarios()
-        {
-            return await _context.Usuario.AsNoTracking().ToListAsync();
-        }
-
+    public async Task<Usuario?> ObtenerPorId(int id)
+    {
+        var usuario = await base.ObtenerPorId(e => e.Id == id);
+        return base.Mapear<Usuario>(usuario);
     }
 }

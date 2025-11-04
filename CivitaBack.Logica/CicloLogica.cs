@@ -1,35 +1,36 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.Repositorio;
+﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
+using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Utils;
 
 namespace CivitaBack.Logica
 {
-    public interface ICicloLogica
-    {
-        Task<List<Partida>> EjecutarCicloAsync();
-
-    }
     public class CicloLogica : ICicloLogica
     {
 
-        private readonly ICicloRepositorio _cicloRepositorio;
+        private readonly IPartidaRepositorio _partidaRepositorio;
+        private readonly IUnidadDeTrabajo _uow;
 
-        public CicloLogica(ICicloRepositorio cicloRepositorio)
+        public CicloLogica(IPartidaRepositorio partidaRepositorio, IUnidadDeTrabajo uow)
         {
-            _cicloRepositorio = cicloRepositorio;
+            _partidaRepositorio = partidaRepositorio;
+            _uow = uow;
         }
 
         public async Task<List<Partida>> EjecutarCicloAsync()
         {
-            List<Partida> partidas = await _cicloRepositorio.ObtenerPartidasConEstructuras();
+            List<Partida> partidas = await _partidaRepositorio.ObtenerTodasConEstructurasYRecursosAsync();
 
             if (partidas == null || partidas.Count == 0) return new List<Partida>();
 
             foreach (var partida in partidas)
             {
                 ProcesarPartida(partida);
+                await _partidaRepositorio.Actualizar(partida);
             }
 
-            await _cicloRepositorio.GuardarCambiosAsync();
+            await _uow.CommitAsync();
+
             return partidas;
         }
 
@@ -41,26 +42,28 @@ namespace CivitaBack.Logica
             Recurso recursosPartida = partida.Recursos;
             int nuevaPoblacion = 0;
 
-            foreach (var estructuraEnMapa in partida.EstructuraMapa)
+            if (partida.EstructuraMapa != null)
             {
+                foreach (var estructuraEnMapa in partida.EstructuraMapa)
+                {
+                    if (estructuraEnMapa.Estructura == null || estructuraEnMapa.Estructura.TipoEstructura == null)
+                        continue;
 
-                if (estructuraEnMapa.Estructura == null || estructuraEnMapa.Estructura.TipoEstructura == null)
-                    continue;
+                    var estructura = estructuraEnMapa.Estructura;
+                    var tipoEstructura = estructura.TipoEstructura;
 
-                var estructura = estructuraEnMapa.Estructura;
-                var tipoEstructura = estructura.TipoEstructura;
+                    recursosPartida.Energia =
+                        ActualizarRecurso(recursosPartida.Energia, tipoEstructura.EnergiaPorCiclo, true);
+                    recursosPartida.EcoCoins =
+                        ActualizarRecurso(recursosPartida.EcoCoins, tipoEstructura.DineroPorCiclo, false);
+                    recursosPartida.Felicidad =
+                        ActualizarRecurso(recursosPartida.Felicidad, estructura.FelicidadCiclo, true);
+                    recursosPartida.Contaminacion =
+                        ActualizarRecurso(recursosPartida.Contaminacion, estructura.ContaminacionCiclo, true);
 
-                recursosPartida.Energia =
-                    ActualizarRecurso(recursosPartida.Energia, tipoEstructura.EnergiaPorCiclo, true);
-                recursosPartida.EcoCoins =
-                    ActualizarRecurso(recursosPartida.EcoCoins, tipoEstructura.DineroPorCiclo, false);
-                recursosPartida.Felicidad =
-                    ActualizarRecurso(recursosPartida.Felicidad, estructura.FelicidadCiclo, true);
-                recursosPartida.Contaminacion =
-                    ActualizarRecurso(recursosPartida.Contaminacion, estructura.ContaminacionCiclo, true);
-
-                if (tipoEstructura.Capacidad > 0)
-                    nuevaPoblacion += tipoEstructura.Capacidad;
+                    if (tipoEstructura.Capacidad > 0)
+                        nuevaPoblacion += tipoEstructura.Capacidad;
+                }
             }
 
             if (recursosPartida.Contaminacion > 70)

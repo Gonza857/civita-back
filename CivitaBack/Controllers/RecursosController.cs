@@ -1,19 +1,21 @@
-﻿using CivitaBack.Data.DTO;
-using CivitaBack.Logica;
-using CivitaBack.Logica.Excepciones;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Interfaces.Logica;
+using CivitaBack.Domain.Excepciones;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
-    public class RecursosController : ControllerBase
+    public class RecursosController : BaseApiController
     {
 
         private readonly IRecursoLogica _recursoLogica;
         private readonly ILogger<RecursosController> _logger;
-        public RecursosController(IRecursoLogica rl, ILogger<RecursosController> logger)
+        public RecursosController(
+            IRecursoLogica rl, 
+            ILogger<RecursosController> logger, 
+            IMapper mapper) : base (mapper)
         {
             this._recursoLogica = rl;
             this._logger = logger;
@@ -24,8 +26,8 @@ namespace CivitaBack.Api.Controllers
         {
             try
             {
-                RecursoDTO recursos = await this._recursoLogica.ObtenerRecursos(idPartida);
-                return Ok(recursos);
+                var recurso = await this._recursoLogica.ObtenerRecursos(idPartida);
+                return Ok(base.Mapear<RecursoDTO>(recurso));
             }
             catch (PartidaExcepcion ex)
             {
@@ -37,8 +39,7 @@ namespace CivitaBack.Api.Controllers
                 return Problem("Ocurrió un error");
             }
         }
-
-        //  Aumentar energía
+        
         [HttpPost("subirEnergia/{idPartida}")]
         public async Task<IActionResult> SubirEnergia(int idPartida)
         {

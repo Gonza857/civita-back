@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CivitaBack.Tests", "CivitaB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CivitaBack.Utils", "CivitaBack.Utils\CivitaBack.Utils.csproj", "{627F5578-576A-49C0-8481-C5AC75A5C4FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CivitaBack.Domain", "CivitaBack.Domain\CivitaBack.Domain.csproj", "{E2211053-851E-4336-8EB3-B585527E7EF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{627F5578-576A-49C0-8481-C5AC75A5C4FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{627F5578-576A-49C0-8481-C5AC75A5C4FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{627F5578-576A-49C0-8481-C5AC75A5C4FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2211053-851E-4336-8EB3-B585527E7EF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2211053-851E-4336-8EB3-B585527E7EF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2211053-851E-4336-8EB3-B585527E7EF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2211053-851E-4336-8EB3-B585527E7EF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

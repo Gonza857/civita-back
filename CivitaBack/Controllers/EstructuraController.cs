@@ -1,17 +1,24 @@
-﻿using CivitaBack.Data.DTO;
+﻿using AutoMapper;
+using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-public class EstructuraController : ControllerBase
+public class EstructuraController : BaseApiController
 {
     private readonly IEstructuraLogica _estructuraLogica;
-    public EstructuraController(IEstructuraLogica el)
+    private readonly ILogger<EstructuraController> _logger;
+    public EstructuraController(
+        IEstructuraLogica el, 
+        IMapper mapper,
+        ILogger<EstructuraController> logger) : base (mapper)
     {
         this._estructuraLogica = el;
+        this._logger = logger;
     }
     
     [HttpGet]
@@ -20,26 +27,29 @@ public class EstructuraController : ControllerBase
         try
         {
             var estructuras = await _estructuraLogica.ObtenerListado();
-            return Ok(estructuras);
+            return Ok(base.MapearLista<EstructuraDTO>(estructuras));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener el listado de Estructuras.");
         }
     }
     
     [HttpPost]
-    public async Task<IActionResult> Crear([FromBody] EstructuraDTO? estructura)
+    public async Task<IActionResult> Crear([FromBody] EstructuraDTO? estructuraDTO)
     {
-        if (estructura == null)
+        if (estructuraDTO == null)
             return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
         try
         {
+            var estructura = base.Mapear<Estructura>(estructuraDTO);
             await _estructuraLogica.Crear(estructura);
-            return Ok();
+            return Created();
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar la Estructura");
         }
     }
@@ -64,7 +74,7 @@ public class EstructuraController : ControllerBase
         try
         {
             var estructura = await this._estructuraLogica.ObtenerPorId(id);
-            return Ok(estructura);
+            return Ok(base.Mapear<EstructuraDTO>(estructura));
         }
         catch (Exception ex)
         {
@@ -80,7 +90,9 @@ public class EstructuraController : ControllerBase
         
         try
         {
-            await this._estructuraLogica.Actualizar(estructuraDTO, id);
+            var estructura = base.Mapear<Estructura>(estructuraDTO);
+
+            await this._estructuraLogica.Actualizar(estructura, id);
             return Ok();
         }
         catch (Exception ex)

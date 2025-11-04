@@ -1,21 +1,26 @@
-﻿using CivitaBack.Data.BO;
+﻿using AutoMapper;
+using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
 
-[ApiController]
+
 [Route("api/[controller]")]
-public class TipoLogroController : ControllerBase
+public class TipoLogroController : BaseApiController
 {
 
     private readonly ITipoLogroLogica _tipoLogroLogica;
+    private readonly ILogger<TipoLogroController> _logger;
 
-    public TipoLogroController(ITipoLogroLogica itll)
+    public TipoLogroController(ITipoLogroLogica itll, ILogger<TipoLogroController> logger,IMapper mapper) : base(mapper)
     {
         this._tipoLogroLogica = itll;
+        this._logger = logger;
     }
 
     [HttpGet]
@@ -24,10 +29,11 @@ public class TipoLogroController : ControllerBase
         try
         {
             var tiposLogros = await this._tipoLogroLogica.ObtenerTiposLogro();
-            return Ok(tiposLogros);
+            return Ok(base.MapearLista<TipoLogroDTO>(tiposLogros));
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener el listado de Tipos de Logros");
         }
     }
@@ -36,15 +42,16 @@ public class TipoLogroController : ControllerBase
     public async Task<IActionResult> Guardar([FromBody] TipoLogroDTO? nuevoTipoLogro)
     {
         if (nuevoTipoLogro == null)
-            return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
+            return BadRequest("Los datos recibidos son inválidos");
 
         try
         {
-            var tipoLogroGuardado = await _tipoLogroLogica.Guardar(nuevoTipoLogro);
-            return Ok(tipoLogroGuardado);
+            var tipoLogroGuardado = await _tipoLogroLogica.Guardar(base.Mapear<TipoLogro>(nuevoTipoLogro));
+            return Ok(base.Mapear<TipoLogroDTO>(tipoLogroGuardado));
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar el Tipo de Logro");
 
         }
@@ -60,6 +67,7 @@ public class TipoLogroController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al eliminar el Tipo de Logro");
         }
     }
@@ -70,10 +78,11 @@ public class TipoLogroController : ControllerBase
         try
         {
             var tipoLogro = await this._tipoLogroLogica.ObtenerPorId(id);
-            return Ok(tipoLogro);
+            return Ok(base.Mapear<TipoLogroDTO>(tipoLogro));
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener el Tipo de Logro");
         }
     }
@@ -82,15 +91,16 @@ public class TipoLogroController : ControllerBase
     public async Task<IActionResult> PatchTipoLogro([FromBody] TipoLogroDTO? tipoLogroDTO, int id)
     {
         if (tipoLogroDTO == null)
-            return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
+            return BadRequest("Los datos recibidos son inválidos");
         
         try
         {
-            await this._tipoLogroLogica.Actualizar(tipoLogroDTO, id);
+            await this._tipoLogroLogica.Actualizar(base.Mapear<TipoLogro>(tipoLogroDTO), id);
             return Ok();
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al actualizar el Tipo de Logro");
         }
     }

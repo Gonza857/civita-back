@@ -1,42 +1,33 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
-using CivitaBack.Data.Repositorio;
+﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
 
-public interface ITipoEstructuraLogica
-{
-    Task<TipoEstructuraDTO> ObtenerPorId(int id);
-    Task<TipoEstructuraDTO> Crear(TipoEstructuraDTO nuevoTipologro);
-
-    Task Actualizar(TipoEstructuraDTO tipoLogro, int idTipoLogro);
-
-    Task<List<TipoEstructuraDTO>> Listado();
-
-    Task Eliminar(int id);
-}
-public class TipoEstructuraLogica : ITipoEstructuraLogica, IParser<TipoEstructura, TipoEstructuraDTO>
+public class TipoEstructuraLogica : ITipoEstructuraLogica
 {
     private readonly ITipoEstructuraRepositorio _repositorioTipoEstructura;
+    private readonly IUnidadDeTrabajo _uow;
     
-    public TipoEstructuraLogica(ITipoEstructuraRepositorio rte)
+    public TipoEstructuraLogica(ITipoEstructuraRepositorio rte, IUnidadDeTrabajo uow)
     {
         _repositorioTipoEstructura = rte;
+        _uow = uow;
     }
 
-    private void Validar(TipoEstructuraDTO tipoEstructuraDTO, int idTipoEstructura)
+    private void Validar(TipoEstructura tipoEstructura, int idTipoEstructura)
     {
-        if (tipoEstructuraDTO == null || idTipoEstructura <= 0) 
+        if (tipoEstructura == null || idTipoEstructura <= 0) 
             throw new Exception("Ocurrió un error al actualizar el Tipo de Estructura");
     }
     
     /// <summary>
     /// Actualiza un Tipo de Estructura
     /// </summary>
-    /// <param name="tipoEstructura">TipoEstructuraDTO</param>
+    /// <param name="tipoEstructura">TipoEstructura</param>
     /// <param name="idTipoEstructura">Id de Tipo Estructura</param>
-    public async Task Actualizar(TipoEstructuraDTO tipoEstructura, int idTipoEstructura)
+    public async Task Actualizar(TipoEstructura tipoEstructura, int idTipoEstructura)
     {
         this.Validar(tipoEstructura, idTipoEstructura);
         var tipoEstructuraBuscada = await this._repositorioTipoEstructura.ObtenerPorId(idTipoEstructura);
@@ -50,6 +41,7 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica, IParser<TipoEstructur
         tipoEstructuraBuscada.DineroPorCiclo = tipoEstructura.DineroPorCiclo;
         
         await this._repositorioTipoEstructura.Actualizar(tipoEstructuraBuscada);
+        await this._uow.CommitAsync();
     }
     
     /// <summary>
@@ -61,67 +53,49 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica, IParser<TipoEstructur
         if (id <= 0) 
             throw new Exception("No se pudo borrar el Tipo de Estructura");
         await this._repositorioTipoEstructura.Eliminar(id);
+        await this._uow.CommitAsync();
     }
     
     /// <summary>
     /// Guarda un Tipo de Estructura
     /// </summary>
-    /// <param name="tipoEstructuraDTO">TipoEstructuraDTO</param>
-    public async Task<TipoEstructuraDTO> Crear(TipoEstructuraDTO tipoEstructuraDTO)
+    /// <param name="TipoEstructura">TipoEstructura</param>
+    public async Task<TipoEstructura> Crear(TipoEstructura TipoEstructura)
     {
-        this.Validar(tipoEstructuraDTO, 1);
+        this.Validar(TipoEstructura, 1);
         
         var tipoEstructura = new TipoEstructura
         {
-            Nombre = tipoEstructuraDTO.Nombre,
-            Capacidad = tipoEstructuraDTO.Capacidad,
-            Ocupacion = tipoEstructuraDTO.Ocupacion,
-            DineroPorCiclo = tipoEstructuraDTO.DineroPorCiclo,
-            EnergiaPorCiclo = tipoEstructuraDTO.EnergiaPorCiclo,
+            Nombre = TipoEstructura.Nombre,
+            Capacidad = TipoEstructura.Capacidad,
+            Ocupacion = TipoEstructura.Ocupacion,
+            DineroPorCiclo = TipoEstructura.DineroPorCiclo,
+            EnergiaPorCiclo = TipoEstructura.EnergiaPorCiclo,
         }; 
         
-        await this._repositorioTipoEstructura.Guardar(tipoEstructura);
-        return this.ToDto(tipoEstructura);
+        await this._repositorioTipoEstructura.Agregar(tipoEstructura);
+        await this._uow.CommitAsync();
+        return tipoEstructura;
     }
     
     /// <summary>
     /// Obtiene un Tipo de Estructura por Id
     /// </summary>
     /// <param name="id">Id de Tipo Estructura</param>
-    public async Task<TipoEstructuraDTO> ObtenerPorId(int id)
+    public async Task<TipoEstructura> ObtenerPorId(int id)
     {
         TipoEstructura? tipoEstructura = await this._repositorioTipoEstructura.ObtenerPorId(id);
         if (tipoEstructura == null) 
             throw new Exception("No se pudo encontrar el Tipo de Logro");
-        return this.ToDto(tipoEstructura);
+        return tipoEstructura;
     }
     
     /// <summary>
     /// Obtiene listado de Tipos de Estructuras
     /// </summary>
-    public async Task<List<TipoEstructuraDTO>> Listado()
+    public async Task<List<TipoEstructura>> Listado()
     {
-        var tiposDeEstructuras = await this._repositorioTipoEstructura.ObtenerTodos();
-        return tiposDeEstructuras
-            .Select(p => this.ToDto(p))
-            .ToList();
+        return await this._repositorioTipoEstructura.ObtenerTodos();
     }
     
-    
-    /// <summary>
-    /// Convierte entidad de dominio a DTO
-    /// </summary>
-    /// <param name="entidad">Tipo Estructura</param>
-    public TipoEstructuraDTO ToDto(TipoEstructura entidad)
-    {
-        return new TipoEstructuraDTO
-        {
-            Id = entidad.Id,
-            Nombre = entidad.Nombre,
-            Capacidad = entidad.Capacidad,
-            Ocupacion = entidad.Ocupacion,
-            DineroPorCiclo = entidad.DineroPorCiclo,
-            EnergiaPorCiclo = entidad.EnergiaPorCiclo
-        };
-    }
 }

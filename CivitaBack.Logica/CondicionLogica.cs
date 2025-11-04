@@ -1,260 +1,248 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
-using CivitaBack.Data.Enum;
-using CivitaBack.Data.Repositorio;
-using CivitaBack.Logica.Excepciones;
+﻿using System.Reflection;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Enum;
+using CivitaBack.Domain.Excepciones;
+using CivitaBack.Domain.Interfaces.Logica;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
 
-public interface ICondicionLogica
-{
-    Task<CondicionDTO> ObtenerPorId(int id);
-    Task Crear(CondicionDTO entidad);
-    Task<List<CondicionDTO>> ObtenerListado();
-    Task Eliminar(int id);
-    Task Actualizar(CondicionDTO condicionDto, int id);
-
-    Task<List<CondicionDTO>> ObtenerListadoRecompensas();
-    Task CrearRecompensa(CondicionDTO recompensa);
-    
-}
-
-public class CondicionLogica : ICondicionLogica, IParser<Condicion, CondicionDTO>
+public class CondicionLogica : ICondicionLogica
 {
     private readonly ICondicionRepositorio _condicionRepositorio;
-    private readonly IEstructuraRepositorio estructuraRepositorio;
+    private readonly IEstructuraRepositorio _estructuraRepositorio;
+    private readonly IUnidadDeTrabajo _uow;
 
-    public CondicionLogica(ICondicionRepositorio icr, IEstructuraRepositorio ier)
+    public CondicionLogica(ICondicionRepositorio icr, IEstructuraRepositorio ier, IUnidadDeTrabajo uow)
     {
-        this._condicionRepositorio = icr;
-        this.estructuraRepositorio = ier;
+        _condicionRepositorio = icr;
+        _estructuraRepositorio = ier;
+        _uow = uow;
     }
 
-    /// <summary>
-    /// Obtener Condicion
-    /// </summary>
-    /// <param name="id">Id de Condicion</param>
-    public async Task<CondicionDTO> ObtenerPorId(int id)
+    /// <inheritdoc />
+    public async Task<Condicion> ObtenerPorId(int id)
     {
-        var condicion = await this._condicionRepositorio.ObtenerPorId(id);
+        var condicion = await _condicionRepositorio.ObtenerPorId(id);
         if (condicion == null)
-            throw new LogroExcepcion("No se pudo obtener la Condicion");
-        return this.ToDto(condicion);
+            throw new CondicionExcepcion($"No se pudo obtener la Condicion con Id {id}");
+        return condicion;
     }
 
-    /// <summary>
-    /// Guarda una Condicion
-    /// </summary>
-    /// <param name="condicionDto">CondicionDTO</param>
-    public async Task Crear(CondicionDTO condicionDto)
+    /// <inheritdoc />
+    public async Task Crear(Condicion condicion)
     {
-        this.ValidarCondicionDTO(condicionDto);
-
-        var condicion = new Condicion();
-
-        if (condicionDto.EstructuraId.HasValue)
-        {
-            Estructura e = await this.estructuraRepositorio.ObtenerPorId(condicionDto.EstructuraId.Value);
-            if (e != null)
-            {
-                condicion.EstructuraId = e.Id;
-                condicion.NombreColumna = null;
-            }
-        }
-
-        if (condicionDto.NombreColumna != null)
-        {
-            condicion.NombreColumna = TipoRecursoHelper.ParseTipoRecurso(condicionDto.NombreColumna).ToString();
-            condicion.EstructuraId = null;
-        }
-
-        condicion.Cantidad = condicionDto.Cantidad;
-
-        await this._condicionRepositorio.Guardar(condicion);
+        await ProcesarCamposExcluyentes(condicion);
+        condicion.EsRecompensa = false;
+        await _condicionRepositorio.Agregar(condicion);
+        await _uow.CommitAsync();
     }
 
-    /// <summary>
-    /// Obtener listado
-    /// </summary>
-    public async Task<List<CondicionDTO>> ObtenerListado()
+    /// <inheritdoc />
+    public async Task<List<Condicion>> ObtenerListado()
     {
-        var condiciones = await this._condicionRepositorio.ObtenerTodos();
-        return condiciones
-            .Select(p => this.ToDto(p))
-            .ToList();
+        return await _condicionRepositorio.ObtenerTodos();
     }
 
-    /// <summary>
-    /// Elimina una Condicion
-    /// </summary>
-    /// <param name="id">Id Condicion</param>
+    /// <inheritdoc />
     public async Task Eliminar(int id)
     {
         if (id <= 0)
-            throw new LogroExcepcion("No se pudo borrar la Condicion");
-        await this._condicionRepositorio.Eliminar(id);
+            throw new Domain.Excepciones.CondicionExcepcion("No se pudo borrar la Condicion. Id inválido.");
+
+        // (Tu Repositorio Genérico ya maneja la lógica de buscar antes de borrar)
+        await _condicionRepositorio.Eliminar(id);
+        await _uow.CommitAsync();
     }
 
-    /// <summary>
-    /// Actualiza una Condicion
-    /// </summary>
-    /// <param name="condicionDto">CondicionDTO</param>
-    /// /// <param name="id">Id Condicion</param>
-    public async Task Actualizar(CondicionDTO condicionDto, int id)
+    /// <inheritdoc />
+    public async Task Actualizar(Condicion condicionNuevosDatos, int id)
     {
-
-        this.ValidarCondicionDTO(condicionDto);
-
-        Condicion? condicionDb = await this._condicionRepositorio.ObtenerPorId(id);
+        // 1. Obtener la entidad de la BD
+        Condicion? condicionDb = await _condicionRepositorio.ObtenerPorId(id);
         if (condicionDb == null)
-            throw new CondicionExcepcion("Ocurrió un error al actualizar la Condicion");
+            throw new CondicionExcepcion($"No se encontró la Condicion con Id {id} para actualizar.");
 
+        // 2. Validar y procesar los datos de entrada
+        await ProcesarCamposExcluyentes(condicionNuevosDatos);
 
-        if (condicionDto.EstructuraId.HasValue)
-        {
-            Estructura e = await this.estructuraRepositorio.ObtenerPorId(condicionDto.EstructuraId.Value);
-            if (e != null)
-            {
-                condicionDb.EstructuraId = e.Id;
-                condicionDb.NombreColumna = null;
-            }
-        }
+        // 3. Mapear los cambios a la entidad de la BD
+        condicionDb.Cantidad = condicionNuevosDatos.Cantidad;
+        condicionDb.NombreColumna = condicionNuevosDatos.NombreColumna;
+        condicionDb.EstructuraId = condicionNuevosDatos.EstructuraId;
 
-        if (condicionDto.NombreColumna != null)
+        // 4. Manejar la Recompensa asociada
+        if (condicionNuevosDatos.RecompensaId.HasValue)
         {
-            condicionDb.NombreColumna = TipoRecursoHelper.ParseTipoRecurso(condicionDto.NombreColumna).ToString();
-            condicionDb.EstructuraId = null;
-        }
-        
-        Condicion? recompensaDb;
-        if (condicionDto.RecompensaId.HasValue)
-        {
-            recompensaDb = await this._condicionRepositorio.ObtenerPorId(condicionDto.RecompensaId.Value);
+            Condicion? recompensaDb = await _condicionRepositorio.ObtenerPorId(condicionNuevosDatos.RecompensaId.Value);
             if (recompensaDb == null)
                 throw new CondicionExcepcion("No se encontró la recompensa para asociar");
-            condicionDb.Recompensa = recompensaDb;
+
+            condicionDb.Recompensa = recompensaDb; // EF usa esto para setear el Id
+        }
+        else
+        {
+            condicionDb.Recompensa = null;
+            condicionDb.RecompensaId = null;
         }
 
-        condicionDb.Cantidad = condicionDto.Cantidad;
+        // 5. Guardar
+        await _condicionRepositorio.Actualizar(condicionDb);
+        await _uow.CommitAsync();
+    }
 
-        await this._condicionRepositorio.Actualizar(condicionDb);
+    /// <inheritdoc />
+    public async Task<List<Condicion>> ObtenerListadoRecompensas()
+    {
+        return await _condicionRepositorio.ObtenerTodasRecompensas();
+    }
+
+    /// <inheritdoc />
+    public async Task CrearRecompensa(Condicion recompensa)
+    {
+        // 1. Valida y procesa la entidad
+        await ProcesarCamposExcluyentes(recompensa);
+        recompensa.EsRecompensa = true;
+
+        // 2. Guarda
+        await _condicionRepositorio.Agregar(recompensa);
+        await _uow.CommitAsync();
+    }
+
+    public List<Condicion> FiltrarCondicionSiCumple(Condicion condicion, Partida partida)
+    {
+        List<Condicion> cs = new List<Condicion>{condicion};
+        return this.FiltrarCondicionesSiCumplen(cs, partida);
+    }
+    
+    /// <summary>
+    /// Filtra una lista de condiciones para devolver solo las que se cumplen.
+    /// </summary>
+    public List<Condicion> FiltrarCondicionesSiCumplen(List<Condicion> condiciones, Partida partida)
+    {
+        List<Condicion> condicionesOk = new List<Condicion>();
+        foreach (Condicion condicion in condiciones)
+        {
+            if (SeCumpleCondicion(condicion, partida))
+                condicionesOk.Add(condicion);
+        }
+        return condicionesOk;
+    }
+    
+    // --- MÉTODOS PRIVADOS REUTILIZABLES ---
+    
+    /// <summary>
+    /// Método orquestador que determina si una condición se cumple,
+    /// llamando al helper correcto (Recurso o Estructura).
+    /// </summary>
+    private bool SeCumpleCondicion(Condicion condicion, Partida partida)
+    {
+        // 1. Condición por Recurso
+        if (!string.IsNullOrEmpty(condicion.NombreColumna))
+        {
+            if (partida.Recursos == null)
+                throw new CondicionExcepcion("La partida no tiene Recursos cargados.");
+
+            return SeCumplePorRecurso(condicion, partida.Recursos);
+        }
+
+        // 2. Condición por Estructura
+        if (condicion.EstructuraId != null)
+        {
+            if (partida.EstructuraMapa == null)
+                throw new CondicionExcepcion("La partida no tiene EstructuraMapa cargada.");
+
+            return SeCumplePorEstructura(condicion, partida.EstructuraMapa);
+        }
+
+        // 3. Condición inválida
+        throw new CondicionExcepcion($"La Condición {condicion.Id} no tiene NombreColumna ni EstructuraId.");
     }
 
     /// <summary>
-    /// Obtiene listado de recompensas
+    /// Diccionario cacheado de las propiedades 'int' de la clase Recurso.
+    /// Es estático para un rendimiento óptimo (solo se crea una vez).
     /// </summary>
-    public async Task<List<CondicionDTO>> ObtenerListadoRecompensas()
+    private static readonly Dictionary<string, PropertyInfo> PropiedadesRecurso =
+        typeof(Recurso)
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(p => p.PropertyType == typeof(int))
+            .ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase); // Case-insensitive
+
+    /// <summary>
+    /// Verifica si una condición de tipo RECURSO se cumple.
+    /// </summary>
+    private bool SeCumplePorRecurso(Condicion condicion, Recurso recursoPartida)
     {
-        var recompensas = await this._condicionRepositorio.ObtenerTodasRecompensas();
-        return recompensas
-            .Select(p => this.ToRecompensaDto(p))
-            .ToList();
-    }
-
-    public async Task CrearRecompensa(CondicionDTO recompensaDto)
-    {
-        this.ValidarRecompensaDTO(recompensaDto);
-
-        var recompensa = new Condicion();
-
-        if (recompensaDto.EstructuraId.HasValue)
+        // Usa el diccionario estático _propiedadesRecurso
+        if (PropiedadesRecurso.TryGetValue(condicion.NombreColumna!, out var propiedad))
         {
-            Estructura? e = await this.estructuraRepositorio.ObtenerPorId(recompensaDto.EstructuraId.Value);
-            if (e != null)
-            {
-                recompensa.EstructuraId = e.Id;
-                recompensa.NombreColumna = null;
-            }
+            int valorActual = (int)propiedad.GetValue(recursoPartida)!;
+            return valorActual >= condicion.Cantidad;
         }
 
-        if (recompensaDto.NombreColumna != null)
-        {
-            recompensa.NombreColumna = TipoRecursoHelper.ParseTipoRecurso(recompensaDto.NombreColumna).ToString();
-            recompensa.EstructuraId = null;
-        }
-
-        recompensa.Cantidad = recompensaDto.Cantidad;
-        recompensa.EsRecompensa = true;
-
-        await this._condicionRepositorio.Guardar(recompensa);
+        // Si la columna no existe en el diccionario, es un error de configuración
+        throw new CondicionExcepcion(
+            $"Nombre de columna '{condicion.NombreColumna}' no es válido para verificar condición.");
     }
 
-    private void ValidarCondicionDTO(CondicionDTO condicionDto)
+    /// <summary>
+    /// Verifica si una condición de tipo ESTRUCTURA se cumple.
+    /// </summary>
+    private bool SeCumplePorEstructura(Condicion condicion, List<EstructuraMapa> estructuraMapa)
     {
-        // Si no manda estructura ni recurso, rebotado
-        if (!condicionDto.EstructuraId.HasValue && condicionDto.NombreColumna == null)
+        int cantidadTotal = estructuraMapa
+            .Count(em => em.EstructuraId == condicion.EstructuraId!.Value);
+
+        return cantidadTotal >= condicion.Cantidad;
+    }
+
+    /// <summary>
+    /// Valida las reglas de negocio base para una Condicion o Recompensa.
+    /// </summary>
+    private void ValidarDatosBase(Condicion condicion)
+    {
+        if (!condicion.EstructuraId.HasValue && string.IsNullOrWhiteSpace(condicion.NombreColumna))
             throw new CondicionExcepcion("Debes seleccionar una estructura o un recurso");
 
-        // Si manda las 2 estructura y recurso, rebotado
-        if (condicionDto.EstructuraId.HasValue && condicionDto.NombreColumna != null)
-            throw new CondicionExcepcion("Debes seleccionar una estructura o un recurso");
+        if (condicion.EstructuraId.HasValue && !string.IsNullOrWhiteSpace(condicion.NombreColumna))
+            throw new CondicionExcepcion("Debes seleccionar una estructura o un recurso, no ambos");
 
-        // Si no mando estructura y el tipo de recurso enviado esta mal, rebotado
-        if (!condicionDto.EstructuraId.HasValue && !TipoRecursoHelper.EsTipoRecursoValido(condicionDto.NombreColumna))
+        if (!condicion.EstructuraId.HasValue && !TipoRecursoHelper.EsTipoRecursoValido(condicion.NombreColumna))
             throw new CondicionExcepcion("El nombre de columna proporcionado es inválido.");
 
-        if (condicionDto.Cantidad < 0)
+        if (condicion.Cantidad < 0)
             throw new CondicionExcepcion("La cantidad no puede ser menor a 0");
     }
 
-    private void ValidarRecompensaDTO(CondicionDTO recompensaDto)
+    /// <summary>
+    /// Valida y normaliza los campos EstructuraId y NombreColumna.
+    /// Modifica el objeto 'condicion' pasado por referencia.
+    /// </summary>
+    private async Task ProcesarCamposExcluyentes(Condicion condicion)
     {
-        // Si no manda estructura ni recurso,  -> Solo se permite 1 recompensa de 1 tipo
-        if (!recompensaDto.EstructuraId.HasValue && recompensaDto.NombreColumna == null)
-            throw new CondicionExcepcion("Debes seleccionar una estructura o un recurso");
+        // 1. Validar la lógica
+        ValidarDatosBase(condicion);
 
-        // Si manda las 2 estructura y recurso, rebotado -> Solo 1 de las 2 se permite
-        if (recompensaDto.EstructuraId.HasValue && recompensaDto.NombreColumna != null)
-            throw new CondicionExcepcion("Debes seleccionar una estructura o un recurso");
-
-        // Si no mando estructura y el tipo de recurso enviado esta mal, rebotado
-        if (!recompensaDto.EstructuraId.HasValue && !TipoRecursoHelper.EsTipoRecursoValido(recompensaDto.NombreColumna))
-            throw new CondicionExcepcion("El nombre de columna proporcionado es inválido.");
-
-        if (recompensaDto.Cantidad < 0)
-            throw new CondicionExcepcion("La cantidad de la recompensa no puede ser menor a 0");
-    }
-
-    private CondicionDTO ToRecompensaDto(Condicion recompensa)
-    {
-        CondicionDTO c = new CondicionDTO
+        // 2. Procesar (Normalizar)
+        if (condicion.EstructuraId.HasValue)
         {
-            Cantidad = recompensa.Cantidad,
-            Id = recompensa.Id,
-            NombreColumna = recompensa.NombreColumna,
-        };
-        return c;
-    }
+            Estructura? e = await _estructuraRepositorio.ObtenerPorId(condicion.EstructuraId.Value);
+            if (e == null)
+            {
+                throw new CondicionExcepcion($"La estructura con Id {condicion.EstructuraId.Value} no existe.");
+            }
 
-    public CondicionDTO ToDto(Condicion entidad)
-    {
-        var dto = new CondicionDTO
+            condicion.EstructuraId = e.Id;
+            condicion.NombreColumna = null; // Asegura exclusividad
+            condicion.Estructura = null; // No guardamos el objeto de navegación
+        }
+        else if (!string.IsNullOrWhiteSpace(condicion.NombreColumna))
         {
-            Id = entidad.Id,
-            Cantidad = entidad.Cantidad,
-            EsRecompensa = entidad.EsRecompensa,
-            NombreColumna = entidad.NombreColumna,
-            EstructuraId = entidad.EstructuraId,
-            Estructura = entidad.Estructura != null
-                ? new EstructuraCondicionDTO { Id = entidad.Estructura.Id, Nombre = entidad.Estructura.Nombre }
-                : null,
-            Recompensa = entidad.Recompensa != null
-                ? new CondicionDTO
-                {
-                    Id = entidad.Recompensa.Id,
-                    Cantidad = entidad.Recompensa.Cantidad,
-                    NombreColumna = entidad.Recompensa.NombreColumna,
-                    EsRecompensa = entidad.Recompensa.EsRecompensa,
-                    EstructuraId = entidad.Recompensa.EstructuraId,
-                    Estructura = entidad.Recompensa.Estructura != null
-                        ? new EstructuraCondicionDTO
-                            { Id = entidad.Recompensa.Estructura.Id, Nombre = entidad.Recompensa.Estructura.Nombre }
-                        : null
-                }
-                : null
-        };
-
-        return dto;
+            condicion.NombreColumna = TipoRecursoHelper.ParseTipoRecurso(condicion.NombreColumna).ToString();
+            condicion.EstructuraId = null; // Asegura exclusividad
+            condicion.Estructura = null;
+        }
     }
 }

@@ -1,19 +1,20 @@
-﻿using CivitaBack.Logica;
-using CivitaBack.Logica.Excepciones;
-using CivitaBack.Tests;
+﻿using AutoMapper;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
+using CivitaBack.Domain.Excepciones;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-public class CondicionController: ControllerBase
+public class CondicionController: BaseApiController
 {
     private readonly ICondicionLogica _condicionLogica;
-    
-    public CondicionController(ICondicionLogica icl)
+    private readonly ILogger<CondicionController> _logger;
+    public CondicionController(ICondicionLogica icl, IMapper mapper, ILogger<CondicionController> logger) : base(mapper)
     {
         this._condicionLogica = icl;
+        this._logger = logger;
     }
     
     [HttpGet]
@@ -22,10 +23,12 @@ public class CondicionController: ControllerBase
         try
         {
             var condiciones = await _condicionLogica.ObtenerListado();
-            return Ok(condiciones);
+            var condicionesDto = base.MapearLista<CondicionDTO>(condiciones);
+            return Ok(condicionesDto);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener el listado de Condiciones.");
         }
     }
@@ -37,10 +40,12 @@ public class CondicionController: ControllerBase
         try
         {
             var recompensas = await _condicionLogica.ObtenerListadoRecompensas();
-            return Ok(recompensas);
+            var recompensasDto = base.MapearLista<CondicionDTO>(recompensas);
+            return Ok(recompensasDto);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener el listado de Recompensas.");
         }
     }
@@ -52,7 +57,9 @@ public class CondicionController: ControllerBase
             return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
         try
         {
-            await _condicionLogica.Crear(condicionNueva);
+            var condicionEntidad = base.Mapear<Condicion>(condicionNueva);
+
+            await _condicionLogica.Crear(condicionEntidad);
             return Ok();
         }
         catch (CondicionExcepcion ex)
@@ -61,6 +68,7 @@ public class CondicionController: ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar la Condicion");
         }
     }
@@ -69,11 +77,12 @@ public class CondicionController: ControllerBase
     public async Task<IActionResult> CrearRecompensa([FromBody] CondicionDTO? recompensaNueva)
     {
         if (recompensaNueva == null)
-            return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
+            return BadRequest("Los datos recibidos son inválidos");
         try
         {
-            await _condicionLogica.CrearRecompensa(recompensaNueva);
-            return Ok();
+            var recompensaEntidad = base.Mapear<Condicion>(recompensaNueva);
+            await _condicionLogica.CrearRecompensa(recompensaEntidad);
+            return Created();
         }
         catch (CondicionExcepcion ex)
         {
@@ -81,6 +90,7 @@ public class CondicionController: ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar la Recompensa");
         }
     }
@@ -95,6 +105,7 @@ public class CondicionController: ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al eliminar la Condicion.");
         }
     }
@@ -105,10 +116,12 @@ public class CondicionController: ControllerBase
         try
         {
             var condicion = await this._condicionLogica.ObtenerPorId(id);
-            return Ok(condicion);
+            var condicionDto = base.Mapear<CondicionDTO>(condicion);
+            return Ok(condicionDto);
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener la Condición.");
         }
     }
@@ -121,7 +134,9 @@ public class CondicionController: ControllerBase
 
         try
         {
-            await this._condicionLogica.Actualizar(condicionDto, id);
+            var condicionEntidad = base.Mapear<Condicion>(condicionDto);
+
+            await this._condicionLogica.Actualizar(condicionEntidad, id);
             return Ok();
         }
         catch (CondicionExcepcion ex)
@@ -130,6 +145,7 @@ public class CondicionController: ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al actualizar la Condición");
         }
     }
