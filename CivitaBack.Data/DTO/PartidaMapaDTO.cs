@@ -4,9 +4,9 @@ namespace CivitaBack.Data.DTO;
 
 public class PartidaMapaDTO
 {
-    int Id { get; set; }
-    int UsuarioId { get; set; }
-    DateTime UltimaVez { get; set; }
-    string JsonMapa {get; set;}
-    List<EstructuraMapa> estructuras {get; set;}
+    public int Id { get; set; }
+    public int UsuarioId { get; set; }
+    public DateTime UltimaVez { get; set; }
+    public string JsonMapa {get; set;}
+    public List<EstructuraMapa>? estructuras {get; set;}
 }

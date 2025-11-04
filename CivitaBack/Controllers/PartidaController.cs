@@ -96,7 +96,6 @@ public class PartidaController : BaseApiController
     {
         try
         {
-            idUsuario = 1;
             Partida partida = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
             return Ok(base.Mapear<PartidaDTO>(partida));
         }
@@ -187,6 +186,7 @@ public class PartidaController : BaseApiController
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
+            _logger.LogError(ex, "Error fatal al guardar el mapa durante el mapeo de estructuras.");
             return Problem("Error al guardar el mapa.");
         }
     }

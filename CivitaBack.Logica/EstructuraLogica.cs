@@ -30,6 +30,10 @@ public class EstructuraLogica : IEstructuraLogica
     public async Task<List<Estructura>> ObtenerListado()
     {
         var estructuras = await this._repositorioEstructura.ObtenerTodos();
+
+        if(estructuras == null || estructuras.Count == 0)
+            throw new EstructuraExcepcion("No se pudieron obtener las Estructuras");
+
         return estructuras;
     }
 

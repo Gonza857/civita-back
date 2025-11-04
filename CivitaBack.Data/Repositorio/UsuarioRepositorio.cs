@@ -14,7 +14,7 @@ public class UsuarioRepositorio
     
     public async Task<Usuario?> ObtenerUsuarioPorMail(string mail)
     {
-        var usuarioEf = await _context.Usuario.AsNoTracking().FirstOrDefaultAsync(u => u.Mail == mail);
+        var usuarioEf = await _context.Usuario.Include(u => u.Partida).AsNoTracking().FirstOrDefaultAsync(u => u.Mail == mail);
         return base.Mapear<Usuario>(usuarioEf);
     }
 
