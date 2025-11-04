@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>5b83b8db-ef39-48ab-b9a8-b00408ad4afc</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -37,6 +38,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Interfaces\" />
+	  <Folder Include="Migrations\" />
 	</ItemGroup>
 
 </Project>

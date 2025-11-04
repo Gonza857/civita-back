@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251103181209_misiones4")]
-    partial class misiones4
+    [Migration("20251104204815_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -576,24 +576,21 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CodigoArticulo")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<DateTime>("Creado")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("NombreArticulo")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                    b.Property<int>("EstructuraId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("PartidaId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EstructuraId");
 
                     b.HasIndex("PartidaId");
 
@@ -1116,7 +1113,7 @@ namespace CivitaBack.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("CivitaBack.Data.BO.PartidaEF", "Partida")
-                        .WithMany()
+                        .WithMany("MisionPartidas")
                         .HasForeignKey("PartidaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1150,11 +1147,19 @@ namespace CivitaBack.Data.Migrations
 
             modelBuilder.Entity("CivitaBack.Data.BO.TiendaEF", b =>
                 {
+                    b.HasOne("CivitaBack.Data.BO.EstructuraEF", "Estructura")
+                        .WithMany()
+                        .HasForeignKey("EstructuraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CivitaBack.Data.BO.PartidaEF", "Partida")
                         .WithMany("Tienda")
                         .HasForeignKey("PartidaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Estructura");
 
                     b.Navigation("Partida");
                 });
@@ -1216,6 +1221,8 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("Evento");
 
                     b.Navigation("LogroPartidas");
+
+                    b.Navigation("MisionPartidas");
 
                     b.Navigation("Recursos");
 

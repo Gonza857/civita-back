@@ -4,10 +4,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace CivitaBack.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class inicial : Migration
+    public partial class Inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -310,8 +312,7 @@ namespace CivitaBack.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    NombreArticulo = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
-                    CodigoArticulo = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    EstructuraId = table.Column<int>(type: "integer", nullable: false),
                     PartidaId = table.Column<int>(type: "integer", nullable: false),
                     Creado = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Editado = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -319,6 +320,12 @@ namespace CivitaBack.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tienda", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tienda_Estructura_EstructuraId",
+                        column: x => x.EstructuraId,
+                        principalTable: "Estructura",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Tienda_Partida_PartidaId",
                         column: x => x.PartidaId,
@@ -386,6 +393,31 @@ namespace CivitaBack.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Mision",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Titulo = table.Column<string>(type: "text", nullable: false),
+                    Descripcion = table.Column<string>(type: "text", nullable: false),
+                    Disponible = table.Column<bool>(type: "boolean", nullable: false),
+                    CondicionId = table.Column<int>(type: "integer", nullable: false),
+                    Tipo = table.Column<string>(type: "text", nullable: false),
+                    Creado = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Editado = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Mision", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Mision_Condicion_CondicionId",
+                        column: x => x.CondicionId,
+                        principalTable: "Condicion",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LogroPartida",
                 columns: table => new
                 {
@@ -410,6 +442,93 @@ namespace CivitaBack.Data.Migrations
                         principalTable: "Partida",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MisionPartida",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FechaCompletado = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FechaEntrega = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Reclamado = table.Column<bool>(type: "boolean", nullable: false),
+                    MisionId = table.Column<int>(type: "integer", nullable: false),
+                    PartidaId = table.Column<int>(type: "integer", nullable: false),
+                    Creado = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Editado = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MisionPartida", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MisionPartida_Mision_MisionId",
+                        column: x => x.MisionId,
+                        principalTable: "Mision",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MisionPartida_Partida_PartidaId",
+                        column: x => x.PartidaId,
+                        principalTable: "Partida",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "TipoEstructura",
+                columns: new[] { "Id", "Capacidad", "Creado", "DineroPorCiclo", "Editado", "EnergiaPorCiclo", "Nombre", "Ocupacion" },
+                values: new object[,]
+                {
+                    { 1, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), -3, null, -2, "Vivienda", 0 },
+                    { 2, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), -7, null, 10, "Energia", 0 },
+                    { 3, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), 50, null, -4, "Industrial", 0 },
+                    { 4, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, null, 0, "Inicial", 0 },
+                    { 5, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, null, 0, "InicialCasa2", 0 },
+                    { 6, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, null, 0, "InicialEdificio", 0 },
+                    { 7, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, null, 0, "InicialBase", 0 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "TipoTip",
+                columns: new[] { "Id", "Creado", "Descripcion", "Editado" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), "info", null },
+                    { 2, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), "onboarding", null }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Estructura",
+                columns: new[] { "Id", "ContaminacionCiclo", "CostoDinero", "CostoEnergia", "Creado", "Editado", "EsMejorable", "FelicidadCiclo", "Nombre", "RutaImagen", "TipoEstructuraId" },
+                values: new object[,]
+                {
+                    { 1, 2, 25, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, 2, "Casa", "/assets/mapa/casas.png", 1 },
+                    { 2, -4, 50, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, 2, "Turbina Eólica", "/assets/mapa/turbina.png", 2 },
+                    { 3, 6, 40, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, -4, "Fabrica", "/assets/mapa/fabrica.png", 3 },
+                    { 4, 0, 0, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, 0, "Iniciales", null, 4 },
+                    { 5, 0, 0, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, 0, "InicialesCasa2", null, 5 },
+                    { 6, 0, 0, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, 0, "InicialesEdificio", null, 6 },
+                    { 7, 0, 0, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, 0, "InicialesBase", null, 7 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Tip",
+                columns: new[] { "Id", "Creado", "Editado", "EfectoFiltro", "ElementoAdicional", "Expresion", "Mensaje", "TipoId" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "", "vitaSaluda", "¡Hola!, soy Vita ", 1 },
+                    { 2, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "", "PulgarArribaVita", "Te doy la bienvenida a Neocivita ", 1 },
+                    { 3, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "", "vitaPregunta", "Antes de empezar, ¿cómo te llamás?", 1 },
+                    { 4, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "", "vitaExplica2", "En Neocivita aprenderás sobre el impacto ecológico que tienen nuestras decisiones al construir y mantener una ciudad.", 1 },
+                    { 5, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "", "vitaDecidida", "¿Creés que podés lograr el equilibrio entre economía, sociedad y ambiente?", 1 },
+                    { 6, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, true, "ecoCoinBrillante", "vitaExplica2", "Estas son las EcoCoins, la moneda para adquirir construcciones en tu ciudad.", 1 },
+                    { 7, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "ecoCoin", "vitaExplica", "Podés conseguirlas con edificaciones industriales o completando misiones. ¡Acompañame a ver las demás!", 1 },
+                    { 8, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "energiaCoin", "vitaCansada", "Te presento la energía eléctrica: podés obtenerla con construcciones específicas que la generen, como un panel solar.", 1 },
+                    { 9, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "contaminacionCoin", "vitaPensativa", "Ahora… la CONTAMINACIÓN. Este recurso destruye tu ciudad y el planeta. ¡Tené cuidado!", 1 },
+                    { 10, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "felicidadCoin", "vitaDecidida", "La FELICIDAD refleja qué tan saludable y feliz está tu población. ¡Es muy importante!", 1 },
+                    { 11, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "", "vitaFesteja", "Ahora que conocés los recursos del juego… ¡acompañame a jugar y empecemos a construir!", 1 },
+                    { 12, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "", "vitaFesteja", "¡Registrate para empezar a construir nuestra ciudad!", 1 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -463,6 +582,21 @@ namespace CivitaBack.Data.Migrations
                 column: "PartidaId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Mision_CondicionId",
+                table: "Mision",
+                column: "CondicionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MisionPartida_MisionId",
+                table: "MisionPartida",
+                column: "MisionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MisionPartida_PartidaId",
+                table: "MisionPartida",
+                column: "PartidaId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Partida_UsuarioId",
                 table: "Partida",
                 column: "UsuarioId",
@@ -473,6 +607,11 @@ namespace CivitaBack.Data.Migrations
                 table: "Recurso",
                 column: "PartidaId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tienda_EstructuraId",
+                table: "Tienda",
+                column: "EstructuraId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tienda_PartidaId",
@@ -508,6 +647,9 @@ namespace CivitaBack.Data.Migrations
                 name: "LogroPartida");
 
             migrationBuilder.DropTable(
+                name: "MisionPartida");
+
+            migrationBuilder.DropTable(
                 name: "Recurso");
 
             migrationBuilder.DropTable(
@@ -523,16 +665,19 @@ namespace CivitaBack.Data.Migrations
                 name: "Logro");
 
             migrationBuilder.DropTable(
+                name: "Mision");
+
+            migrationBuilder.DropTable(
                 name: "Partida");
 
             migrationBuilder.DropTable(
                 name: "Tip");
 
             migrationBuilder.DropTable(
-                name: "Condicion");
+                name: "TipoLogro");
 
             migrationBuilder.DropTable(
-                name: "TipoLogro");
+                name: "Condicion");
 
             migrationBuilder.DropTable(
                 name: "Usuario");
