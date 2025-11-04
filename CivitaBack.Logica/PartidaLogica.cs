@@ -1,8 +1,7 @@
-﻿using CivitaBack.Data.DTO;
-using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
-using CivitaBack.Domain.Excepciones;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
