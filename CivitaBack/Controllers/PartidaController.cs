@@ -96,7 +96,6 @@ public class PartidaController : BaseApiController
     {
         try
         {
-            idUsuario = 1;
             Partida partida = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
             return Ok(base.Mapear<PartidaDTO>(partida));
         }
