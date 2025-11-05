@@ -276,7 +276,7 @@ public class PartidaController : BaseApiController
             }
         }
 
-    [HttpPost("comprar-estructura")]
+    [HttpPost("comprar-estructura/{partidaId}/{estructuraId}")] 
     public async Task<IActionResult> ComprarEstructura(int partidaId, int estructuraId)
     {
         try
