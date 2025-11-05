@@ -16,7 +16,9 @@ public class RecursoRepositorio
     public async Task<Recurso?> ObtenerPorId(int id)
     {
         RecursoEF? recursoEf = await _context.Recurso
+            .Include(r => r.Partida)
             .Where(r => r.PartidaId == id)
+            .AsNoTracking()
             .FirstOrDefaultAsync();
         return base.Mapear<Recurso>(recursoEf);
     }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Enum;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Excepciones;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ public class PartidaController : BaseApiController
     private readonly IPartidaLogica _partidaLogica;
     private readonly IRecursoLogica _recursoLogica;
     private readonly IUsuarioLogica _usuarioLogica;
+    private readonly IMisionLogica _misionLogica;
     private readonly IEstructuraMapaLogica _estructuraMapaLogica;
     private readonly ILogroPartidaLogica _logroPartidaLogica;
     private readonly ILogger<PartidaController> _logger;
@@ -21,6 +23,7 @@ public class PartidaController : BaseApiController
         IPartidaLogica partidaLogica,
         IRecursoLogica recursoLogica,
         IUsuarioLogica usuarioLogica,
+        IMisionLogica misionLogica,
         IEstructuraMapaLogica estructuraMapaLogica,
         ILogger<PartidaController> logger,
         ILogroPartidaLogica logroPartidaLogica,
@@ -29,6 +32,7 @@ public class PartidaController : BaseApiController
         _partidaLogica = partidaLogica;
         _recursoLogica = recursoLogica;
         _usuarioLogica = usuarioLogica;
+        _misionLogica = misionLogica;
         _estructuraMapaLogica = estructuraMapaLogica;
         _logroPartidaLogica = logroPartidaLogica;
         _logger = logger;
@@ -54,19 +58,23 @@ public class PartidaController : BaseApiController
         }
     }
 
-    [HttpPost("expo/reiniciar")]
-    public async Task<IActionResult> ReiniciarDemo()
+    [HttpPost("Reiniciar/{id}")]
+    public async Task<IActionResult> ReiniciarDemo(int id)
     {
-        var partida = await _partidaLogica.ObtenerPorUsuarioId(1);
+        try
+        {
+            var partida = await _partidaLogica.ObtenerPorId(id);
+            await _recursoLogica.ConfigurarInicial(partida);
+            await this._misionLogica.ResetMisiones(TipoMision.Diaria);
+            await _estructuraMapaLogica.ReiniciarEstructurasDePartida(partida.Id);
+            await _logroPartidaLogica.ReiniciarLogros(partida.Id);
+            return Ok("Partida Demo reiniciada");
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al resetear.");
+        }
 
-        if (partida == null)
-            return NotFound("No hay partida Demo para reiniciar");
-
-        await _recursoLogica.ConfigurarInicial(partida);
-        await _estructuraMapaLogica.ReiniciarEstructurasDePartida(partida.Id);
-        await _logroPartidaLogica.ReiniciarLogros(partida.Id);
-
-        return Ok("Partida Demo reiniciada");
     }
 
     [HttpPost("Iniciar/{idUsuario}")]

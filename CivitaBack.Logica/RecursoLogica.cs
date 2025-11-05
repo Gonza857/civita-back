@@ -20,15 +20,13 @@ public class RecursoLogica : IRecursoLogica
     public async Task ConfigurarInicial(Partida partida)
     {
         if (partida == null) throw new PartidaExcepcion("No se proporcionó Partida");
-        Recurso recurso = new Recurso
-        {
-            PartidaId = partida.Id,
-            EcoCoins = 450,
-            Felicidad = 40,
-            Energia = 30,
-            Contaminacion = 60,
-        };
-        await this._repositorioRecurso.Agregar(recurso);
+        Recurso r = await this._repositorioRecurso.ObtenerPorId(partida.Id);
+        if (r is null) throw new Exception("No se encontraron los recursos");
+        r.EcoCoins = 450;
+        r.Felicidad = 40;
+        r.Energia = 30;
+        r.Contaminacion = 60;
+        await this._repositorioRecurso.Actualizar(r);
         await this._uow.CommitAsync();
     }
 
