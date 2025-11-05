@@ -56,6 +56,7 @@ public class PartidaRepositorio
     {
         var partida = await _context.Partida
             .Include(p => p.Recursos)
+            .Include(p => p.EstructuraMapa)
             .Where(p => p.Id == id)
             .AsNoTracking()
             .FirstOrDefaultAsync();
