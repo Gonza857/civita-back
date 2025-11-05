@@ -17,6 +17,7 @@ public class LogroLogicaTest
     private readonly Mock<ITipoLogroRepositorio> _mockTipoLogroRepositorio;
     private readonly Mock<ICondicionRepositorio> _mockCondicionRepositorio;
     private readonly Mock<ILogroPartidaRepositorio> _mockLogroPartidaRepositorio;
+    private readonly Mock<IEstructuraRepositorio> _mockEstructuraRepositorio;
 
     private readonly IPartidaLogica _partidaLogica;
     private readonly IRecursoLogica _recursoLogica;
@@ -34,6 +35,7 @@ public class LogroLogicaTest
         _mockLogroRepositorio = new Mock<ILogroRepositorio>();
         _mockLogroPartidaRepositorio = new Mock<ILogroPartidaRepositorio>();
         _mockCondicionRepositorio = new Mock<ICondicionRepositorio>();
+        _mockEstructuraRepositorio = new Mock<IEstructuraRepositorio>();
         _mockUow = new Mock<IUnidadDeTrabajo>();
 
         _logroLogica = new LogroLogica(
@@ -50,6 +52,7 @@ public class LogroLogicaTest
             _mockRecursoRepositorio.Object,
             _mockEstructuraMapaRepositorio.Object,
             _mockLogroRepositorio.Object,
+            _mockEstructuraRepositorio.Object,
             _mockUow.Object
         );
     }
