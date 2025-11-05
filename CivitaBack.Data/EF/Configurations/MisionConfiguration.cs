@@ -1,4 +1,5 @@
 ﻿using CivitaBack.Data.BO;
+using CivitaBack.Domain.Enum;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,6 +18,21 @@ public class MisionConfiguration : IEntityTypeConfiguration<MisionEF>
             .HasForeignKey(m => m.CondicionId);
         
         // Guarda el Enum como string (ej. "Diaria", "Semanal")
-        builder.Property(m => m.Tipo).HasConversion<string>(); 
+        builder.Property(m => m.Tipo).HasConversion<string>();
+
+        var seedDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        builder.HasData(
+            new MisionEF
+            {
+                Id = 1, // ID de esta misión
+                Titulo = "¡Construye 1 casa!",
+                Descripcion = "Nuestros ciudadanos necesitan lugar para vivir. Construye 1 casa.",
+                Disponible = true,
+                Tipo = TipoMision.Diaria,
+                CondicionId = 2, 
+                Creado = seedDate,
+                Editado = seedDate
+            }
+        );
     }
 }
