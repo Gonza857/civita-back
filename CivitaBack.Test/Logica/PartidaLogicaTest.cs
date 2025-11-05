@@ -21,6 +21,8 @@ public class PartidaLogicaTest
 
     private readonly Mock<IUnidadDeTrabajo> _mockUow;
 
+    private readonly Mock<IEstructuraRepositorio> _mockEstructuraRepositorio;
+
     public PartidaLogicaTest()
     {
         // Creamos los mocks de las dependencias
@@ -28,6 +30,7 @@ public class PartidaLogicaTest
         _mockRecursoRepositorio = new Mock<IRecursoRepositorio>();
         _mockEstructuraMapaRepositorio = new Mock<IEstructuraMapaRepositorio>();
         _mockLogroRepositorio = new Mock<ILogroRepositorio>();
+        _mockEstructuraRepositorio = new Mock<IEstructuraRepositorio>(); 
         _mockUow = new Mock<IUnidadDeTrabajo>();
 
         // Inyectamos los mocks en el constructor de PartidaLogica
@@ -36,6 +39,7 @@ public class PartidaLogicaTest
             _mockRecursoRepositorio.Object,
             _mockEstructuraMapaRepositorio.Object,
             _mockLogroRepositorio.Object,
+            _mockEstructuraRepositorio.Object, 
             _mockUow.Object
         );
     }

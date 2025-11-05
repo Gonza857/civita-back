@@ -62,7 +62,7 @@ public class InicialLogica : IInicialLogica
         var rutaMapa = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
             "..", "..", "..", "..",
-            "CivitaBack.Data", "Mapa", "mapa3.json"
+            "CivitaBack.Data", "Mapa", "MapaJuego.json"
         );
 
         rutaMapa = Path.GetFullPath(rutaMapa);

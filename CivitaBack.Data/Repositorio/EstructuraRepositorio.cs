@@ -25,6 +25,7 @@ public class EstructuraRepositorio : GenericoRepositorio<Estructura, EstructuraE
     {
         var estructurasEF = await _dbSet
             .Include(e => e.TipoEstructura)
+            .Where(e => e.RutaImagen != null)
             .AsNoTracking()
             .ToListAsync();
 

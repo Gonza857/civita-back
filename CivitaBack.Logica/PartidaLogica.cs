@@ -1,4 +1,5 @@
-﻿using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
@@ -12,6 +13,7 @@ public class PartidaLogica : IPartidaLogica
     private readonly IRecursoRepositorio _recursoRepositorio;
     private readonly IEstructuraMapaRepositorio _repositorioEstructuraMapa;
     private readonly ILogroRepositorio _logroRepositorio;
+    private readonly IEstructuraRepositorio _estructuraRepositorio;
     private readonly IUnidadDeTrabajo _uow;
     
     public PartidaLogica(
@@ -19,6 +21,7 @@ public class PartidaLogica : IPartidaLogica
         IRecursoRepositorio irr, 
         IEstructuraMapaRepositorio em, 
         ILogroRepositorio ilr,
+        IEstructuraRepositorio er,
         IUnidadDeTrabajo uow
         )
     {
@@ -26,6 +29,7 @@ public class PartidaLogica : IPartidaLogica
         this._recursoRepositorio = irr;
         this._repositorioEstructuraMapa = em;
         this._logroRepositorio = ilr;
+        this._estructuraRepositorio = er;
         this._uow = uow;
     }
 
@@ -239,6 +243,30 @@ public class PartidaLogica : IPartidaLogica
         if (partida == null)
             throw new PartidaExcepcion("Partida no encontrada");
         return partida;
+    }
+
+    public async Task<int> ComprarEstructuraAsync(int partidaId, int estructuraId)
+    {
+        Partida? partida = await _repositorioPartida.ObtenerPorId(partidaId);
+        Estructura? estructura = await _estructuraRepositorio.ObtenerPorId(estructuraId);
+
+        if (partida == null || partida.Recursos == null)
+            throw new PartidaExcepcion("Partida inválida o recursos no encontrados.");
+        if (estructura == null)
+            throw new PartidaExcepcion("Estructura no encontrada.");
+
+        int costo = estructura.CostoDinero;
+
+        if (partida.Recursos.EcoCoins < costo)
+            throw new PartidaExcepcion("Dinero insuficiente.");
+
+        partida.Recursos.EcoCoins -= costo;
+
+        await _repositorioPartida.Actualizar(partida);
+
+        await _uow.CommitAsync();
+
+        return partida.Recursos.EcoCoins;
     }
 }
 

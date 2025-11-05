@@ -17,4 +17,6 @@ public interface IPartidaLogica
     Task<Partida?> ObtenerMapaAsync(int partidaId);
     
     Task<Partida> ObtenerPorId(int idPartida);
+
+    Task<int> ComprarEstructuraAsync(int partidaId, int estructuraId);
 }
