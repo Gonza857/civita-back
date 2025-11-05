@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.BO;
+using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 
 namespace CivitaBack.Api.Mapping
@@ -10,6 +11,7 @@ namespace CivitaBack.Api.Mapping
         {
             CreateMap<Evento, EventoEF>();
             CreateMap<EventoEF, Evento>();
+            CreateMap<Evento, EventoDisparadoDTO>();
         }
 
     }
