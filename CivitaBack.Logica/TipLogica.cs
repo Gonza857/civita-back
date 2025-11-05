@@ -12,6 +12,12 @@ namespace CivitaBack.Logica
         private readonly ITipoTipRepositorio _tiposTipRepositorio;
         private readonly IUnidadDeTrabajo _uow;
 
+        /// <summary>
+        /// Inicializa una nueva instancia de la clase <see cref="TipLogica"/>.
+        /// </summary>
+        /// <param name="itr">El repositorio de Tips.</param>
+        /// <param name="ittr">El repositorio de TipoTip.</param>
+        /// <param name="iudt">La unidad de trabajo.</param>
         public TipLogica(ITipsRepositorio itr, ITipoTipRepositorio ittr, IUnidadDeTrabajo iudt)
         {
             _tipsRepositorio = itr;
@@ -19,16 +25,19 @@ namespace CivitaBack.Logica
             _uow = iudt;
         }
 
+        /// <inheritdoc />
         public async Task<List<Tip>> ObtenerMsjPorIdTipo(int id)
         {
             return await _tipsRepositorio.ObtenerMsjPorIdTipo(id);
         }
 
+        /// <inheritdoc />
         public async Task<List<Tip>> Listado()
         {
             return await _tipsRepositorio.ObtenerTodos();
         }
 
+        /// <inheritdoc />
         public async Task Crear(Tip tip)
         {
             var tipoTip = await this._tiposTipRepositorio.ObtenerPorId(tip.TipoId);
@@ -51,10 +60,11 @@ namespace CivitaBack.Logica
             }
             catch (Exception ex)
             {
-                throw new ErrorInternoExcepction("Ocurrió un error al crear un Tip");
+                throw new ErrorInternoException("Ocurrió un error al crear un Tip");
             }
         }
 
+        /// <inheritdoc />
         public async Task Actualizar(Tip tip, int id)
         {
             var tipoTip = await this._tiposTipRepositorio.ObtenerPorId(tip.TipoId);
@@ -78,10 +88,11 @@ namespace CivitaBack.Logica
             }
             catch (Exception ex)
             {
-                throw new ErrorInternoExcepction("Ocurrió un error al Actualizar un Tip");
+                throw new ErrorInternoException("Ocurrió un error al Actualizar un Tip");
             }
         }
 
+        /// <inheritdoc />
         public async Task<Tip?> ObtenerPorIdTipo(int id)
         {
             return await this._tipsRepositorio.ObtenerPorId(id);

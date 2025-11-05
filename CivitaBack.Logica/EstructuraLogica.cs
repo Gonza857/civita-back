@@ -74,11 +74,11 @@ public class EstructuraLogica : IEstructuraLogica
     public async Task Actualizar(Estructura estructura, int id)
     {
         this.Validar(estructura);
-        TipoEstructura? tipoEstructuraBuscada = await this._repositorioTipoEstructura.ObtenerPorId(estructura.TipoEstructura.Id);
+        TipoEstructura? tipoEstructuraBuscada = await this._repositorioTipoEstructura.ObtenerPorId(estructura.TipoEstructuraId);
         Estructura? estructuraBuscada = await this._repositorioEstructura.ObtenerPorId(id);
         
         if (tipoEstructuraBuscada == null || estructuraBuscada == null) 
-            throw new LogroExcepcion("Ocurrió un error al actualizar la Estructura");
+            throw new EstructuraExcepcion("Ocurrió un error al actualizar la Estructura");
 
         estructuraBuscada.TipoEstructura = tipoEstructuraBuscada;
         estructuraBuscada.EsMejorable = estructura.EsMejorable;
