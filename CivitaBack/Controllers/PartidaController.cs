@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
-using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Excepciones;
+using CivitaBack.Domain.Interfaces.Logica;
 using Microsoft.AspNetCore.Mvc;
+using System.Transactions;
 
 namespace CivitaBack.Api.Controllers;
 
@@ -273,4 +274,24 @@ public class PartidaController : BaseApiController
                 return Problem("Error eliminando la estructura");
             }
         }
+
+    [HttpPost("comprar-estructura")]
+    public async Task<IActionResult> ComprarEstructura([FromBody] CompraEstructuraDTO request)
+    {
+        try
+        {
+            int nuevoSaldo = await _partidaLogica.ComprarEstructuraAsync(request.PartidaId, request.EstructuraId);
+
+            return Ok(nuevoSaldo);
+        }
+        catch (PartidaExcepcion ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return Problem("Ocurrió un error interno al procesar la compra.");
+        }
+    }
+
 }

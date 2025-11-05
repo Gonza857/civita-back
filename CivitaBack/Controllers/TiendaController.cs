@@ -32,5 +32,7 @@ namespace CivitaBack.Api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Ocurrió un error al obtener las estructuras.");
             }
         }
+
+
     }
 }
