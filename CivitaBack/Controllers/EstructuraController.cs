@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using Microsoft.AspNetCore.Mvc;
@@ -64,6 +65,7 @@ public class EstructuraController : BaseApiController
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al eliminar la Estructura.");
         }
     }
@@ -78,25 +80,30 @@ public class EstructuraController : BaseApiController
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener la Estructura.");
         }
     }
     
     [HttpPatch("{id}")]
-    public async Task<IActionResult> Actualizar([FromBody] EstructuraDTO? estructuraDTO, int id)
+    public async Task<IActionResult> Actualizar([FromBody] EstructuraDTO? estructuraDto, int id)
     {
-        if (estructuraDTO == null)
+        if (estructuraDto == null)
             return BadRequest("Los datos recibidos son inválidos");
-        
+
         try
         {
-            var estructura = base.Mapear<Estructura>(estructuraDTO);
-
+            var estructura = base.Mapear<Estructura>(estructuraDto);
             await this._estructuraLogica.Actualizar(estructura, id);
             return Ok();
         }
+        catch (EstructuraExcepcion ex)
+        {
+            return BadRequest(ex.Message);
+        }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al actualizar la Estructura.");
         }
     }

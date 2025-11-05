@@ -91,10 +91,9 @@ public class PartidaRepositorio
 
     public async Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId)
     {
-        var partida = await _dbSet
-            .AsNoTracking()
+        var partida = await _context.Partida
             .Include(p => p.EstructuraMapa)
-            .ThenInclude(em => em.Estructura)
+            .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == partidaId);
         return base.Mapear<Partida>(partida);
     }

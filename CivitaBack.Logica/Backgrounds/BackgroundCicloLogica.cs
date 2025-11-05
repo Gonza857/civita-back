@@ -19,7 +19,8 @@ namespace CivitaBack.Logica.Backgrounds
 
         private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(15); // 7/8
 
-        public BackgroundCicloLogica(IServiceProvider serviceProvider, ILogger<BackgroundCicloLogica> logger, IHubContext<CicloHub> hubContext)
+        public BackgroundCicloLogica(IServiceProvider serviceProvider, ILogger<BackgroundCicloLogica> logger,
+            IHubContext<CicloHub> hubContext)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
@@ -37,19 +38,16 @@ namespace CivitaBack.Logica.Backgrounds
             {
                 try
                 {
-
-                    //Espera si está en pausa
+                    // 1. Espera si está en pausa
                     _pauseEvent.Wait(stoppingToken);
 
                     using var scope = _serviceProvider.CreateScope();
                     var cicloLogica = scope.ServiceProvider.GetRequiredService<ICicloLogica>();
 
-                    // Espera hasta el próximo ciclo
-                    await Task.Delay(_intervalo, stoppingToken);
-
+                    // 2. ¡HACE EL TRABAJO! (Esto ahora se ejecuta primero)
                     var partidas = await cicloLogica.EjecutarCicloAsync();
 
-                    // Enviar los recursos a cada grupo de SignalR
+                    // 3. Enviar los recursos a cada grupo de SignalR
                     foreach (var partida in partidas)
                     {
                         var payload = new RecursoDTO
@@ -65,19 +63,24 @@ namespace CivitaBack.Logica.Backgrounds
                             .SendAsync("RecursosActualizados", payload);
                     }
 
-                    _logger.LogInformation("✅ Ciclo ejecutado y recursos enviados a SignalR a las {Hora}", DateTime.Now);
+                    _logger.LogInformation("✅ Ciclo ejecutado y recursos enviados a SignalR a las {Hora}",
+                        DateTime.Now);
+
+                    // 4. ¡ESPERA DESPUÉS de terminar el trabajo!
+                    await Task.Delay(_intervalo, stoppingToken);
                 }
                 catch (Exception ex)
                 {
+                    // 5. Si algo falló (en EjecutarCicloAsync o SignalR), loguealo
                     _logger.LogError(ex, "❌ Error durante la ejecución del ciclo automático");
 
+                    // 6. Esperá 15 segundos antes de reintentar el ciclo
+                    //    (para no spamear la BD si el error es grave)
                     await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
                 }
-
             }
 
             _logger.LogInformation("🛑 CicloBackgroundService detenido a las {Hora}", DateTime.Now);
         }
-
     }
 }

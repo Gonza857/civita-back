@@ -22,6 +22,13 @@ public class EstructuraProfile : Profile
                 opt => opt.MapFrom(dominio => dominio.TipoEstructura) // ...usá el valor de "TipoEstructura" del Dominio.
             );
         
+        CreateMap<EstructuraDTO, Estructura>()
+            .ForMember(
+                dominio => dominio.TipoEstructuraId,
+                opt => opt.MapFrom(dto => dto.TipoId)
+            );;
+        
         CreateMap<Estructura, EstructuraCondicionDTO>();
+
     }
 }

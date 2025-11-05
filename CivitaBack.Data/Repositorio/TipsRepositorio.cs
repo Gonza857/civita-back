@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
-public class TipsRepositorio
+public class TipRepositorio
     : GenericoRepositorio<Tip, TipEF>, ITipsRepositorio
 {
-    public TipsRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
+    public TipRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
     public async Task<List<Tip>> ObtenerMsjPorIdTipo(int idTipo)
     {
@@ -26,6 +26,7 @@ public class TipsRepositorio
         var tipEf = await _context.Tip
             .Where(t => t.Id == id)
             .Include(t => t.TipoTip)
+            .AsNoTracking()
             .FirstOrDefaultAsync();
         return base.Mapear<Tip>(tipEf);
     }

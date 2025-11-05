@@ -1,8 +1,6 @@
 ﻿namespace CivitaBack.Domain.Excepciones;
 
-public class ErrorInternoExcepction : Exception
+public class ErrorInternoException : Exception
 {
-    public ErrorInternoExcepction() { }
-
-    public ErrorInternoExcepction(string message) : base(message) { }
+    public ErrorInternoException(string message) : base(message) { }
 }
