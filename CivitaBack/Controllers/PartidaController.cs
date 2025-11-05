@@ -4,6 +4,7 @@ using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing.Constraints;
 using System.Transactions;
 
 namespace CivitaBack.Api.Controllers;
@@ -276,11 +277,11 @@ public class PartidaController : BaseApiController
         }
 
     [HttpPost("comprar-estructura")]
-    public async Task<IActionResult> ComprarEstructura([FromBody] CompraEstructuraDTO request)
+    public async Task<IActionResult> ComprarEstructura(int partidaId, int estructuraId)
     {
         try
         {
-            int nuevoSaldo = await _partidaLogica.ComprarEstructuraAsync(request.PartidaId, request.EstructuraId);
+            int nuevoSaldo = await _partidaLogica.ComprarEstructuraAsync(partidaId, estructuraId);
 
             return Ok(new { nuevoSaldo = nuevoSaldo });
         }
