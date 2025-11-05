@@ -10,5 +10,7 @@ public class EstructuraDTO
     public int CostoDinero { get; set; }
     public int FelicidadCiclo { get; set; }
     public int ContaminacionCiclo { get; set; }
-    public TipoEstructuraDTO Tipo { get; set; }
+    
+    public int TipoId { get; set; }
+    public TipoEstructuraDTO? Tipo { get; set; }
 }

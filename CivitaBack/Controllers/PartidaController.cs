@@ -47,7 +47,7 @@ public class PartidaController : BaseApiController
         {
             return BadRequest(ex.Message);
         }
-        catch (ErrorInternoExcepction ex)
+        catch (ErrorInternoException ex)
         {
             _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar la partida.");
@@ -83,7 +83,7 @@ public class PartidaController : BaseApiController
         {
             return BadRequest(ex.Message);
         }
-        catch (ErrorInternoExcepction ex)
+        catch (ErrorInternoException ex)
         {
             _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al guardar la partida.");
@@ -186,7 +186,6 @@ public class PartidaController : BaseApiController
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
-            _logger.LogError(ex, "Error fatal al guardar el mapa durante el mapeo de estructuras.");
             return Problem("Error al guardar el mapa.");
         }
     }
@@ -260,10 +259,11 @@ public class PartidaController : BaseApiController
         {
             try
             {
-                await _estructuraMapaLogica.EliminarEstructuraAsync(base.Mapear<EstructuraMapa>(dto));
+                var estructurasEliminar = base.Mapear<EstructuraMapa>(dto); 
+                await _estructuraMapaLogica.EliminarEstructuraAsync(estructurasEliminar);
                 return Ok("Estructura eliminada correctamente");
             }
-            catch (InvalidOperationException ex)
+            catch (EstructuraMapaException ex)
             {
                 return NotFound(ex.Message);
             }

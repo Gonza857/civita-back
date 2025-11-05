@@ -21,5 +21,8 @@ public class TipoEstructuraProfile : Profile
         
         // 3. Mapa de Dominio -> DTO (para devolver al frontend)
         CreateMap<TipoEstructura, TipoEstructuraDTO>();
+        
+        CreateMap<TipoEstructuraDTO, TipoEstructura>();
+
     }
 }

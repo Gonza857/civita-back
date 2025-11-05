@@ -1,4 +1,6 @@
-﻿using CivitaBack.Domain.Entidades;
+﻿using AutoMapper;
+using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Hubs;
 using Microsoft.AspNetCore.Mvc;
@@ -7,13 +9,16 @@ using Microsoft.AspNetCore.SignalR;
 namespace CivitaBack.Api.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
-    public class EventoController : ControllerBase
+    public class EventoController : BaseApiController
     {
         private readonly IEventoLogica _eventoLogica;
         private readonly IHubContext<EventoHub> _hubContext;
 
-        public EventoController(IEventoLogica eventoLogica, IHubContext<EventoHub> hubContext)
+        public EventoController(
+            IEventoLogica eventoLogica, 
+            IHubContext<EventoHub> hubContext,
+            IMapper mapper
+            ) : base(mapper)
         {
             _eventoLogica = eventoLogica;
             _hubContext = hubContext;
@@ -29,7 +34,7 @@ namespace CivitaBack.Api.Controllers
                 await _hubContext.Clients.Group(partidaId.ToString())
                 .SendAsync("EventoDisparado", eventoDisparado);
 
-                return Ok(eventoDisparado);
+                return Ok(base.Mapear<EventoDisparadoDTO>(eventoDisparado));
             }
             catch (Exception ex)
             {

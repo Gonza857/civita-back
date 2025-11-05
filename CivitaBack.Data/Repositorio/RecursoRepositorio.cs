@@ -28,7 +28,8 @@ public class RecursoRepositorio
 
     public async Task<Recurso> ObtenerRecursosPartida(int idPartida)
     {
-        RecursoEF? recursoEf = await _context.Recurso
+        var recursoEf = await _context.Recurso
+            .AsNoTracking()
             .FirstOrDefaultAsync(r => r.PartidaId == idPartida);
         return base.Mapear<Recurso>(recursoEf);
     }

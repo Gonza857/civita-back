@@ -20,7 +20,7 @@ namespace CivitaBack.Tests
             //Assert.Null(partida.Recurso);
             Assert.Null(partida.Evento);
             Assert.Null(partida.Tienda);
-            Assert.Null(partida.EstructuraMapa);
+            Assert.Empty(partida.EstructuraMapa);
             Assert.Null(partida.TipEnPartida);
             // La propiedad LogroPartidas no se inicializa automáticamente
         }

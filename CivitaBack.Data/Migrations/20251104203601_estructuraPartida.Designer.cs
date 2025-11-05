@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251104203601_estructuraPartida")]
+    partial class estructuraPartida
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -352,22 +355,6 @@ namespace CivitaBack.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EventoMaestro");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ContaminacionAceptar = -10,
-                            ContaminacionRechazar = 20,
-                            Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EcoCoinsAceptar = -100,
-                            FelicidadAceptar = 10,
-                            FelicidadRechazar = -10,
-                            Nombre = "Separación de residuos",
-                            TextoAceptar = "En Argentina, solo el 3% de los residuos se reciclan. Separar la basura reduce rellenos sanitarios y emisiones de metano.",
-                            TextoDescripcion = "Los vecinos solicitan un sistema de reciclaje en la ciudad debido a la alta contaminación.",
-                            TextoRechazar = "Cuando no se recicla, los rellenos sanitarios crecen y emiten metano, un gas 28 veces peor que el CO₂ para el clima."
-                        });
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.LogroEF", b =>

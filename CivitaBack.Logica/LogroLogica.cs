@@ -162,7 +162,7 @@ public class LogroLogica : ILogroLogica
 
     public async Task<List<Logro>> ComprobarSiCumpleAlgunLogro(Partida? partida, List<Logro> logrosDB)
     {
-        if (partida == null || logrosDB.Count == 0 || partida.Recursos == null)
+        if (partida == null || partida.Recursos == null)
             throw new LogroExcepcion("No se pudo obtener si cumple algún logro.");
         /*
             por cada recurso

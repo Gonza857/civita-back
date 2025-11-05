@@ -56,6 +56,7 @@ public class PartidaRepositorio
     {
         var partida = await _context.Partida
             .Include(p => p.Recursos)
+            .Include(p => p.EstructuraMapa)
             .Where(p => p.Id == id)
             .AsNoTracking()
             .FirstOrDefaultAsync();
@@ -91,10 +92,9 @@ public class PartidaRepositorio
 
     public async Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId)
     {
-        var partida = await _dbSet
-            .AsNoTracking()
+        var partida = await _context.Partida
             .Include(p => p.EstructuraMapa)
-            .ThenInclude(em => em.Estructura)
+            .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == partidaId);
         return base.Mapear<Partida>(partida);
     }
@@ -182,11 +182,11 @@ public class PartidaRepositorio
     public async Task<List<Partida>> ObtenerTodasConEstructurasYRecursosAsync()
     {
         var listaPartidasEF = await _dbSet
+             .AsNoTracking()
              .Include(p => p.Recursos)
              .Include(p => p.EstructuraMapa)
              .ThenInclude(em => em.Estructura)
              .ThenInclude(e => e.TipoEstructura)
-             .AsNoTracking()
              .ToListAsync();
 
         return MapearLista<Partida>(listaPartidasEF);

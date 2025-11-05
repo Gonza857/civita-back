@@ -28,20 +28,22 @@ namespace CivitaBack.Logica
 
         public async Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida)
         {
-            var maestro = await _eventoRepositorio.ObtenerEventoMaestroAsync(); // Por ahora traigo el primero
+            var maestro = await _eventoRepositorio.ObtenerEventoMaestroAsync();
             if (maestro == null) return null;
 
-            var evento = _mapper.Map<Evento>(maestro);
+            var evento = _mapper.Map<Evento>(maestro); 
 
+            evento.EventoMaestroId = maestro.Id;
+            evento.EventoMaestro = null; 
             evento.PartidaId = idPartida;
             evento.SeDisparo = true;
             evento.Resuelto = false;
 
-            await _eventoRepositorio.CrearEventoAsync(evento);
+            var eventoCreado = await _eventoRepositorio.CrearEventoAsync(evento);
 
-            await this._uow.CommitAsync();
+            eventoCreado.EventoMaestro = maestro;
 
-            var respuestaDTO = _mapper.Map<EventoDisparadoDTO>(evento);
+            var respuestaDTO = _mapper.Map<EventoDisparadoDTO>(eventoCreado);
 
             return respuestaDTO;
         }
@@ -68,14 +70,12 @@ namespace CivitaBack.Logica
 
             await this._uow.CommitAsync();
 
-            var resultado = new
-            {
-                evento.Id,
-                Texto = acepto ? evento.TextoAceptar : evento.TextoRechazar,
-                PartidaId = partida.Id,
-            };
+            var resultadoDTO = _mapper.Map<EventoResueltoDTO>(
+        evento,
+        opt => opt.Items.Add("Aceptado", acepto)
+    );
 
-            return _mapper.Map<EventoResueltoDTO>(resultado);
+            return resultadoDTO;
         }
     }
 }

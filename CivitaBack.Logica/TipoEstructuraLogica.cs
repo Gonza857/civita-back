@@ -15,18 +15,8 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
         _repositorioTipoEstructura = rte;
         _uow = uow;
     }
-
-    private void Validar(TipoEstructura tipoEstructura, int idTipoEstructura)
-    {
-        if (tipoEstructura == null || idTipoEstructura <= 0) 
-            throw new Exception("Ocurrió un error al actualizar el Tipo de Estructura");
-    }
     
-    /// <summary>
-    /// Actualiza un Tipo de Estructura
-    /// </summary>
-    /// <param name="tipoEstructura">TipoEstructura</param>
-    /// <param name="idTipoEstructura">Id de Tipo Estructura</param>
+    /// <inheritdoc />
     public async Task Actualizar(TipoEstructura tipoEstructura, int idTipoEstructura)
     {
         this.Validar(tipoEstructura, idTipoEstructura);
@@ -44,10 +34,7 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
         await this._uow.CommitAsync();
     }
     
-    /// <summary>
-    /// Elimina un Tipo de Estructura
-    /// </summary>
-    /// <param name="id">Id de Tipo Estructura</param>
+    /// <inheritdoc />
     public async Task Eliminar(int id)
     {
         if (id <= 0) 
@@ -56,10 +43,7 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
         await this._uow.CommitAsync();
     }
     
-    /// <summary>
-    /// Guarda un Tipo de Estructura
-    /// </summary>
-    /// <param name="TipoEstructura">TipoEstructura</param>
+    /// <inheritdoc />
     public async Task<TipoEstructura> Crear(TipoEstructura TipoEstructura)
     {
         this.Validar(TipoEstructura, 1);
@@ -78,10 +62,7 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
         return tipoEstructura;
     }
     
-    /// <summary>
-    /// Obtiene un Tipo de Estructura por Id
-    /// </summary>
-    /// <param name="id">Id de Tipo Estructura</param>
+    /// <inheritdoc />
     public async Task<TipoEstructura> ObtenerPorId(int id)
     {
         TipoEstructura? tipoEstructura = await this._repositorioTipoEstructura.ObtenerPorId(id);
@@ -90,12 +71,15 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
         return tipoEstructura;
     }
     
-    /// <summary>
-    /// Obtiene listado de Tipos de Estructuras
-    /// </summary>
+    /// <inheritdoc />
     public async Task<List<TipoEstructura>> Listado()
     {
         return await this._repositorioTipoEstructura.ObtenerTodos();
     }
     
+    private void Validar(TipoEstructura tipoEstructura, int idTipoEstructura)
+    {
+        if (tipoEstructura == null || idTipoEstructura <= 0) 
+            throw new Exception("Ocurrió un error al actualizar el Tipo de Estructura");
+    }
 }

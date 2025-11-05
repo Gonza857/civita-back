@@ -8,5 +8,5 @@ public class PartidaMapaDTO
     public int UsuarioId { get; set; }
     public DateTime UltimaVez { get; set; }
     public string JsonMapa {get; set;}
-    public List<EstructuraMapa>? estructuras {get; set;}
+    public List<EstructuraMapaDTO>? estructuras {get; set;}
 }
