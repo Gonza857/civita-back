@@ -14,16 +14,5 @@ public class Recurso : Auditable
 
     public int PartidaId { get; set; }
     public Partida? Partida { get; set; }
-
-    public Recurso() { }
-
-    public Recurso(int energia, int contaminacion, int felicidad, int ecoCoins, Partida partida)
-    {
-        Energia = energia;
-        Contaminacion = contaminacion;
-        Felicidad = felicidad;
-        EcoCoins = ecoCoins;
-        PartidaId = partida.Id;
-        Partida = partida;
-    }
+    
 }
