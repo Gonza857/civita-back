@@ -2,15 +2,14 @@
 using CivitaBack.Data.BO;
 using CivitaBack.Domain.Entidades;
 
-namespace CivitaBack.Api.Mapping;
-
-public class EventoMaestroProfile : Profile
+namespace CivitaBack.Api.Mapping
 {
-    public EventoMaestroProfile()
+    public class EventoMaestroProfile : Profile
     {
-        CreateMap<EventoMaestroEF, EventoMaestro>();
-        CreateMap<EventoMaestro, EventoMaestroEF>();
-        CreateMap<Evento, EventoMaestro>();
-        CreateMap<EventoMaestro, Evento>();
+        public EventoMaestroProfile()
+        {
+            CreateMap<EventoMaestroEF, EventoMaestro>();
+            CreateMap<EventoMaestro, EventoMaestroEF>();
+        }
     }
 }
