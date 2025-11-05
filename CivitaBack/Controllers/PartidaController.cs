@@ -282,7 +282,7 @@ public class PartidaController : BaseApiController
         {
             int nuevoSaldo = await _partidaLogica.ComprarEstructuraAsync(request.PartidaId, request.EstructuraId);
 
-            return Ok(nuevoSaldo);
+            return Ok(new { nuevoSaldo = nuevoSaldo });
         }
         catch (PartidaExcepcion ex)
         {
