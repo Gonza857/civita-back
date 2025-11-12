@@ -40,4 +40,10 @@
 	  <Folder Include="Interfaces\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="Mapa\MapaJuego.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>

@@ -11,7 +11,6 @@ namespace CivitaBack.Data.DTO
 
         [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
         [EmailAddress(ErrorMessage = "El correo no tiene un formato válido.")] 
-        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "El formato de correo no es válido.")]
         public string Mail { get; set; }
 
         [Required(ErrorMessage = "La contraseña es obligatoria.")]

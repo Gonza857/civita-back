@@ -39,9 +39,12 @@ public class InicialLogica : IInicialLogica
             JsonMapa = this.GenerarMapa(),
             UltimaVez = DateTime.UtcNow,
         };
+        
         partida.Recursos = this.GenerarRecursos(partida);
+        
         await this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida);
         await this._partidaRepositorio.Agregar(partida);
+        
         await this._uow.CommitAsync();
     }
 
@@ -59,16 +62,14 @@ public class InicialLogica : IInicialLogica
 
     private string GenerarMapa()
     {
-        var rutaMapa = Path.Combine(
-            AppDomain.CurrentDomain.BaseDirectory,
-            "..", "..", "..", "..",
-            "CivitaBack.Data", "Mapa", "MapaJuego.json"
-        );
-
-        rutaMapa = Path.GetFullPath(rutaMapa);
-
+        string baseDirectorio = AppContext.BaseDirectory;
+        var rutaMapa = Path.Combine(baseDirectorio, "Mapa", "MapaJuego.json");
+        
         if (!File.Exists(rutaMapa))
+        {
+            // _logger.LogError("El archivo de mapa no se encuentra en la ruta esperada: {rutaMapa}", rutaMapa);
             throw new FileNotFoundException("No se encontró el archivo de mapa base.", rutaMapa);
+        }
 
         return File.ReadAllText(rutaMapa);
     }
