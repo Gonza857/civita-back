@@ -40,15 +40,13 @@ public class InicialLogica : IInicialLogica
             UltimaVez = DateTime.UtcNow,
         };
         
-        partida.Recursos = this.GenerarRecursos(partida);
-        
-        await this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida);
+        partida.Recursos = this.GenerarRecursos();
         await this._partidaRepositorio.Agregar(partida);
-        
+        await this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida);
         await this._uow.CommitAsync();
     }
 
-    private Recurso GenerarRecursos(Partida partida)
+    private Recurso GenerarRecursos()
     {
         return new Recurso
         {
@@ -56,7 +54,6 @@ public class InicialLogica : IInicialLogica
             Felicidad = 40,
             Energia = 30,
             Contaminacion = 60,
-            Partida = partida,
         };
     }
 

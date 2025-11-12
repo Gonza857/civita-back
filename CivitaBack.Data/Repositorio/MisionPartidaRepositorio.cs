@@ -34,7 +34,7 @@ public class MisionPartidaRepositorio
             misionesPartida.Add(nuevaAsignacion);
         }
         
-        await base.AgregarVarios(misionesPartida);
+        partida.MisionPartidas = misionesPartida;
     }
 
     public async Task<List<MisionPartida>> ObtenerMisionesPartida(int idPartida)
