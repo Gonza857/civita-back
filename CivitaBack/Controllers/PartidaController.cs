@@ -21,6 +21,7 @@ public class PartidaController : BaseApiController
     private readonly IEstructuraMapaLogica _estructuraMapaLogica;
     private readonly ILogroPartidaLogica _logroPartidaLogica;
     private readonly IMapaLogica _mapaLogica;
+    private readonly ICompraEstructurasLogica _compraEstructurasLogica;
     private readonly ILogger<PartidaController> _logger;
     
     public PartidaController(
@@ -32,6 +33,7 @@ public class PartidaController : BaseApiController
         ILogger<PartidaController> logger,
         ILogroPartidaLogica logroPartidaLogica,
         IMapaLogica mapaLogica,
+        ICompraEstructurasLogica compraEstructurasLogica,   
         IMapper mapper) : base(mapper)
     {
         _partidaLogica = partidaLogica;
@@ -41,6 +43,7 @@ public class PartidaController : BaseApiController
         _estructuraMapaLogica = estructuraMapaLogica;
         _logroPartidaLogica = logroPartidaLogica;
         _mapaLogica = mapaLogica;
+        _compraEstructurasLogica = compraEstructurasLogica;
         _logger = logger;
     }
 
@@ -293,7 +296,7 @@ public class PartidaController : BaseApiController
     {
         try
         {
-            int nuevoSaldo = await _partidaLogica.ComprarEstructuraAsync(partidaId, estructuraId);
+            int nuevoSaldo = await _compraEstructurasLogica.ComprarEstructuraAsync(partidaId, estructuraId);
 
             return Ok(new { nuevoSaldo = nuevoSaldo });
         }
