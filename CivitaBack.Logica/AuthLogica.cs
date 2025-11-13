@@ -80,7 +80,8 @@ namespace CivitaBack.Logica
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                 new Claim(ClaimTypes.Name, usuario.NombreUsuario),
-                new Claim(ClaimTypes.Email, usuario.Mail)
+                new Claim(ClaimTypes.Email, usuario.Mail),
+                new Claim("EsDios", usuario.EsDios.ToString())
             };
 
             var token = new JwtSecurityToken(

@@ -10,6 +10,8 @@ public class Usuario : Auditable
     public string? Mail { get; set; }
     public string? HashDeContrasena { get; set; }
 
+    public bool EsDios { get; set; } = false;
+
     // Relación con Partidas
     public Partida Partida { get; set; }
 }

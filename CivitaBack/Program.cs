@@ -1,20 +1,21 @@
-using CivitaBack.Data.BO;
+using CivitaBack.Api.Security;
 using CivitaBack.Data.EF;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Enum;
+using CivitaBack.Domain.Interfaces.Logica;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Backgrounds;
+using CivitaBack.Logica.Hubs;
+using CivitaBack.Logica.Interfaces;
+using CivitaBack.Utils;
+using Hangfire;
+using Hangfire.Common;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using CivitaBack.Domain.Enum;
-using CivitaBack.Domain.Interfaces.Logica;
-using CivitaBack.Logica.Hubs;
-using CivitaBack.Domain.Interfaces.Repositorios;
-using CivitaBack.Utils;
-using Hangfire;
-using Hangfire.PostgreSql;
-using Hangfire.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,9 +70,14 @@ builder.Services.AddHangfire((sp, config) =>
     });
 });
 builder.Services.AddHangfireServer();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IAccesoUsuarios, AccesoUsuarios>();
 
 builder.Services.AddScoped<IPartidaLogica, PartidaLogica>();
 builder.Services.AddScoped<IPartidaRepositorio, PartidaRepositorio>();
+
+builder.Services.AddScoped<IActualizarRecursosLogica, ActualizarRecursosLogica>();
 
 builder.Services.AddScoped<ITipoLogroLogica, TipoLogroLogica>();
 builder.Services.AddScoped<ITipoLogroRepositorio, TipoLogroRepositorio>();

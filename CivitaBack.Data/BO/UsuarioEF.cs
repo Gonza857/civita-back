@@ -14,6 +14,8 @@ namespace CivitaBack.Data.BO
         public string? Mail { get; set; }
         public string? HashDeContrasena { get; set; }
 
+        public bool EsDios { get; set; } = false;
+
         // Relaciones
         [JsonIgnore]
         public PartidaEF Partida { get; set; }

@@ -2,7 +2,7 @@
 
 namespace CivitaBack.Domain.Interfaces.Repositorios
 {
-    public interface IEventoRepositorio
+    public interface IEventoRepositorio : IRepositorioBase<Evento>
     {
         Task<EventoMaestro?> ObtenerEventoMaestroAsync();
         Task<Evento> CrearEventoAsync(Evento evento);

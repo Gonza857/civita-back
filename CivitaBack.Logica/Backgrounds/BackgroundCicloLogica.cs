@@ -1,5 +1,4 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
+﻿using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Hubs;
 using Microsoft.AspNetCore.SignalR;
@@ -17,7 +16,7 @@ namespace CivitaBack.Logica.Backgrounds
         private readonly IHubContext<CicloHub> _hubContext;
         private readonly ManualResetEventSlim _pauseEvent = new(true); // empieza "activo"
 
-        private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(3); // 7/8
+        private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(15); // 7/8
 
         public BackgroundCicloLogica(IServiceProvider serviceProvider, ILogger<BackgroundCicloLogica> logger,
             IHubContext<CicloHub> hubContext)
