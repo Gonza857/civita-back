@@ -20,6 +20,7 @@ public class PartidaController : BaseApiController
     private readonly IMisionLogica _misionLogica;
     private readonly IEstructuraMapaLogica _estructuraMapaLogica;
     private readonly ILogroPartidaLogica _logroPartidaLogica;
+    private readonly IMapaLogica _mapaLogica;
     private readonly ILogger<PartidaController> _logger;
     
     public PartidaController(
@@ -30,6 +31,7 @@ public class PartidaController : BaseApiController
         IEstructuraMapaLogica estructuraMapaLogica,
         ILogger<PartidaController> logger,
         ILogroPartidaLogica logroPartidaLogica,
+        IMapaLogica mapaLogica,
         IMapper mapper) : base(mapper)
     {
         _partidaLogica = partidaLogica;
@@ -38,6 +40,7 @@ public class PartidaController : BaseApiController
         _misionLogica = misionLogica;
         _estructuraMapaLogica = estructuraMapaLogica;
         _logroPartidaLogica = logroPartidaLogica;
+        _mapaLogica = mapaLogica;
         _logger = logger;
     }
 
@@ -191,7 +194,7 @@ public class PartidaController : BaseApiController
         try
         {
             var estructuras = base.MapearLista<EstructuraMapa>(dto.Estructuras);
-            await _partidaLogica.ActualizarMapaDePartidaAsync(dto.PartidaId, dto.JsonMapa, estructuras);
+            await _mapaLogica.ActualizarMapaDePartidaAsync(dto.PartidaId, dto.JsonMapa, estructuras);
             return Ok(new { mensaje = "Mapa guardado correctamente." });
         }
         catch (Exception ex)
@@ -207,7 +210,7 @@ public class PartidaController : BaseApiController
     {
         try
         {
-            var partida = await _partidaLogica.ObtenerMapaAsync(partidaId);
+            var partida = await _mapaLogica.ObtenerMapaAsync(partidaId);
             if (partida == null)
                 return NotFound("No se encontró la partida.");
             return Ok(base.Mapear<PartidaMapaDTO>(partida));
@@ -225,7 +228,7 @@ public class PartidaController : BaseApiController
     {
         try
         {
-            var partida = await _partidaLogica.ObtenerMapaAsync(partidaId);
+            var partida = await _mapaLogica.ObtenerMapaAsync(partidaId);
             if (partida == null)
                 return NotFound("No se encontró la partida.");
 
@@ -251,7 +254,7 @@ public class PartidaController : BaseApiController
         try
         {
             var estructuras = base.MapearLista<EstructuraMapa>(dto.Estructuras);
-            await _partidaLogica.ActualizarMapaDePartidaAsync(dto.PartidaId, dto.JsonMapa, estructuras);
+            await _mapaLogica.ActualizarMapaDePartidaAsync(dto.PartidaId, dto.JsonMapa, estructuras);
             return Ok(new { mensaje = "Mapa actualizado correctamente." });
         }
         catch (PartidaExcepcion ex)

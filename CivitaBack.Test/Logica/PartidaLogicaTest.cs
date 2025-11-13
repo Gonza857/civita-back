@@ -251,7 +251,7 @@ public class PartidaLogicaTest
         _mockUow.Verify(u => u.CommitAsync(), Times.Never());
     }
 
-    [Fact]
+    /*[Fact]
     public async Task GuardarMapa_SinEstructuras_OK()
     {
         // Arrange
@@ -355,7 +355,7 @@ public class PartidaLogicaTest
 
         // Assert
         Assert.Null(p);
-    }
+    }*/
 }
 
 

@@ -77,6 +77,8 @@ builder.Services.AddScoped<IAccesoUsuarios, AccesoUsuarios>();
 builder.Services.AddScoped<IPartidaLogica, PartidaLogica>();
 builder.Services.AddScoped<IPartidaRepositorio, PartidaRepositorio>();
 
+builder.Services.AddScoped<IMapaLogica, MapaLogica>();
+
 builder.Services.AddScoped<IActualizarRecursosLogica, ActualizarRecursosLogica>();
 
 builder.Services.AddScoped<ITipoLogroLogica, TipoLogroLogica>();
