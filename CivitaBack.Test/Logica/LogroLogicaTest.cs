@@ -1,8 +1,9 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
-using CivitaBack.Domain.Excepciones;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 using Moq;
 
@@ -24,6 +25,8 @@ public class LogroLogicaTest
     private readonly ILogroLogica _logroLogica;
 
     private readonly Mock<IUnidadDeTrabajo> _mockUow;
+    private readonly Mock<IAccesoUsuarios> _mockAccesoUsuarios;
+
 
     public LogroLogicaTest()
     {
@@ -37,6 +40,7 @@ public class LogroLogicaTest
         _mockCondicionRepositorio = new Mock<ICondicionRepositorio>();
         _mockEstructuraRepositorio = new Mock<IEstructuraRepositorio>();
         _mockUow = new Mock<IUnidadDeTrabajo>();
+        _mockAccesoUsuarios = new Mock<IAccesoUsuarios>();
 
         _logroLogica = new LogroLogica(
             _mockLogroRepositorio.Object,
@@ -50,9 +54,8 @@ public class LogroLogicaTest
         _partidaLogica = new PartidaLogica(
             _mockPartidaRepositorio.Object,
             _mockRecursoRepositorio.Object,
-            _mockEstructuraMapaRepositorio.Object,
             _mockLogroRepositorio.Object,
-            _mockEstructuraRepositorio.Object,
+            _mockAccesoUsuarios.Object,
             _mockUow.Object
         );
     }

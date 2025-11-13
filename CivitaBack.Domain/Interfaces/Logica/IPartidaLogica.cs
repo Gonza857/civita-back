@@ -12,4 +12,6 @@ public interface IPartidaLogica
     
     Task ReclamarLogros(Partida partida, List<Logro> logros);    
     Task<Partida> ObtenerPorId(int idPartida);
+
+    Task<Partida> ObtenerPartidaParaLogin(int idUsuario);
 }

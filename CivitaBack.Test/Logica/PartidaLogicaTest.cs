@@ -6,6 +6,7 @@ using CivitaBack.Logica;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Utils;
 using Moq;
+using CivitaBack.Logica.Interfaces;
 
 namespace CivitaBack.Tests;
 
@@ -13,33 +14,30 @@ public class PartidaLogicaTest
 {
     private readonly Mock<IPartidaRepositorio> _mockPartidaRepositorio;
     private readonly Mock<IRecursoRepositorio> _mockRecursoRepositorio;
-    private readonly Mock<IEstructuraMapaRepositorio> _mockEstructuraMapaRepositorio;
     private readonly Mock<ILogroRepositorio> _mockLogroRepositorio;
 
     private readonly IPartidaLogica _partidaLogica;
     private readonly IRecursoLogica _recursoLogica;
 
-    private readonly Mock<IUnidadDeTrabajo> _mockUow;
+    private readonly Mock<IAccesoUsuarios> _mockAccesoUsuarios;
 
-    private readonly Mock<IEstructuraRepositorio> _mockEstructuraRepositorio;
+    private readonly Mock<IUnidadDeTrabajo> _mockUow;
 
     public PartidaLogicaTest()
     {
         // Creamos los mocks de las dependencias
         _mockPartidaRepositorio = new Mock<IPartidaRepositorio>();
         _mockRecursoRepositorio = new Mock<IRecursoRepositorio>();
-        _mockEstructuraMapaRepositorio = new Mock<IEstructuraMapaRepositorio>();
         _mockLogroRepositorio = new Mock<ILogroRepositorio>();
-        _mockEstructuraRepositorio = new Mock<IEstructuraRepositorio>(); 
+        _mockAccesoUsuarios = new Mock<IAccesoUsuarios>();
         _mockUow = new Mock<IUnidadDeTrabajo>();
 
         // Inyectamos los mocks en el constructor de PartidaLogica
         _partidaLogica = new PartidaLogica(
             _mockPartidaRepositorio.Object,
             _mockRecursoRepositorio.Object,
-            _mockEstructuraMapaRepositorio.Object,
             _mockLogroRepositorio.Object,
-            _mockEstructuraRepositorio.Object, 
+            _mockAccesoUsuarios.Object,
             _mockUow.Object
         );
     }
@@ -83,11 +81,12 @@ public class PartidaLogicaTest
     public async void Actualizar_SaleOK()
     {
         // Arrange
+        const int IdUsuario = 7;
+
         Usuario usuarioMock = new Usuario
         {
-            Id = 7,
+            Id = IdUsuario,
         };
-
 
         Partida partidaDominioActualizada = new Partida
         {
@@ -107,6 +106,9 @@ public class PartidaLogicaTest
             UsuarioId = 7,
             Recursos = new Recurso { EcoCoins = 0, Contaminacion = 0, Energia = 0, Felicidad = 0 }
         };
+
+        _mockAccesoUsuarios.Setup(a => a.ObtenerIdUsuarioActual()).Returns(IdUsuario);
+        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(false);
 
         _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
          .ReturnsAsync(partidaDBExistente);
@@ -164,10 +166,11 @@ public class PartidaLogicaTest
     public async void Actualizar_CuandoNoSeEncuentraPartida_LanzaError()
     {
         // Arrange
+        const int IdUsuario = 7;
 
         Usuario usuarioMock = new Usuario
         {
-            Id = 7,
+            Id = IdUsuario,
         };
 
 
@@ -182,6 +185,9 @@ public class PartidaLogicaTest
                 EcoCoins = 100,
             },
         };
+
+        _mockAccesoUsuarios.Setup(a => a.ObtenerIdUsuarioActual()).Returns(IdUsuario);
+        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(false);
 
         _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(7))
          .ReturnsAsync((Partida)null);
@@ -248,6 +254,89 @@ public class PartidaLogicaTest
 
         // Act & Assert
         await Assert.ThrowsAsync<PartidaExcepcion>(() => _partidaLogica.Actualizar(partidaDominioActualizada, usuarioMock));
+        _mockUow.Verify(u => u.CommitAsync(), Times.Never());
+    }
+
+    [Fact]
+    public async Task ObtenerPorId_AccesoDenegado_LanzaExcepcion()
+    {
+        // Arrange
+        const int idUsuarioAutenticado = 100;
+        const int idPropietarioPartida = 200; // ID diferente al logueado
+        const int idPartida = 1;
+
+        Partida partidaMock = new Partida { Id = idPartida, UsuarioId = idPropietarioPartida };
+
+        // Simular que el usuario logueado NO es el dueño y NO es Dios
+        _mockAccesoUsuarios.Setup(a => a.ObtenerIdUsuarioActual()).Returns(idUsuarioAutenticado);
+        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(false);
+
+        // Simular que el repositorio devuelve una partida ajena
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorId(idPartida))
+                               .ReturnsAsync(partidaMock);
+
+        // Act & Assert
+        // Se espera que la lógica lance la excepción de Acceso Denegado
+        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(
+            () => _partidaLogica.ObtenerPorId(idPartida)
+        );
+
+        // Verificar que la búsqueda se realizó, pero la lógica abortó la ejecución
+        _mockPartidaRepositorio.Verify(r => r.ObtenerPorId(idPartida), Times.Once);
+        _mockUow.Verify(u => u.CommitAsync(), Times.Never());
+    }
+
+    [Fact]
+    public async Task ObtenerPorId_AccesoPermitido_RetornaPartida()
+    {
+        // Arrange
+        const int idUsuario = 100;
+        const int idPartida = 1;
+
+        Partida partidaMock = new Partida { Id = idPartida, UsuarioId = idUsuario }; // Dueño = Logueado
+
+        // Simular que el usuario logueado ES el dueño
+        _mockAccesoUsuarios.Setup(a => a.ObtenerIdUsuarioActual()).Returns(idUsuario);
+        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(false);
+
+        // Simular que el repositorio devuelve la partida propia
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorId(idPartida))
+                               .ReturnsAsync(partidaMock);
+
+        // Act
+        var resultado = await _partidaLogica.ObtenerPorId(idPartida);
+
+        // Assert
+        // La lógica no debe lanzar excepción y debe devolver el objeto
+        Assert.NotNull(resultado);
+        Assert.Equal(idUsuario, resultado.UsuarioId);
+        _mockUow.Verify(u => u.CommitAsync(), Times.Never());
+    }
+
+    [Fact]
+    public async Task ObtenerPorId_UsuarioDios_PermiteAccesoAjenos()
+    {
+        // Arrange
+        const int idUsuarioDios = 999;
+        const int idPropietarioPartida = 200; // Partida ajena
+        const int idPartida = 50;
+
+        Partida partidaMock = new Partida { Id = idPartida, UsuarioId = idPropietarioPartida };
+
+        // Simular la identidad del usuario actual como DIOS
+        _mockAccesoUsuarios.Setup(a => a.ObtenerIdUsuarioActual()).Returns(idUsuarioDios);
+        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(true); // 🔑 BYPASS DE DIOS
+
+        // Simular el repositorio devolviendo la partida ajena
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorId(idPartida))
+                               .ReturnsAsync(partidaMock);
+
+        // Act
+        var resultado = await _partidaLogica.ObtenerPorId(idPartida);
+
+        // Assert
+        Assert.NotNull(resultado);
+        Assert.Equal(idPropietarioPartida, resultado.UsuarioId); // Accedió a la partida del ID 200
         _mockUow.Verify(u => u.CommitAsync(), Times.Never());
     }
 

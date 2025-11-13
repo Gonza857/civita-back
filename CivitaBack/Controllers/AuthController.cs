@@ -45,7 +45,6 @@ public class AuthController : BaseApiController
 
             var response = new LoginDTO
             {
-                Token = token,
                 NombreUsuario = usuarioPartida.NombreUsuario!,
                 Mail = usuarioPartida.Mail!,
                 IdUsuario = usuarioPartida.Id!,
@@ -71,27 +70,51 @@ public class AuthController : BaseApiController
         try
         {
             string token = await _authLogica.IniciarSesion(iniciarSesionDto.Mail, iniciarSesionDto.Contrasena);
-            Usuario usuario = await _usuarioLogica.ObtenerPorCorreo(iniciarSesionDto.Mail);
-            Partida partida = await _partidaLogica.ObtenerPorUsuarioId(usuario.Id);
+            Usuario? usuario = await _usuarioLogica.ObtenerPorCorreo(iniciarSesionDto.Mail);
+
+            if (usuario == null)
+            {
+                throw new AutenticacionException("Error interno de autenticación.");
+            }
+
+            Partida? partida = await _partidaLogica.ObtenerPartidaParaLogin(usuario.Id);
+
+            // 🍪 GUARDAR EL TOKEN EN LA COOKIE
+            Response.Cookies.Append(
+                "jwt-auth", // Nombre de la cookie
+                token,
+                new CookieOptions
+                {
+                    HttpOnly = true, // 🛡️ Evita acceso vía JavaScript (XSS)
+                    Expires = DateTimeOffset.UtcNow.AddHours(1), // Coincide con la expiración del JWT
+                    Secure = true, // Recomendado: Solo para HTTPS
+                    SameSite = SameSiteMode.Strict // Protección CSRF
+                }
+            );
 
             var response = new LoginDTO
             {
-                Token = token,
                 NombreUsuario = usuario.NombreUsuario!,
                 Mail = usuario.Mail!,
-                IdUsuario = usuario.Id!,
-                IdPartida = partida.Id
+                IdUsuario = usuario.Id,
+                IdPartida = partida?.Id ?? 0
             };
 
             return Ok(response);
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (AutenticacionException ex)
         {
-            return Unauthorized(ex.Message);
+            // Si hay fallo de autenticación (usuario/contraseña incorrectos), limpiar cookies y devolver 401
+            Response.Cookies.Delete("jwt-auth");
+            return Unauthorized(new { error = ex.Message });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            Response.Cookies.Delete("jwt-auth");
             return Problem("Ocurrió un error al iniciar sesión");
         }
     }

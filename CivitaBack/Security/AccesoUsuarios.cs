@@ -1,4 +1,5 @@
-﻿using CivitaBack.Logica.Interfaces;
+﻿using CivitaBack.Domain.Excepciones;
+using CivitaBack.Logica.Interfaces;
 using System.Security.Claims;
 
 namespace CivitaBack.Api.Security
@@ -36,6 +37,16 @@ namespace CivitaBack.Api.Security
             }
 
             return 0;
+        }
+
+        public void ValidarAcceso(int idUsuarioPartida)
+        {
+            if (this.EsDios()) return;
+
+            var usuarioActualId = this.ObtenerIdUsuarioActual();
+
+            if (usuarioActualId != idUsuarioPartida)
+                throw new AccesoDenegadoExcepcion("No tenes permiso para acceder a esta partida.");
         }
 
         private ClaimsPrincipal? ObtenerClaimsPrincipal()

@@ -3,6 +3,7 @@ using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
@@ -11,25 +12,22 @@ public class PartidaLogica : IPartidaLogica
 {
     private readonly IPartidaRepositorio _repositorioPartida;
     private readonly IRecursoRepositorio _recursoRepositorio;
-    private readonly IEstructuraMapaRepositorio _repositorioEstructuraMapa;
     private readonly ILogroRepositorio _logroRepositorio;
-    private readonly IEstructuraRepositorio _estructuraRepositorio;
+    private readonly IAccesoUsuarios _accesoUsuarios;
     private readonly IUnidadDeTrabajo _uow;
     
     public PartidaLogica(
         IPartidaRepositorio rp, 
         IRecursoRepositorio irr, 
-        IEstructuraMapaRepositorio em, 
         ILogroRepositorio ilr,
-        IEstructuraRepositorio er,
+        IAccesoUsuarios accesoUsuarios,
         IUnidadDeTrabajo uow
         )
     {
         this._repositorioPartida = rp;
         this._recursoRepositorio = irr;
-        this._repositorioEstructuraMapa = em;
         this._logroRepositorio = ilr;
-        this._estructuraRepositorio = er;
+        this._accesoUsuarios = accesoUsuarios;
         this._uow = uow;
     }
 
@@ -59,7 +57,9 @@ public class PartidaLogica : IPartidaLogica
         this.ValidarRecursosPartida(partida);
         if (usuario == null)
             throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: Datos inválidos.");
-        
+
+        _accesoUsuarios.ValidarAcceso(usuario.Id);
+
         Partida? partidaBuscada = await this._repositorioPartida.ObtenerPorUsuarioId(usuario.Id);
         
         if (partidaBuscada == null || partidaBuscada.Recursos == null)
@@ -87,12 +87,14 @@ public class PartidaLogica : IPartidaLogica
     /// <param name="idUsuario">Id de usuario</param>
     public async Task<Partida> CrearPartida(int idUsuario)
     {
+        this._accesoUsuarios.ValidarAcceso(idUsuario);
+
         var partidaExistente = await this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
         if (partidaExistente != null)
             throw new PartidaExcepcion("Ya tienes una partida empezada.");
         if (idUsuario <= 0)
             throw new PartidaExcepcion("El Id del usuario es inválido.");
-        
+
         try
         {
             var partida = await this._repositorioPartida.CrearPartida(idUsuario);
@@ -109,20 +111,27 @@ public class PartidaLogica : IPartidaLogica
     // 📜 OBTENER TODAS LAS PARTIDAS
     public async Task<List<Partida>> ObtenerPartidas()
     {
+        if (!_accesoUsuarios.EsDios())
+            throw new AccesoDenegadoExcepcion("No tenes permiso para acceder a las partidas.");
+
         return await this._repositorioPartida.ObtenerTodos();
     }
 
     public async Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario)
     {
+        _accesoUsuarios.ValidarAcceso(idUsuario);
+
         return await this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
     }
 
     /// <summary>
-    /// Devuelve la partida de un usuario
+    /// Devuelve la partida de un usuario   
     /// </summary>
     /// <param name="idUsuario">ID del Usuario</param>
     public async Task<Partida> ObtenerPorUsuarioId(int IdUsuario)
     {
+        _accesoUsuarios.ValidarAcceso(IdUsuario);
+
         var partida = await this._repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
         if (partida == null) throw new PartidaExcepcion("Partida no encontrada");
         return partida;
@@ -131,6 +140,8 @@ public class PartidaLogica : IPartidaLogica
     public async Task ReclamarLogros(Partida partida, List<Logro> logrosDto)
     {
         if (partida == null) throw new PartidaExcepcion("Ocurrió un error al reclamar los logros");
+
+        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
 
         var logrosDb = await this._logroRepositorio.ObtenerTodos();
 
@@ -176,6 +187,16 @@ public class PartidaLogica : IPartidaLogica
         var partida = await this._repositorioPartida.ObtenerPorId(idPartida);
         if (partida == null)
             throw new PartidaExcepcion("Partida no encontrada");
+        
+        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
+
+        return partida;
+    }
+
+    public async Task<Partida> ObtenerPartidaParaLogin(int idUsuario)
+    {
+        var partida = await this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
+        if (partida == null) throw new PartidaExcepcion("Partida no encontrada");
         return partida;
     }
 }

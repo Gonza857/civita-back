@@ -8,7 +8,6 @@ namespace CivitaBack.Data.DTO
 {
     public class LoginDTO
     {
-        public string Token { get; set; }
         public string NombreUsuario { get; set; }
         public string Mail { get; set; }
 

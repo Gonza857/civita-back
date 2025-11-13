@@ -23,7 +23,7 @@ public class PartidaController : BaseApiController
     private readonly IMapaLogica _mapaLogica;
     private readonly ICompraEstructurasLogica _compraEstructurasLogica;
     private readonly ILogger<PartidaController> _logger;
-    
+
     public PartidaController(
         IPartidaLogica partidaLogica,
         IRecursoLogica recursoLogica,
@@ -33,7 +33,7 @@ public class PartidaController : BaseApiController
         ILogger<PartidaController> logger,
         ILogroPartidaLogica logroPartidaLogica,
         IMapaLogica mapaLogica,
-        ICompraEstructurasLogica compraEstructurasLogica,   
+        ICompraEstructurasLogica compraEstructurasLogica,
         IMapper mapper) : base(mapper)
     {
         _partidaLogica = partidaLogica;
@@ -96,6 +96,10 @@ public class PartidaController : BaseApiController
             //Ver estructuras iniciales segun mapa
             return Ok(base.Mapear<PartidaDTO>(partida));
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (PartidaExcepcion ex)
         {
             return BadRequest(ex.Message);
@@ -115,6 +119,10 @@ public class PartidaController : BaseApiController
         {
             Partida partida = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
             return Ok(base.Mapear<PartidaDTO>(partida));
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (PartidaExcepcion ex)
         {
@@ -136,6 +144,10 @@ public class PartidaController : BaseApiController
             var partidas = await _partidaLogica.ObtenerPartidas();
             return Ok(base.MapearLista<PartidaDTO>(partidas));
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
@@ -156,6 +168,10 @@ public class PartidaController : BaseApiController
             await _partidaLogica.Actualizar(base.Mapear<Partida>(partidaDto), usuario);
             return Ok();
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (PartidaExcepcion ex)
         {
             return Conflict(new { message = ex.Message });
@@ -175,6 +191,10 @@ public class PartidaController : BaseApiController
         {
             var partida = await _partidaLogica.ObtenerPorUsuarioId(id);
             return Ok(base.Mapear<PartidaDTO>(partida));
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (PartidaExcepcion ex)
         {
@@ -200,6 +220,10 @@ public class PartidaController : BaseApiController
             await _mapaLogica.ActualizarMapaDePartidaAsync(dto.PartidaId, dto.JsonMapa, estructuras);
             return Ok(new { mensaje = "Mapa guardado correctamente." });
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
@@ -217,6 +241,10 @@ public class PartidaController : BaseApiController
             if (partida == null)
                 return NotFound("No se encontró la partida.");
             return Ok(base.Mapear<PartidaMapaDTO>(partida));
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (Exception ex)
         {
@@ -240,6 +268,10 @@ public class PartidaController : BaseApiController
 
             return Ok(partida.JsonMapa);
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
@@ -260,6 +292,10 @@ public class PartidaController : BaseApiController
             await _mapaLogica.ActualizarMapaDePartidaAsync(dto.PartidaId, dto.JsonMapa, estructuras);
             return Ok(new { mensaje = "Mapa actualizado correctamente." });
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (PartidaExcepcion ex)
         {
             return BadRequest("Error al actualizar el mapa: " + ex.Message);
@@ -271,27 +307,31 @@ public class PartidaController : BaseApiController
         }
     }
 
-        [HttpDelete("expo/eliminar-estructura")]
-        public async Task<IActionResult> EliminarEstructura([FromBody] EliminarEstructuraDTO dto)
+    [HttpDelete("expo/eliminar-estructura")]
+    public async Task<IActionResult> EliminarEstructura([FromBody] EliminarEstructuraDTO dto)
+    {
+        try
         {
-            try
-            {
-                var estructurasEliminar = base.Mapear<EstructuraMapa>(dto); 
-                await _estructuraMapaLogica.EliminarEstructuraAsync(estructurasEliminar);
-                return Ok("Estructura eliminada correctamente");
-            }
-            catch (EstructuraMapaException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return Problem("Error eliminando la estructura");
-            }
+            var estructurasEliminar = base.Mapear<EstructuraMapa>(dto);
+            await _estructuraMapaLogica.EliminarEstructuraAsync(estructurasEliminar);
+            return Ok("Estructura eliminada correctamente");
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
+        catch (EstructuraMapaException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return Problem("Error eliminando la estructura");
+        }
+    }
 
-    [HttpPost("comprar-estructura/{partidaId}/{estructuraId}")] 
+    [HttpPost("comprar-estructura/{partidaId}/{estructuraId}")]
     public async Task<IActionResult> ComprarEstructura(int partidaId, int estructuraId)
     {
         try
@@ -299,6 +339,10 @@ public class PartidaController : BaseApiController
             int nuevoSaldo = await _compraEstructurasLogica.ComprarEstructuraAsync(partidaId, estructuraId);
 
             return Ok(new { nuevoSaldo = nuevoSaldo });
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (PartidaExcepcion ex)
         {

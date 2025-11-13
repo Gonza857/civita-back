@@ -2,6 +2,7 @@
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica
@@ -9,17 +10,20 @@ namespace CivitaBack.Logica
     public class MapaLogica : IMapaLogica
     {
 
-        public readonly IPartidaRepositorio _repositorioPartida;
-        public readonly IEstructuraMapaRepositorio _repositorioEstructuraMapa;
-        public readonly IUnidadDeTrabajo _uow;
+        private readonly IPartidaRepositorio _repositorioPartida;
+        private readonly IEstructuraMapaRepositorio _repositorioEstructuraMapa;
+        private readonly IAccesoUsuarios _accesoUsuarios;
+        private readonly IUnidadDeTrabajo _uow;
 
         public MapaLogica(
             IPartidaRepositorio repositorioPartida,
             IEstructuraMapaRepositorio repositorioEstructuraMapa,
+            IAccesoUsuarios accesoUsuarios,
             IUnidadDeTrabajo uow)
         {
             _repositorioPartida = repositorioPartida;
             _repositorioEstructuraMapa = repositorioEstructuraMapa;
+            _accesoUsuarios = accesoUsuarios;
             _uow = uow;
         }
 
@@ -31,6 +35,8 @@ namespace CivitaBack.Logica
         {
             var partida = await _repositorioPartida.ObtenerPartidaConMapaAsync(partidaId);
             if (partida == null) return null;
+
+            this._accesoUsuarios.ValidarAcceso(partida.UsuarioId);
 
             if (!string.IsNullOrWhiteSpace(partida.JsonMapa)) return partida;
 
@@ -56,6 +62,8 @@ namespace CivitaBack.Logica
             var partida = await _repositorioPartida.ObtenerPartidaConMapaAsync(partidaId);
             if (partida == null)
                 throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No existe la partida.");
+
+            this._accesoUsuarios.ValidarAcceso(partida.UsuarioId);
 
             partida.JsonMapa = jsonMapa;
             partida.UltimaVez = DateTime.UtcNow;
