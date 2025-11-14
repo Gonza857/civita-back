@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using Microsoft.AspNetCore.Mvc;
@@ -45,6 +46,10 @@ public class TipoEstructuraController : BaseApiController
             var guardado = await _tipoEstructuraLogica.Crear(base.Mapear<TipoEstructura>(nuevoTipoEstructura));
             return Ok(base.Mapear<TipoEstructuraDTO>(guardado));
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
@@ -60,6 +65,10 @@ public class TipoEstructuraController : BaseApiController
         {
             await this._tipoEstructuraLogica.Eliminar(id);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (Exception ex)
         {
@@ -94,6 +103,10 @@ public class TipoEstructuraController : BaseApiController
             var estructura = base.Mapear<TipoEstructura>(tipoEstructuraDto);
             await this._tipoEstructuraLogica.Actualizar(estructura, id);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (Exception ex)
         {
