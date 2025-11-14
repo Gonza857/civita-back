@@ -5,6 +5,7 @@ using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Hubs;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 using Microsoft.AspNetCore.SignalR;
 using Moq;

@@ -53,6 +53,10 @@ public class AuthController : BaseApiController
 
             return Ok(new { mensaje = "Usuario registrado correctamente!", response });
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (ValidacionRegistroException ex)
         {
             return BadRequest(ex.Message);

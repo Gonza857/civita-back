@@ -4,6 +4,7 @@ using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Utils;
+using CivitaBack.Logica.Interfaces;
 
 namespace CivitaBack.Logica;
 
@@ -14,6 +15,7 @@ public class LogroLogica : ILogroLogica
     private readonly ICondicionRepositorio _condicionRepositorio;
     private readonly ILogroPartidaRepositorio _logroPartidaRepositorio;
     private IUnidadDeTrabajo _uow;
+    private readonly IAccesoUsuarios _accesoUsuarios;
 
     private readonly List<string> recursos = new List<string> { "Energia", "Contaminacion", "EcoCoins", "Felicidad" };
 
@@ -22,7 +24,8 @@ public class LogroLogica : ILogroLogica
         ITipoLogroRepositorio itlr, 
         ICondicionRepositorio icr,
         ILogroPartidaRepositorio ilpr,
-        IUnidadDeTrabajo uow
+        IUnidadDeTrabajo uow,
+        IAccesoUsuarios accesoUsuarios
         )
     {
         _repositorioLogro = rtl;
@@ -30,6 +33,7 @@ public class LogroLogica : ILogroLogica
         _condicionRepositorio = icr;
         _logroPartidaRepositorio = ilpr;
         _uow = uow;
+        _accesoUsuarios = accesoUsuarios;
     }
 
     /// <summary>
@@ -49,6 +53,8 @@ public class LogroLogica : ILogroLogica
     /// /// <param name="id">Id Logro</param>
     public async Task Actualizar(Logro logro, int id)
     {
+        ValidarAdmin();
+
         this.ValidarLogro(logro);
         Logro? logroBuscado = await this._repositorioLogro.ObtenerPorId(id);
         TipoLogro tipoLogroBuscado = await this.repositorioTipoLogro.ObtenerPorId(logro.TipoLogro.Id);
@@ -77,6 +83,8 @@ public class LogroLogica : ILogroLogica
     /// <param name="id">Id Logro</param>
     public async Task Eliminar(int id)
     {
+        ValidarAdmin();
+
         if (id <= 0) 
             throw new LogroExcepcion("No se pudo borrar el Logro");
         await this._repositorioLogro.Eliminar(id);
@@ -91,6 +99,8 @@ public class LogroLogica : ILogroLogica
     /// <param name="logroDTO">LogroDTO</param>
     public async Task Crear(Logro entidad)
     {
+        ValidarAdmin();
+
         this.ValidarLogro(entidad);
         TipoLogro? tipoLogro = await this.repositorioTipoLogro.ObtenerPorId(entidad.TipoLogro.Id);
         if (tipoLogro == null) 
@@ -138,6 +148,8 @@ public class LogroLogica : ILogroLogica
 
     public async Task<List<Logro>> ObtenerLogrosCumplidos(Partida partida)
     {
+        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
+
         List<LogroPartida> logrosPartida = partida.LogroPartidas;
         if (logrosPartida.Count != 0) return logrosPartida.Select(lp => lp.Logro).ToList();
 
@@ -164,6 +176,9 @@ public class LogroLogica : ILogroLogica
     {
         if (partida == null || partida.Recursos == null)
             throw new LogroExcepcion("No se pudo obtener si cumple algún logro.");
+
+        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
+
         /*
             por cada recurso
             entro a logro 
@@ -214,6 +229,9 @@ public class LogroLogica : ILogroLogica
     {
         if (partida == null || logrosDB.Count == 0 || partida.Recursos == null)
             throw new LogroExcepcion("No se pudo obtener si cumple algún logro.");
+
+        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
+
         /*
             por cada logro
             verifico que no exista en la bd
@@ -240,5 +258,11 @@ public class LogroLogica : ILogroLogica
     {
         return await this._logroPartidaRepositorio.ObtenerLogrosNoCumplidos(partidaId);
     }
-    
+
+    private void ValidarAdmin()
+    {
+        if (!_accesoUsuarios.EsDios())
+            throw new AccesoDenegadoExcepcion("Se requieren privilegios de administrador para modificar los logros.");
+    }
+
 }

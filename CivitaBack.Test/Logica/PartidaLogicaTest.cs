@@ -1,12 +1,13 @@
 ﻿using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
-using CivitaBack.Domain.Excepciones;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 using Moq;
-using CivitaBack.Logica.Interfaces;
+using System.Reflection;
 
 namespace CivitaBack.Tests;
 
@@ -17,7 +18,6 @@ public class PartidaLogicaTest
     private readonly Mock<ILogroRepositorio> _mockLogroRepositorio;
 
     private readonly IPartidaLogica _partidaLogica;
-    private readonly IRecursoLogica _recursoLogica;
 
     private readonly Mock<IAccesoUsuarios> _mockAccesoUsuarios;
 
@@ -34,11 +34,11 @@ public class PartidaLogicaTest
 
         // Inyectamos los mocks en el constructor de PartidaLogica
         _partidaLogica = new PartidaLogica(
-            _mockPartidaRepositorio.Object,
-            _mockRecursoRepositorio.Object,
-            _mockLogroRepositorio.Object,
-            _mockAccesoUsuarios.Object,
-            _mockUow.Object
+            rp: _mockPartidaRepositorio.Object,
+            irr: _mockRecursoRepositorio.Object,
+            ilr: _mockLogroRepositorio.Object,
+            accesoUsuarios: _mockAccesoUsuarios.Object,
+            uow: _mockUow.Object
         );
     }
 
@@ -262,7 +262,7 @@ public class PartidaLogicaTest
     {
         // Arrange
         const int idUsuarioAutenticado = 100;
-        const int idPropietarioPartida = 200; // ID diferente al logueado
+        const int idPropietarioPartida = 200;
         const int idPartida = 1;
 
         Partida partidaMock = new Partida { Id = idPartida, UsuarioId = idPropietarioPartida };
@@ -271,17 +271,23 @@ public class PartidaLogicaTest
         _mockAccesoUsuarios.Setup(a => a.ObtenerIdUsuarioActual()).Returns(idUsuarioAutenticado);
         _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(false);
 
-        // Simular que el repositorio devuelve una partida ajena
+        // 🔑 MOCKEO PARA FORZAR LA EXCEPCIÓN:
+        _mockAccesoUsuarios
+            .Setup(a => a.ValidarAcceso(idPropietarioPartida)) // Cuando el ID 200 se pasa
+            .Throws(new AccesoDenegadoExcepcion("Acceso denegado por test.")); 
+
+
+        // Simular que el repositorio devuelve la partida ajena
         _mockPartidaRepositorio.Setup(r => r.ObtenerPorId(idPartida))
                                .ReturnsAsync(partidaMock);
 
         // Act & Assert
-        // Se espera que la lógica lance la excepción de Acceso Denegado
-        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(
-            () => _partidaLogica.ObtenerPorId(idPartida)
-        );
 
-        // Verificar que la búsqueda se realizó, pero la lógica abortó la ejecución
+        var act = async () => await _partidaLogica.ObtenerPorId(idPartida);
+        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(act);
+
+        _mockAccesoUsuarios.Verify(a => a.ValidarAcceso(idPropietarioPartida), Times.Once);
+
         _mockPartidaRepositorio.Verify(r => r.ObtenerPorId(idPartida), Times.Once);
         _mockUow.Verify(u => u.CommitAsync(), Times.Never());
     }

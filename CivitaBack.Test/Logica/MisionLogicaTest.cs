@@ -4,6 +4,7 @@ using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 using Moq;
 
@@ -15,7 +16,8 @@ public class MisionLogicaTest
     private readonly Mock<IMisionPartidaRepositorio> _mockMisionPartidaRepositorio;
     private readonly Mock<ICondicionRepositorio> _mockCondicionRepositorio;
     private readonly Mock<IUnidadDeTrabajo> _mockUnidadDeTrabajo;
-    
+    private readonly Mock<IAccesoUsuarios> _mockAccesoUsuarios;
+
     private readonly IMisionLogica _misionLogica;
 
     public MisionLogicaTest()
@@ -25,26 +27,30 @@ public class MisionLogicaTest
         _mockMisionPartidaRepositorio = new Mock<IMisionPartidaRepositorio>();
         _mockCondicionRepositorio = new Mock<ICondicionRepositorio>();
         _mockUnidadDeTrabajo = new Mock<IUnidadDeTrabajo>();
-        
+        _mockAccesoUsuarios = new Mock<IAccesoUsuarios>();
+
         _misionLogica = new MisionLogica(
             _mockMisionRepositorio.Object,
             _mockCondicionRepositorio.Object,
             _mockUnidadDeTrabajo.Object,
-            _mockMisionPartidaRepositorio.Object
+            _mockMisionPartidaRepositorio.Object,
+            _mockAccesoUsuarios.Object
         );
         
         // Mockeo por defecto para el CommitAsync
         _mockUnidadDeTrabajo.Setup(u => u.CommitAsync()).ReturnsAsync(1);
     }
-    
-    // --- TESTS PARA Crear ---
 
+    // --- TESTS PARA Crear ---
     [Fact]
     public async Task Crear_ConDatosValidos_DebeAgregarYGuardar()
     {
         // Arrange
         var mision = new Mision { Titulo = "Test", Descripcion = "Test Desc", CondicionId = 1 };
         var condicion = new Condicion { Id = 1, Cantidad = 100 };
+
+        // 1. Simular que el usuario SÍ es Admin (BYPASS)
+        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(true);
 
         _mockCondicionRepositorio.Setup(r => r.ObtenerPorId(1)).ReturnsAsync(condicion);
         _mockMisionRepositorio.Setup(r => r.Agregar(It.IsAny<Mision>())).Returns(Task.CompletedTask);
@@ -53,6 +59,7 @@ public class MisionLogicaTest
         await _misionLogica.Crear(mision);
 
         // Assert
+        // La lógica procede porque el bypass fue activado.
         _mockMisionRepositorio.Verify(r => r.Agregar(It.Is<Mision>(m => m.Titulo == mision.Titulo)), Times.Once);
         _mockUnidadDeTrabajo.Verify(u => u.CommitAsync(), Times.Once);
     }
@@ -82,7 +89,7 @@ public class MisionLogicaTest
     }
     
     // --- TESTS PARA Actualizar ---
-    
+   
     [Fact]
     public async Task Actualizar_ConDatosValidos_DebeActualizarYGuardar()
     {
@@ -93,6 +100,8 @@ public class MisionLogicaTest
 
         _mockCondicionRepositorio.Setup(r => r.ObtenerPorId(1)).ReturnsAsync(condicion);
         _mockMisionRepositorio.Setup(r => r.ObtenerPorId(5)).ReturnsAsync(misionDb);
+
+        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(true);
 
         // Act
         await _misionLogica.Actualizar(misionNuevosDatos, 5);

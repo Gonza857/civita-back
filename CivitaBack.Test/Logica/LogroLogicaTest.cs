@@ -47,7 +47,8 @@ public class LogroLogicaTest
             _mockTipoLogroRepositorio.Object,
             _mockCondicionRepositorio.Object,
             _mockLogroPartidaRepositorio.Object,
-            _mockUow.Object
+            _mockUow.Object,
+            _mockAccesoUsuarios.Object
         );
 
         // Inyectamos los mocks en el constructor de PartidaLogica

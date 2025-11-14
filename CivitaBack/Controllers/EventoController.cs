@@ -3,6 +3,7 @@ using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Hubs;
+using CivitaBack.Logica.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 

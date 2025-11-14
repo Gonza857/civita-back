@@ -3,16 +3,11 @@ using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica
 {
-    public interface IEventoLogica
-    {
-        Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida);
-        Task<EventoResueltoDTO> ResolverEventoAsync(int eventoId, bool aceptado);
-
-    }
 
     public class EventoLogica : IEventoLogica
     {

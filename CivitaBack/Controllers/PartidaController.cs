@@ -4,10 +4,7 @@ using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Enum;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Excepciones;
-using CivitaBack.Domain.Interfaces.Logica;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing.Constraints;
-using System.Transactions;
 
 namespace CivitaBack.Api.Controllers;
 
@@ -183,13 +180,13 @@ public class PartidaController : BaseApiController
         }
     }
 
-    // 🔎 Obtener partida por ID de usuario
+    // 🔎 Obtener partida por ID 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPartidaPorId(int id)
     {
         try
         {
-            var partida = await _partidaLogica.ObtenerPorUsuarioId(id);
+            var partida = await _partidaLogica.ObtenerPorId(id);
             return Ok(base.Mapear<PartidaDTO>(partida));
         }
         catch (AccesoDenegadoExcepcion ex)

@@ -3,6 +3,7 @@ using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Utils;
+using CivitaBack.Logica.Interfaces;
 
 namespace CivitaBack.Logica;
 
@@ -10,12 +11,14 @@ public class EstructuraLogica : IEstructuraLogica
 {
     private readonly IEstructuraRepositorio _repositorioEstructura;
     private readonly ITipoEstructuraRepositorio _repositorioTipoEstructura;
+    private readonly IAccesoUsuarios _accesoUsuarios;
     private readonly IUnidadDeTrabajo _uow;
 
-    public EstructuraLogica(IEstructuraRepositorio re, ITipoEstructuraRepositorio ter, IUnidadDeTrabajo uow)
+    public EstructuraLogica(IEstructuraRepositorio re, ITipoEstructuraRepositorio ter, IAccesoUsuarios accesoUsuarios, IUnidadDeTrabajo uow)
     {
         _repositorioEstructura = re;
         _repositorioTipoEstructura = ter;
+        _accesoUsuarios = accesoUsuarios;
         _uow = uow;
     }
 
@@ -39,6 +42,8 @@ public class EstructuraLogica : IEstructuraLogica
 
     public async Task Crear(Estructura estructura)
     {
+        ValidarAdmin();
+
         this.Validar(estructura);
         TipoEstructura? tipoEstructura = await this._repositorioTipoEstructura.ObtenerPorId(estructura.TipoEstructura.Id);
         if (tipoEstructura == null) 
@@ -64,6 +69,8 @@ public class EstructuraLogica : IEstructuraLogica
 
     public async Task Eliminar(int idEstructura)
     {
+        ValidarAdmin();
+
         if (idEstructura <= 0) 
             throw new EstructuraExcepcion("No se pudo borrar la Estructura");
         await this._repositorioEstructura.Eliminar(idEstructura);
@@ -73,6 +80,8 @@ public class EstructuraLogica : IEstructuraLogica
 
     public async Task Actualizar(Estructura estructura, int id)
     {
+        ValidarAdmin();
+
         this.Validar(estructura);
         TipoEstructura? tipoEstructuraBuscada = await this._repositorioTipoEstructura.ObtenerPorId(estructura.TipoEstructuraId);
         Estructura? estructuraBuscada = await this._repositorioEstructura.ObtenerPorId(id);
@@ -92,6 +101,12 @@ public class EstructuraLogica : IEstructuraLogica
         await this._repositorioEstructura.Actualizar(estructuraBuscada);
 
         await this._uow.CommitAsync();
+    }
+
+    private void ValidarAdmin()
+    {
+        if (!_accesoUsuarios.EsDios())
+            throw new AccesoDenegadoExcepcion("Se requieren privilegios de administrador para modificar el catálogo de estructuras.");
     }
 
     /// <summary>
