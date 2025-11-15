@@ -8,7 +8,7 @@ using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 using Moq;
 
-namespace CivitaBack.Tests.Logica;
+namespace CivitaBack.Tests;
 
 public class MisionLogicaTest
 {
@@ -196,5 +196,190 @@ public class MisionLogicaTest
         // Assert
         _mockMisionPartidaRepositorio.Verify(r => r.ActualizarVarios(It.IsAny<ICollection<MisionPartida>>()), Times.Never);
         _mockUnidadDeTrabajo.Verify(u => u.CommitAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task ResetMisiones_ConMisiones_ReseteaMisiones()
+    {
+        // Arrange
+        var misionesPartida = new List<MisionPartida>
+        {
+            new MisionPartida
+            {
+                Id = 1,
+                Reclamado = true,
+                FechaCompletado = DateTime.UtcNow,
+                FechaEntrega = DateTime.UtcNow.AddDays(-1)
+            },
+            new MisionPartida
+            {
+                Id = 2,
+                Reclamado = true,
+                FechaCompletado = DateTime.UtcNow,
+                FechaEntrega = DateTime.UtcNow.AddDays(-1)
+            }
+        };
+
+        _mockMisionPartidaRepositorio.Setup(r => r.Listado())
+            .ReturnsAsync(misionesPartida);
+        _mockMisionPartidaRepositorio.Setup(r => r.ActualizarVarios(It.IsAny<ICollection<MisionPartida>>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _misionLogica.ResetMisiones(TipoMision.Diaria);
+
+        // Assert
+        Assert.All(misionesPartida, mp =>
+        {
+            Assert.False(mp.Reclamado);
+            Assert.Null(mp.FechaCompletado);
+            Assert.NotNull(mp.FechaEntrega);
+        });
+        _mockMisionPartidaRepositorio.Verify(r => r.ActualizarVarios(misionesPartida), Times.Once);
+        _mockUnidadDeTrabajo.Verify(u => u.CommitAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task Listado_RetornaListaMisiones()
+    {
+        // Arrange
+        var misionesMock = new List<Mision>
+        {
+            new Mision { Id = 1, Titulo = "Mision 1" },
+            new Mision { Id = 2, Titulo = "Mision 2" }
+        };
+
+        _mockMisionRepositorio.Setup(r => r.Listado())
+            .ReturnsAsync(misionesMock);
+
+        // Act
+        var resultado = await _misionLogica.Listado();
+
+        // Assert
+        Assert.NotNull(resultado);
+        Assert.Equal(2, resultado.Count);
+        _mockMisionRepositorio.Verify(r => r.Listado(), Times.Once);
+    }
+
+    [Fact]
+    public async Task ObtenerPorId_MisionExiste_RetornaMision()
+    {
+        // Arrange
+        const int idMision = 1;
+        var misionMock = new Mision
+        {
+            Id = idMision,
+            Titulo = "Test Mision"
+        };
+
+        _mockMisionRepositorio.Setup(r => r.ObtenerPorId(idMision))
+            .ReturnsAsync(misionMock);
+
+        // Act
+        var resultado = await _misionLogica.ObtenerPorId(idMision);
+
+        // Assert
+        Assert.NotNull(resultado);
+        Assert.Equal(idMision, resultado.Id);
+        _mockMisionRepositorio.Verify(r => r.ObtenerPorId(idMision), Times.Once);
+    }
+
+    [Fact]
+    public async Task ObtenerMisionesActivasParaPartida_PartidaValida_RetornaMisiones()
+    {
+        // Arrange
+        var partida = new Partida { Id = 1 };
+        var misionesPartida = new List<MisionPartida>
+        {
+            new MisionPartida
+            {
+                PartidaId = 1,
+                Mision = new Mision { Id = 1, Titulo = "Mision 1" }
+            },
+            new MisionPartida
+            {
+                PartidaId = 1,
+                Mision = new Mision { Id = 2, Titulo = "Mision 2" }
+            }
+        };
+
+        _mockMisionPartidaRepositorio.Setup(r => r.ObtenerMisionesPartida(1))
+            .ReturnsAsync(misionesPartida);
+
+        // Act
+        var resultado = await _misionLogica.ObtenerMisionesActivasParaPartida(partida);
+
+        // Assert
+        Assert.NotNull(resultado);
+        Assert.Equal(2, resultado.Count);
+        _mockMisionPartidaRepositorio.Verify(r => r.ObtenerMisionesPartida(1), Times.Once);
+    }
+
+    [Fact]
+    public async Task ObtenerMisionesActivasParaPartida_PartidaNull_LanzaExcepcion()
+    {
+        // Arrange
+        Partida? partida = null;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<MisionExcepcion>(() => 
+            _misionLogica.ObtenerMisionesActivasParaPartida(partida!));
+    }
+
+    [Fact]
+    public async Task ObtenerMisionesDisponibles_RetornaMisionesActivas()
+    {
+        // Arrange
+        var misionesMock = new List<Mision>
+        {
+            new Mision { Id = 1, Titulo = "Mision 1", Disponible = true },
+            new Mision { Id = 2, Titulo = "Mision 2", Disponible = true }
+        };
+
+        _mockMisionRepositorio.Setup(r => r.ListadoActivo())
+            .ReturnsAsync(misionesMock);
+
+        // Act
+        var resultado = await _misionLogica.ObtenerMisionesDisponibles();
+
+        // Assert
+        Assert.NotNull(resultado);
+        Assert.Equal(2, resultado.Count);
+        _mockMisionRepositorio.Verify(r => r.ListadoActivo(), Times.Once);
+    }
+
+    [Fact]
+    public async Task Crear_NoEsAdmin_LanzaExcepcion()
+    {
+        // Arrange
+        var mision = new Mision { Titulo = "Test", Descripcion = "Test Desc", CondicionId = 1 };
+        var condicion = new Condicion { Id = 1, Cantidad = 100 };
+
+        _mockCondicionRepositorio.Setup(r => r.ObtenerPorId(1))
+            .ReturnsAsync(condicion);
+        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(false);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(() => _misionLogica.Crear(mision));
+        _mockMisionRepositorio.Verify(r => r.Agregar(It.IsAny<Mision>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Actualizar_NoEsAdmin_LanzaExcepcion()
+    {
+        // Arrange
+        var misionNuevosDatos = new Mision { Titulo = "Test", Descripcion = "Test Desc", CondicionId = 1 };
+        var condicion = new Condicion { Id = 1, Cantidad = 100 };
+        var misionDb = new Mision { Id = 5, Titulo = "Viejo", Descripcion = "Vieja", CondicionId = 2 };
+
+        _mockCondicionRepositorio.Setup(r => r.ObtenerPorId(1))
+            .ReturnsAsync(condicion);
+        _mockMisionRepositorio.Setup(r => r.ObtenerPorId(5))
+            .ReturnsAsync(misionDb);
+        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(false);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(() => _misionLogica.Actualizar(misionNuevosDatos, 5));
+        _mockMisionRepositorio.Verify(r => r.Actualizar(It.IsAny<Mision>()), Times.Never);
     }
 }

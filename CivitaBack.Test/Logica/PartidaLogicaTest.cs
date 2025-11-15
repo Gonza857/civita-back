@@ -451,6 +451,219 @@ public class PartidaLogicaTest
         // Assert
         Assert.Null(p);
     }*/
+
+    [Fact]
+    public async Task ObtenerPartidas_NoEsAdmin_LanzaExcepcion()
+    {
+        // Arrange
+        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(false);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(() => _partidaLogica.ObtenerPartidas());
+        _mockPartidaRepositorio.Verify(r => r.ObtenerTodos(), Times.Never);
+    }
+
+    [Fact]
+    public async Task ObtenerPartidas_EsAdmin_RetornaListaPartidas()
+    {
+        // Arrange
+        var partidasMock = new List<Partida>
+        {
+            new Partida { Id = 1, UsuarioId = 1 },
+            new Partida { Id = 2, UsuarioId = 2 }
+        };
+
+        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(true);
+        _mockPartidaRepositorio.Setup(r => r.ObtenerTodos())
+            .ReturnsAsync(partidasMock);
+
+        // Act
+        var resultado = await _partidaLogica.ObtenerPartidas();
+
+        // Assert
+        Assert.NotNull(resultado);
+        Assert.Equal(2, resultado.Count);
+        _mockAccesoUsuarios.Verify(a => a.EsDios(), Times.Once);
+        _mockPartidaRepositorio.Verify(r => r.ObtenerTodos(), Times.Once);
+    }
+
+    [Fact]
+    public async Task ObtenerPartidaPorIdInterno_AccesoDenegado_LanzaExcepcion()
+    {
+        // Arrange
+        const int idUsuarioPropietario = 200;
+        const int idUsuarioAutenticado = 100; // Usuario diferente
+
+        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(idUsuarioPropietario))
+            .Throws(new AccesoDenegadoExcepcion("Acceso denegado"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(() => 
+            _partidaLogica.ObtenerPartidaPorIdInterno(idUsuarioPropietario));
+        _mockPartidaRepositorio.Verify(r => r.ObtenerPorUsuarioId(It.IsAny<int>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ObtenerPartidaPorIdInterno_AccesoPermitido_RetornaPartida()
+    {
+        // Arrange
+        const int idUsuario = 100;
+        var partidaMock = new Partida { Id = 1, UsuarioId = idUsuario };
+
+        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(idUsuario))
+            .Verifiable();
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(idUsuario))
+            .ReturnsAsync(partidaMock);
+
+        // Act
+        var resultado = await _partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
+
+        // Assert
+        Assert.NotNull(resultado);
+        Assert.Equal(idUsuario, resultado.UsuarioId);
+        _mockAccesoUsuarios.Verify(a => a.ValidarAcceso(idUsuario), Times.Once);
+        _mockPartidaRepositorio.Verify(r => r.ObtenerPorUsuarioId(idUsuario), Times.Once);
+    }
+
+    [Fact]
+    public async Task ObtenerPorUsuarioId_AccesoDenegado_LanzaExcepcion()
+    {
+        // Arrange
+        const int idUsuarioPropietario = 200;
+        const int idUsuarioAutenticado = 100; // Usuario diferente
+
+        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(idUsuarioPropietario))
+            .Throws(new AccesoDenegadoExcepcion("Acceso denegado"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(() => 
+            _partidaLogica.ObtenerPorUsuarioId(idUsuarioPropietario));
+        _mockPartidaRepositorio.Verify(r => r.ObtenerPorUsuarioId(It.IsAny<int>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ObtenerPorUsuarioId_AccesoPermitido_RetornaPartida()
+    {
+        // Arrange
+        const int idUsuario = 100;
+        var partidaMock = new Partida { Id = 1, UsuarioId = idUsuario };
+
+        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(idUsuario))
+            .Verifiable();
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(idUsuario))
+            .ReturnsAsync(partidaMock);
+
+        // Act
+        var resultado = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
+
+        // Assert
+        Assert.NotNull(resultado);
+        Assert.Equal(idUsuario, resultado.UsuarioId);
+        _mockAccesoUsuarios.Verify(a => a.ValidarAcceso(idUsuario), Times.Once);
+        _mockPartidaRepositorio.Verify(r => r.ObtenerPorUsuarioId(idUsuario), Times.Once);
+    }
+
+    [Fact]
+    public async Task ObtenerPorUsuarioId_PartidaNoExiste_LanzaExcepcion()
+    {
+        // Arrange
+        const int idUsuario = 100;
+
+        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(idUsuario))
+            .Verifiable();
+        _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(idUsuario))
+            .ReturnsAsync((Partida?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<PartidaExcepcion>(() => 
+            _partidaLogica.ObtenerPorUsuarioId(idUsuario));
+        _mockAccesoUsuarios.Verify(a => a.ValidarAcceso(idUsuario), Times.Once);
+    }
+
+    [Fact]
+    public async Task ReclamarLogros_AccesoDenegado_LanzaExcepcion()
+    {
+        // Arrange
+        const int idUsuarioPropietario = 200;
+        var partida = new Partida
+        {
+            Id = 1,
+            UsuarioId = idUsuarioPropietario
+        };
+        var logros = new List<Logro>
+        {
+            new Logro { Id = 1, Titulo = "Logro 1" }
+        };
+
+        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(idUsuarioPropietario))
+            .Throws(new AccesoDenegadoExcepcion("Acceso denegado"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(() => 
+            _partidaLogica.ReclamarLogros(partida, logros));
+        _mockLogroRepositorio.Verify(r => r.ObtenerTodos(), Times.Never);
+    }
+
+    [Fact]
+    public async Task ReclamarLogros_AccesoPermitido_ReclamaLogros()
+    {
+        // Arrange
+        const int idUsuario = 100;
+        var partida = new Partida
+        {
+            Id = 1,
+            UsuarioId = idUsuario
+        };
+        var logrosDto = new List<Logro>
+        {
+            new Logro { Id = 1, Titulo = "Logro 1" }
+        };
+        var logrosDb = new List<Logro>
+        {
+            new Logro
+            {
+                Id = 1,
+                Titulo = "Logro 1",
+                Condicion = new Condicion
+                {
+                    Recompensa = new Condicion
+                    {
+                        NombreColumna = "EcoCoins",
+                        Cantidad = 50
+                    }
+                }
+            }
+        };
+        var recurso = new Recurso
+        {
+            Id = 1,
+            PartidaId = 1,
+            EcoCoins = 100,
+            Felicidad = 50,
+            Energia = 50,
+            Contaminacion = 50
+        };
+
+        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(idUsuario))
+            .Verifiable();
+        _mockLogroRepositorio.Setup(r => r.ObtenerTodos())
+            .ReturnsAsync(logrosDb);
+        _mockRecursoRepositorio.Setup(r => r.ObtenerPorId(1))
+            .ReturnsAsync(recurso);
+        _mockRecursoRepositorio.Setup(r => r.Actualizar(It.IsAny<Recurso>()))
+            .Returns(Task.CompletedTask);
+        _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(1);
+
+        // Act
+        await _partidaLogica.ReclamarLogros(partida, logrosDto);
+
+        // Assert
+        _mockAccesoUsuarios.Verify(a => a.ValidarAcceso(idUsuario), Times.Once);
+        _mockLogroRepositorio.Verify(r => r.ObtenerTodos(), Times.Once);
+        _mockRecursoRepositorio.Verify(r => r.ObtenerPorId(1), Times.Once);
+        _mockRecursoRepositorio.Verify(r => r.Actualizar(It.IsAny<Recurso>()), Times.Once);
+        _mockUow.Verify(u => u.CommitAsync(), Times.Once);
+    }
 }
 
 
