@@ -43,6 +43,19 @@ public class AuthController : BaseApiController
 
             string token = await _authLogica.IniciarSesion(request.Mail, request.Password);
 
+            // 🍪 GUARDAR EL TOKEN EN LA COOKIE
+            Response.Cookies.Append(
+                "jwt-auth", // Nombre de la cookie
+                token,
+                new CookieOptions
+                {
+                    HttpOnly = true, // 🛡️ Evita acceso vía JavaScript (XSS)
+                    Expires = DateTimeOffset.UtcNow.AddHours(1), // Coincide con la expiración del JWT
+                    Secure = true, // Recomendado: Solo para HTTPS
+                    SameSite = SameSiteMode.Strict // Protección CSRF
+                }
+            );
+
             var response = new LoginDTO
             {
                 NombreUsuario = usuarioPartida.NombreUsuario!,
