@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251116021740_refactor_eventos")]
+    partial class refactor_eventos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -434,10 +437,10 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 1,
-                            ContenidoPrincipal = "Si tenés que recorrer 5 km en la ciudad, ¿qué opción genera la MENOR cantidad de emisiones de CO₂ (Dióxido de carbono) por persona?",
+                            ContenidoPrincipal = "Si tienes que recorrer 5 km en la ciudad, ¿qué opción genera la MENOR cantidad de emisiones de CO₂ (Dióxido de carbono) por persona?",
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            OpcionA_Texto = "A) Ir en colectivo con 30 personas más.",
-                            OpcionB_Texto = "B) Usar un auto moderno, solo con el conductor.",
+                            OpcionA_Texto = "A) Ir en autobús (colectivo) con 30 personas más.",
+                            OpcionB_Texto = "B) Usar un coche moderno, solo con el conductor.",
                             RespuestaCorrecta = "A",
                             TipoEvento = 1,
                             Titulo = "¿Cómo me muevo hoy?"

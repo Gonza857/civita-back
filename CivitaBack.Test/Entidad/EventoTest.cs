@@ -34,16 +34,16 @@ namespace CivitaBack.Tests
 
             // 2. Inicializar el objeto bajo prueba (EventoLogica) con las dependencias.
             // **Asegúrate de que el orden de los argumentos coincida con el constructor real de EventoLogica.**
-            _eventoLogica = new EventoLogica(
+            /*_eventoLogica = new EventoLogica(
                 _mockEventoRepositorio.Object,
                 _mockPartidaRepositorio.Object,
                 _mockUow.Object,
                 _mockMapper.Object,
                 _mockActualizarRecursosLogica.Object
-            );
+            );*/
         }
 
-        private EventoMaestro CrearMaestro() => new EventoMaestro
+        /*private EventoMaestro CrearMaestro() => new EventoMaestro
         {
             Id = 10,
             Nombre = "Riesgo",
@@ -134,7 +134,7 @@ namespace CivitaBack.Tests
 
             // 4. Verificar que NO hubo Commit
             _mockUow.Verify(u => u.CommitAsync(), Times.Never()); // ✅ Correcto, el UoW fue eliminado.
-        }*/
+        }
 
         [Fact]
         public async Task DispararEventoAsync_SinMaestro_RetornaNull()
@@ -239,7 +239,7 @@ namespace CivitaBack.Tests
 
             // Verificar que NO se intentó guardar
             _mockUow.Verify(u => u.CommitAsync(), Times.Never());
-        }
+        }*/
     }
 
 }

@@ -34,7 +34,8 @@ namespace CivitaBack.Data.Repositorio
 
         public async Task<Evento?> ObtenerEventoConPartidaAsync(int eventoId)
         {
-            var eventoEF = await _context.Evento 
+            var eventoEF = await _dbSet
+                .Include(e => e.EventoMaestro).ThenInclude(em => em.Efectos)
                  .Include(e => e.Partida).ThenInclude(p => p.Recursos)
                  .Where(e => e.Id == eventoId)
                  .AsNoTracking()

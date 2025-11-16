@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Hubs;
 using CivitaBack.Logica.Interfaces;
@@ -35,7 +36,11 @@ namespace CivitaBack.Api.Controllers
                 await _hubContext.Clients.Group(partidaId.ToString())
                 .SendAsync("EventoDisparado", eventoDisparado);
 
-                return Ok(base.Mapear<EventoDisparadoDTO>(eventoDisparado));
+                return Ok(eventoDisparado);
+            }
+            catch (AccesoDenegadoExcepcion ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
             }
             catch (Exception ex)
             {
@@ -44,17 +49,21 @@ namespace CivitaBack.Api.Controllers
         }
 
         [HttpPost("resolver/{eventoId}")]
-        public async Task<IActionResult> ResolverEvento(int eventoId, [FromQuery] bool acepto)
+        public async Task<IActionResult> ResolverEvento(int eventoId, [FromQuery] string respuesta)
         {
 
             try
             {
-                var resultado = await _eventoLogica.ResolverEventoAsync(eventoId, acepto);
+                var resultado = await _eventoLogica.ResolverEventoPreguntaAsync(eventoId, respuesta);
 
                 await _hubContext.Clients.Group(resultado.PartidaId.ToString())
                 .SendAsync("EventoResuelto", resultado);
 
                 return Ok(resultado);
+            }
+            catch (AccesoDenegadoExcepcion ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
             }
             catch (Exception ex)
             {

@@ -5,7 +5,7 @@ namespace CivitaBack.Logica.Interfaces
     public interface IEventoLogica
     {
         Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida);
-        Task<EventoResueltoDTO> ResolverEventoAsync(int eventoId, bool aceptado);
+        Task<EventoResueltoDTO> ResolverEventoPreguntaAsync(int eventoId, string respuesta);
 
     }
 }

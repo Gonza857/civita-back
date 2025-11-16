@@ -9,8 +9,7 @@ namespace CivitaBack.Data.DTO
     public class EventoResueltoDTO
     {
         public int Id { get; set; }
-        public string Texto { get; set; } = string.Empty;
-
+        public string TextoRespuesta { get; set; } = string.Empty;
         public int PartidaId { get; set; }
     }
 }
