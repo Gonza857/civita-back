@@ -14,8 +14,9 @@ public class LogroEF : AuditableEF
     public string Descripcion { get; set; } = string.Empty;
 
     public TipoLogroEF TipoLogro { get; set; }
-
+    public int TipoLogroId { get; set; }
     public CondicionEF Condicion { get; set; }
+    public int CondicionId { get; set; }
     public ICollection<LogroPartidaEF> LogroPartidas { get; set; }
 
 

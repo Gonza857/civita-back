@@ -91,13 +91,11 @@ public class LogroController : BaseApiController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Guardar([FromBody] LogroDTO? nuevoLogroDTO)
+    public async Task<IActionResult> Guardar([FromBody] LogroDTO? nuevoLogroDto)
     {
-        if (nuevoLogroDTO == null)
-            return BadRequest("Los datos recibidos son inválidos");
         try
         {
-            Logro nuevoLogroDominio = base.Mapear<Logro>(nuevoLogroDTO);
+            Logro nuevoLogroDominio = base.Mapear<Logro>(nuevoLogroDto);
             await _logroLogica.Crear(nuevoLogroDominio);
             return Ok();
         }
