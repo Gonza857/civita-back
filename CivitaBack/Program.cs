@@ -103,6 +103,8 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<IAccesoUsuarios, AccesoUsuarios>();
 
+builder.Services.AddScoped<IConfigurarCookieLogica, ConfigurarCookieLogica>();
+
 builder.Services.AddScoped<IPartidaLogica, PartidaLogica>();
 builder.Services.AddScoped<IPartidaRepositorio, PartidaRepositorio>();
 
@@ -181,6 +183,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Intenta leer el valor del token de la cookie "jwt-auth"
+                context.Request.Cookies.TryGetValue("jwt-auth", out string? token);
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    // Si encontramos el token en la cookie, lo asignamos al contexto.Token.
+                    // Esto hace que el middleware de JWT lo procese como si viniera del encabezado 'Authorization: Bearer'.
+                    context.Token = token;
+                }
+
+                return Task.CompletedTask;
+            }
         };
     });
 
