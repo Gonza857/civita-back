@@ -1,6 +1,7 @@
 ﻿using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Hubs;
+using CivitaBack.Logica.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,16 +15,18 @@ namespace CivitaBack.Logica.Backgrounds
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<BackgroundCicloLogica> _logger;
         private readonly IHubContext<CicloHub> _hubContext;
+        private readonly IEventoLogica _eventoLogica;
         private readonly ManualResetEventSlim _pauseEvent = new(true); // empieza "activo"
 
         private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(15); // 7/8
 
         public BackgroundCicloLogica(IServiceProvider serviceProvider, ILogger<BackgroundCicloLogica> logger,
-            IHubContext<CicloHub> hubContext)
+            IHubContext<CicloHub> hubContext, IEventoLogica eventoLogica)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
             _hubContext = hubContext;
+            _eventoLogica = eventoLogica;
         }
 
         public void Pausar() => _pauseEvent.Reset();
@@ -57,6 +60,11 @@ namespace CivitaBack.Logica.Backgrounds
                             EcoCoins = partida.Recursos.EcoCoins,
                             Poblacion = partida.Recursos.Poblacion
                         };
+
+                        if (partida.Recursos.Contaminacion > 80)
+                        {
+                            await _eventoLogica.DispararTipContaminacionAsync(partida);
+                        }
 
                         await _hubContext.Clients.Group(partida.Id.ToString())
                             .SendAsync("RecursosActualizados", payload);

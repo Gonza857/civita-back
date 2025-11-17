@@ -19,7 +19,7 @@ namespace CivitaBack.Data.Migrations
             migrationBuilder.InsertData(
                 table: "EfectoEvento",
                 columns: new[] { "Id", "Contaminacion", "Creado", "EcoCoins", "Editado", "Energia", "EventoMaestroId", "Experiencia", "Felicidad", "TipoResultado" },
-                values: new object[] { 3, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, null, 0, 2, 0, -5, 1 });
+                values: new object[] { 3, 0, new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, null, 0, 2, 0, 0, 1 });
         }
 
         /// <inheritdoc />

@@ -29,7 +29,9 @@ namespace CivitaBack.Logica
 
         public async Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida)
         {
-            var maestro = await _eventoRepositorio.ObtenerEventoMaestroAsync();
+            const int EVENTO_PREGUNTA = 1;
+
+            var maestro = await _eventoRepositorio.ObtenerEventoMaestroAsync(EVENTO_PREGUNTA);
             if (maestro == null) throw new EventoException("Evento maestro no encontrado.");
 
             var evento = new Evento
@@ -100,6 +102,29 @@ namespace CivitaBack.Logica
                 TextoRespuesta = mensajeFinal, 
                 PartidaId = partida.Id
             };
+        }
+
+        public async Task DispararTipContaminacionAsync(Partida partida)
+        {
+            const int TIP_CONTAMINACION_ID = 2;
+
+            bool yaEnviado = await _eventoRepositorio.ExisteTipEnviadoAsync(partida.Id, TIP_CONTAMINACION_ID);
+
+            if (yaEnviado) return; 
+
+            var maestroTip = await _eventoRepositorio.ObtenerEventoMaestroAsync(TIP_CONTAMINACION_ID);
+            if (maestroTip == null) return;
+
+            var evento = new Evento
+            {
+                PartidaId = partida.Id,
+                EventoMaestroId = maestroTip.Id,
+                Contenido = maestroTip.ContenidoPrincipal,
+                SeDisparo = true,
+                Resuelto = true, 
+            };
+
+            await _eventoRepositorio.CrearEventoAsync(evento);
         }
 
         public static string FormatoEfectos(EfectoEvento? ef)

@@ -50,7 +50,7 @@ public class EfectoEventoConfiguration : IEntityTypeConfiguration<EfectoEventoEF
                 EventoMaestroId = 2,
                 TipoResultado = TipoResultado.ACIERTO,
                 EcoCoins = 0,
-                Felicidad = -5,
+                Felicidad = 0,
                 Contaminacion = 0,
                 Energia = 0,
                 Experiencia = 0,
