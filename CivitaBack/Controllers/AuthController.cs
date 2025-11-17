@@ -4,6 +4,7 @@ using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Excepciones;
 using Microsoft.AspNetCore.Mvc;
+using CivitaBack.Logica.Interfaces;
 
 namespace CivitaBack.Api.Controllers;
 
@@ -14,6 +15,7 @@ public class AuthController : BaseApiController
     private readonly IPartidaLogica _partidaLogica;
     private readonly IUsuarioLogica _usuarioLogica;
     private readonly IInicialLogica _inicialLogica;
+    private readonly IConfigurarCookieLogica _configurarCookieLogica;
     private readonly ILogger _logger;
 
     public AuthController(
@@ -21,6 +23,7 @@ public class AuthController : BaseApiController
         IPartidaLogica partidaLogica,
         IUsuarioLogica usuarioLogica,
         IInicialLogica inicialLogica,
+        IConfigurarCookieLogica configurarCookieLogica,
         ILogger<AuthController> logger,
         IMapper mapper) : base(mapper)
     {
@@ -28,6 +31,7 @@ public class AuthController : BaseApiController
         _partidaLogica = partidaLogica;
         _usuarioLogica = usuarioLogica;
         _inicialLogica = inicialLogica;
+        _configurarCookieLogica = configurarCookieLogica;
         _logger = logger;
     }
 
@@ -39,9 +43,12 @@ public class AuthController : BaseApiController
             Usuario usuario = await _authLogica.CrearUsuario(request.NombreUsuario, request.Mail, request.Password);
             await this._inicialLogica.IniciarPartida(usuario);
             Usuario usuarioPartida = await _usuarioLogica.ObtenerPorCorreo(request.Mail);
+
             Partida partida = usuarioPartida.Partida;
 
             string token = await _authLogica.IniciarSesion(request.Mail, request.Password);
+
+            _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddHours(1));
 
             var response = new LoginDTO
             {
@@ -53,9 +60,10 @@ public class AuthController : BaseApiController
 
             return Ok(new { mensaje = "Usuario registrado correctamente!", response });
         }
-        catch (AccesoDenegadoExcepcion ex)
+        catch (AutenticacionException ex)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+            Response.Cookies.Delete("jwt-auth");
+            return Unauthorized(new { error = ex.Message });
         }
         catch (ValidacionRegistroException ex)
         {
@@ -83,18 +91,7 @@ public class AuthController : BaseApiController
 
             Partida? partida = await _partidaLogica.ObtenerPartidaParaLogin(usuario.Id);
 
-            // 🍪 GUARDAR EL TOKEN EN LA COOKIE
-            Response.Cookies.Append(
-                "jwt-auth", // Nombre de la cookie
-                token,
-                new CookieOptions
-                {
-                    HttpOnly = true, // 🛡️ Evita acceso vía JavaScript (XSS)
-                    Expires = DateTimeOffset.UtcNow.AddHours(1), // Coincide con la expiración del JWT
-                    Secure = true, // Recomendado: Solo para HTTPS
-                    SameSite = SameSiteMode.Strict // Protección CSRF
-                }
-            );
+            _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddHours(1));
 
             var response = new LoginDTO
             {
@@ -105,10 +102,6 @@ public class AuthController : BaseApiController
             };
 
             return Ok(response);
-        }
-        catch (AccesoDenegadoExcepcion ex)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (AutenticacionException ex)
         {

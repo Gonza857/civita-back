@@ -477,16 +477,12 @@ public class LogroLogicaTest
             }
         };
 
-        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(1))
-            .Verifiable();
-
         // Act
         var resultado = await _logroLogica.ObtenerLogrosCumplidos(partida);
 
         // Assert
         Assert.NotNull(resultado);
         Assert.Equal(2, resultado.Count);
-        _mockAccesoUsuarios.Verify(a => a.ValidarAcceso(1), Times.Once);
     }
 
     [Fact]
@@ -583,8 +579,6 @@ public class LogroLogicaTest
             }
         };
 
-        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(1))
-            .Verifiable();
         _mockLogroPartidaRepositorio.Setup(r => r.ObtenerLogrosParaReclamarQueNoEstenCumplidos(It.IsAny<List<int>>()))
             .ReturnsAsync(logros);
 
@@ -594,7 +588,6 @@ public class LogroLogicaTest
         // Assert
         Assert.NotNull(resultado);
         Assert.Single(resultado);
-        _mockAccesoUsuarios.Verify(a => a.ValidarAcceso(1), Times.Once);
     }
 
     [Fact]
