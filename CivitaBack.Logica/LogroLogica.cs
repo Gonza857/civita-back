@@ -148,8 +148,6 @@ public class LogroLogica : ILogroLogica
 
     public async Task<List<Logro>> ObtenerLogrosCumplidos(Partida partida)
     {
-        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
-
         List<LogroPartida> logrosPartida = partida.LogroPartidas;
         if (logrosPartida.Count != 0) return logrosPartida.Select(lp => lp.Logro).ToList();
 
@@ -176,8 +174,6 @@ public class LogroLogica : ILogroLogica
     {
         if (partida == null || partida.Recursos == null)
             throw new LogroExcepcion("No se pudo obtener si cumple algún logro.");
-
-        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
 
         /*
             por cada recurso
@@ -229,8 +225,6 @@ public class LogroLogica : ILogroLogica
     {
         if (partida == null || logrosDB.Count == 0 || partida.Recursos == null)
             throw new LogroExcepcion("No se pudo obtener si cumple algún logro.");
-
-        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
 
         /*
             por cada logro

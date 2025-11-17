@@ -27,8 +27,8 @@ namespace CivitaBack.Logica
             {
                 HttpOnly = true,
                 Expires = expires,
-                Secure = !isDevelopment,
-                SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.Strict
+                Secure = true,
+                SameSite = SameSiteMode.None
             };
 
             httpContext.Response.Cookies.Append(

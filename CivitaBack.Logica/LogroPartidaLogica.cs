@@ -44,8 +44,6 @@ public class LogroPartidaLogica : ILogroPartidaLogica
     {
         this.ValidarPartida(partida);
 
-        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
-
         return await _repositorioLogroPartida.ObtenerLogrosIncompletos(partida!.Id);
     }
 
@@ -53,8 +51,6 @@ public class LogroPartidaLogica : ILogroPartidaLogica
     public async Task<List<Logro>> ObtenerLogrosCompletados(Partida? partida)
     {
         this.ValidarPartida(partida);
-
-        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
 
         return await _repositorioLogroPartida.ObtenerLogrosCompletos(partida!.Id);
 
@@ -65,8 +61,6 @@ public class LogroPartidaLogica : ILogroPartidaLogica
     {
         this.ValidarPartida(partida);
 
-        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
-
         return await this.ObtenerLogrosParaReclamables(partida!);
     }
 
@@ -74,8 +68,6 @@ public class LogroPartidaLogica : ILogroPartidaLogica
     public async Task ReclamarLogros(Partida? partidaInput)
     {
         var partidaValidada =  this.ValidarPartida(partidaInput);
-
-        _accesoUsuarios.ValidarAcceso(partidaValidada.UsuarioId);
 
         // 1. Obtener los logros que cumplen la condición ahora mismo
         var logros = await this.ObtenerLogrosParaReclamables(partidaValidada);

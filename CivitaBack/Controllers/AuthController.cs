@@ -43,6 +43,7 @@ public class AuthController : BaseApiController
             Usuario usuario = await _authLogica.CrearUsuario(request.NombreUsuario, request.Mail, request.Password);
             await this._inicialLogica.IniciarPartida(usuario);
             Usuario usuarioPartida = await _usuarioLogica.ObtenerPorCorreo(request.Mail);
+
             Partida partida = usuarioPartida.Partida;
 
             string token = await _authLogica.IniciarSesion(request.Mail, request.Password);
