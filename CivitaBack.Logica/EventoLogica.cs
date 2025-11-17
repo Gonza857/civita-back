@@ -104,16 +104,16 @@ namespace CivitaBack.Logica
             };
         }
 
-        public async Task DispararTipContaminacionAsync(Partida partida)
+        public async Task<EventoDisparadoDTO> DispararTipContaminacionAsync(Partida partida)
         {
             const int TIP_CONTAMINACION_ID = 2;
 
             bool yaEnviado = await _eventoRepositorio.ExisteTipEnviadoAsync(partida.Id, TIP_CONTAMINACION_ID);
 
-            if (yaEnviado) return; 
+            if (yaEnviado) return null; 
 
             var maestroTip = await _eventoRepositorio.ObtenerEventoMaestroAsync(TIP_CONTAMINACION_ID);
-            if (maestroTip == null) return;
+            if (maestroTip == null) throw new EventoException("Evento maestro no encontrado.");
 
             var evento = new Evento
             {
@@ -124,7 +124,20 @@ namespace CivitaBack.Logica
                 Resuelto = true, 
             };
 
+            var dto = new EventoDisparadoDTO
+            {
+                Id = evento.Id,
+                TipoEvento = maestroTip.TipoEvento.ToString(),
+                Titulo = maestroTip.Titulo,
+                PreguntaTexto = maestroTip.ContenidoPrincipal,
+                OpcionA_Texto = maestroTip.OpcionA_Texto,
+                OpcionB_Texto = "",
+                EfectoAciertoResumen = ""
+            };
+
             await _eventoRepositorio.CrearEventoAsync(evento);
+
+            return dto;
         }
 
         public static string FormatoEfectos(EfectoEvento? ef)

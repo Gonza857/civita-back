@@ -15,18 +15,16 @@ namespace CivitaBack.Logica.Backgrounds
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<BackgroundCicloLogica> _logger;
         private readonly IHubContext<CicloHub> _hubContext;
-        private readonly IEventoLogica _eventoLogica;
         private readonly ManualResetEventSlim _pauseEvent = new(true); // empieza "activo"
 
         private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(15); // 7/8
 
         public BackgroundCicloLogica(IServiceProvider serviceProvider, ILogger<BackgroundCicloLogica> logger,
-            IHubContext<CicloHub> hubContext, IEventoLogica eventoLogica)
+            IHubContext<CicloHub> hubContext)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
             _hubContext = hubContext;
-            _eventoLogica = eventoLogica;
         }
 
         public void Pausar() => _pauseEvent.Reset();
@@ -40,41 +38,51 @@ namespace CivitaBack.Logica.Backgrounds
             {
                 try
                 {
-                    // 1. Espera si está en pausa
-                    _pauseEvent.Wait(stoppingToken);
-
-                    using var scope = _serviceProvider.CreateScope();
-                    var cicloLogica = scope.ServiceProvider.GetRequiredService<ICicloLogica>();
-
-                    // 2. ¡HACE EL TRABAJO! (Esto ahora se ejecuta primero)
-                    var partidas = await cicloLogica.EjecutarCicloAsync();
-
-                    // 3. Enviar los recursos a cada grupo de SignalR
-                    foreach (var partida in partidas)
+                    using (var scope = _serviceProvider.CreateScope())
                     {
-                        var payload = new RecursoDTO
-                        {
-                            Energia = partida.Recursos.Energia,
-                            Contaminacion = partida.Recursos.Contaminacion,
-                            Felicidad = partida.Recursos.Felicidad,
-                            EcoCoins = partida.Recursos.EcoCoins,
-                            Poblacion = partida.Recursos.Poblacion
-                        };
+                        // 1. Espera si está en pausa
+                        _pauseEvent.Wait(stoppingToken);
 
-                        if (partida.Recursos.Contaminacion > 80)
+                        var cicloLogica = scope.ServiceProvider.GetRequiredService<ICicloLogica>();
+
+                        var eventoLogica = scope.ServiceProvider.GetRequiredService<IEventoLogica>();
+
+                        // 2. ¡HACE EL TRABAJO! (Esto ahora se ejecuta primero)
+                        var partidas = await cicloLogica.EjecutarCicloAsync();
+
+                        // 3. Enviar los recursos a cada grupo de SignalR
+                        foreach (var partida in partidas)
                         {
-                            await _eventoLogica.DispararTipContaminacionAsync(partida);
+                            var payload = new RecursoDTO
+                            {
+                                Energia = partida.Recursos.Energia,
+                                Contaminacion = partida.Recursos.Contaminacion,
+                                Felicidad = partida.Recursos.Felicidad,
+                                EcoCoins = partida.Recursos.EcoCoins,
+                                Poblacion = partida.Recursos.Poblacion
+                            };
+
+                            if (partida.Recursos.Contaminacion > 80)
+                            {
+                                var tipDisparado = await eventoLogica.DispararTipContaminacionAsync(partida);
+                            
+                                if (tipDisparado != null)
+                                {
+                                    await _hubContext.Clients.Group(partida.Id.ToString())
+                                        .SendAsync("EventoDisparado", tipDisparado);
+                                }
+                            }
+
+                            await _hubContext.Clients.Group(partida.Id.ToString())
+                                .SendAsync("RecursosActualizados", payload);
                         }
 
-                        await _hubContext.Clients.Group(partida.Id.ToString())
-                            .SendAsync("RecursosActualizados", payload);
+                        _logger.LogInformation("✅ Ciclo ejecutado y recursos enviados a SignalR a las {Hora}",
+                            DateTime.Now);
+
+                        // 4. ¡ESPERA DESPUÉS de terminar el trabajo!
+                        await Task.Delay(_intervalo, stoppingToken);
                     }
-
-                    _logger.LogInformation("✅ Ciclo ejecutado y recursos enviados a SignalR a las {Hora}",
-                        DateTime.Now);
-
-                    // 4. ¡ESPERA DESPUÉS de terminar el trabajo!
-                    await Task.Delay(_intervalo, stoppingToken);
                 }
                 catch (Exception ex)
                 {

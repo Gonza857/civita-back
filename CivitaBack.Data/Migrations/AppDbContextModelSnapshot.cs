@@ -156,7 +156,7 @@ namespace CivitaBack.Data.Migrations
                             Energia = 0,
                             EventoMaestroId = 2,
                             Experiencia = 0,
-                            Felicidad = -5,
+                            Felicidad = 0,
                             TipoResultado = 1
                         });
                 });

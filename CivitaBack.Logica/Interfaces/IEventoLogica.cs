@@ -7,6 +7,6 @@ namespace CivitaBack.Logica.Interfaces
     {
         Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida);
         Task<EventoResueltoDTO> ResolverEventoPreguntaAsync(int eventoId, string respuesta);
-        Task DispararTipContaminacionAsync(Partida partida);
+        Task<EventoDisparadoDTO> DispararTipContaminacionAsync(Partida partida);
     }
 }
