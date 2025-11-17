@@ -2,6 +2,7 @@
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Enum;
 
 namespace CivitaBack.Api.Mapping
 {
@@ -14,33 +15,28 @@ namespace CivitaBack.Api.Mapping
             .ForMember(dest => dest.EventoMaestro, opt => opt.Ignore())
             .ForMember(dest => dest.EventoMaestroId, opt => opt.MapFrom(src => src.EventoMaestro != null ? src.EventoMaestro.Id : src.EventoMaestroId));*/
 
-            CreateMap<EventoMaestro, Evento>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.Contenido, opt => opt.MapFrom(src => src.ContenidoPrincipal))
+            CreateMap<Evento, EventoEF>();
 
-            .ForMember(dest => dest.EcoCoinsAplicada, opt => opt.Ignore())
-            .ForMember(dest => dest.FelicidadAplicada, opt => opt.Ignore())
-            .ForMember(dest => dest.ContaminacionAplicada, opt => opt.Ignore())
-            .ForMember(dest => dest.EnergiaAplicada, opt => opt.Ignore())
-            .ForMember(dest => dest.ExperienciaAplicada, opt => opt.Ignore())
+            CreateMap<EventoEF, Evento>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
 
-            .ForMember(dest => dest.EventoMaestroId, opt => opt.Ignore())
-            .ForMember(dest => dest.EventoMaestro, opt => opt.Ignore())
-            .ForMember(dest => dest.PartidaId, opt => opt.Ignore())
-            .ForMember(dest => dest.SeDisparo, opt => opt.Ignore())
-            .ForMember(dest => dest.Resuelto, opt => opt.Ignore());
-
-            CreateMap<Evento, EventoEF>().ReverseMap();
             CreateMap<EventoMaestro, EventoMaestroEF>().ReverseMap();
             CreateMap<EfectoEvento, EfectoEventoEF>().ReverseMap();
 
-            CreateMap<Evento, EventoDisparadoDTO>()
-            .ForMember(dest => dest.Titulo, opt => opt.MapFrom(src => src.EventoMaestro.Titulo))
-            .ForMember(dest => dest.PreguntaTexto, opt => opt.MapFrom(src => src.EventoMaestro.ContenidoPrincipal))
-            .ForMember(dest => dest.OpcionA_Texto, opt => opt.MapFrom(src => src.EventoMaestro.OpcionA_Texto))
-            .ForMember(dest => dest.OpcionB_Texto, opt => opt.MapFrom(src => src.EventoMaestro.OpcionB_Texto))
-            .ForMember(dest => dest.EventoMaestroId, opt => opt.MapFrom(src => src.EventoMaestroId));
-
+            CreateMap<EventoMaestro, EventoDisparadoDTO>()
+            .ForMember(dest => dest.TipoEvento, opt => opt.MapFrom(src => src.TipoEvento.ToString()))
+            .ForMember(dest => dest.Titulo, opt => opt.MapFrom(src => src.Titulo))
+            .ForMember(dest => dest.PreguntaTexto, opt => opt.MapFrom(src => src.ContenidoPrincipal))
+            .ForMember(dest => dest.OpcionA_Texto, opt => opt.MapFrom(src => src.OpcionA_Texto))
+            .ForMember(dest => dest.OpcionB_Texto, opt => opt.MapFrom(src => src.OpcionB_Texto))
+            .ForMember(dest => dest.EfectoAciertoResumen,
+                       opt => opt.MapFrom(src =>
+                            FormatearEfectos(
+                                src.Efectos != null
+                                    ? src.Efectos.FirstOrDefault(e => e.TipoResultado == TipoResultado.ACIERTO)
+                                    : null
+                            )
+                       ));
 
             CreateMap<Evento, EventoResueltoDTO>()
             .ForMember(dest => dest.PartidaId, opt => opt.MapFrom(src => src.PartidaId))
@@ -54,9 +50,14 @@ namespace CivitaBack.Api.Mapping
                         : $"Respuesta incorrecta. {src.EventoMaestro.Titulo} ha sido resuelto.";
                 })
             );
-
-
         }
 
+            private string FormatearEfectos(EfectoEvento? ef)
+            {
+                if (ef == null) return string.Empty;
+             
+                return $"+{ef.EcoCoins} EcoCoins, +{ef.Felicidad} Felicidad, {ef.Contaminacion} Contaminación, +{ef.Energia} Energía";
+            }
     }
+
 }

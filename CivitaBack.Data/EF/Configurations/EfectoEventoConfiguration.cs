@@ -43,6 +43,18 @@ public class EfectoEventoConfiguration : IEntityTypeConfiguration<EfectoEventoEF
                 Energia = 0,
                 Experiencia = 0,
                 Creado = seedDate
+            },
+            new EfectoEventoEF
+            {
+                Id = 3, 
+                EventoMaestroId = 2,
+                TipoResultado = TipoResultado.ACIERTO,
+                EcoCoins = 0,
+                Felicidad = -5,
+                Contaminacion = 0,
+                Energia = 0,
+                Experiencia = 0,
+                Creado = seedDate
             }
         );
     }

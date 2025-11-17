@@ -12,6 +12,4 @@ public enum TipoEvento
 
     [Description("Evento con decisión binaria (Aceptar/Rechazar)")]
     DECISION_BINARIA = 3,
-
-    
 }

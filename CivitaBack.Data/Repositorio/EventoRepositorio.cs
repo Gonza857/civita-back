@@ -15,6 +15,7 @@ namespace CivitaBack.Data.Repositorio
         public async Task<EventoMaestro?> ObtenerEventoMaestroAsync()
         {           
             var eventoMaestroEF = await _context.EventoMaestro
+                .Include(e => e.Efectos)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 

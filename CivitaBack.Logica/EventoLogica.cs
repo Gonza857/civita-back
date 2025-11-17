@@ -15,45 +15,46 @@ namespace CivitaBack.Logica
     {
         private readonly IEventoRepositorio _eventoRepositorio;
         private readonly IUnidadDeTrabajo _uow;
-        private readonly IMapper _mapper;
         private readonly IActualizarRecursosLogica _actualizarRecursosLogica;
-        private readonly IAccesoUsuarios _accesoUsuarios;
+        private readonly IPartidaRepositorio _partidaRepositorio;
 
-        public EventoLogica(IEventoRepositorio eventoRepositorio, IAccesoUsuarios accesoUsuarios, IUnidadDeTrabajo uow, 
-            IMapper mapper, IActualizarRecursosLogica actualizarRecursosLogica)
+        public EventoLogica(IEventoRepositorio eventoRepositorio, IUnidadDeTrabajo uow, 
+            IActualizarRecursosLogica actualizarRecursosLogica, IPartidaRepositorio partidaRepositorio  )
         {
             _eventoRepositorio = eventoRepositorio;
-            _accesoUsuarios = accesoUsuarios;
             _uow = uow;
-            _mapper = mapper;
             _actualizarRecursosLogica = actualizarRecursosLogica;
+            _partidaRepositorio = partidaRepositorio;
         }
 
         public async Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida)
         {
             var maestro = await _eventoRepositorio.ObtenerEventoMaestroAsync();
-            if (maestro == null) return null;
+            if (maestro == null) throw new EventoException("Evento maestro no encontrado.");
 
-            var evento = _mapper.Map<Evento>(maestro);
-
-
-            if (evento.Partida != null)
+            var evento = new Evento
             {
-                _accesoUsuarios.ValidarAcceso(evento.Partida.UsuarioId);
-            } else
+                PartidaId = idPartida,
+                EventoMaestroId = maestro.Id,
+                Contenido = maestro.ContenidoPrincipal,
+                SeDisparo = true,
+                Resuelto = false
+            };
+
+            evento = await _eventoRepositorio.CrearEventoAsync(evento);
+
+            var dto = new EventoDisparadoDTO
             {
-                throw new PartidaExcepcion("Partida no encontrada");
-            }
+                Id = evento.Id,
+                TipoEvento = maestro.TipoEvento.ToString(),
+                Titulo = maestro.Titulo,
+                PreguntaTexto = maestro.ContenidoPrincipal,
+                OpcionA_Texto = maestro.OpcionA_Texto,
+                OpcionB_Texto = maestro.OpcionB_Texto,
+                EfectoAciertoResumen = FormatoEfectos(maestro.Efectos?.FirstOrDefault(e => e.TipoResultado == TipoResultado.ACIERTO))
+            };
 
-            await _eventoRepositorio.CrearEventoAsync(evento);
-            await this._uow.CommitAsync();
-
-            evento.EventoMaestro = maestro;
-            evento.SeDisparo = true;
-
-            var respuestaDTO = _mapper.Map<EventoDisparadoDTO>(evento);
-
-            return respuestaDTO;
+            return dto;
         }
 
         public async Task<EventoResueltoDTO> ResolverEventoPreguntaAsync(int eventoId, string respuestaElegida)
@@ -63,8 +64,6 @@ namespace CivitaBack.Logica
             if (evento == null || evento.Resuelto) throw new EventoException("Evento no encontrado o ya resuelto.");
             var partida = evento.Partida;
             if (partida == null) throw new PartidaExcepcion("Evento sin partida asociada.");
-
-            _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
 
             bool esCorrecta = (respuestaElegida == evento.EventoMaestro.RespuestaCorrecta);
             TipoResultado tipoResultado = esCorrecta ? TipoResultado.ACIERTO : TipoResultado.FALLO;
@@ -101,6 +100,12 @@ namespace CivitaBack.Logica
                 TextoRespuesta = mensajeFinal, 
                 PartidaId = partida.Id
             };
+        }
+
+        public static string FormatoEfectos(EfectoEvento? ef)
+        {
+            if (ef == null) return string.Empty;
+            return $"+{ef.EcoCoins} EcoCoins, +{ef.Felicidad} Felicidad, {ef.Contaminacion} Contaminación, +{ef.Energia} Energía";
         }
     }
 }

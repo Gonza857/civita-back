@@ -42,6 +42,17 @@ public class EventoMaestroConfiguration : IEntityTypeConfiguration<EventoMaestro
                 OpcionB_Texto = "B) Usar un auto moderno, solo con el conductor.",
                 RespuestaCorrecta = "A",
                 Creado = seedDate,
+            },
+            new EventoMaestroEF
+            {
+                Id = 2,
+                TipoEvento = TipoEvento.TIP_INFORMATIVO,
+                Titulo = "¡Alerta Roja de Contaminación!",
+                ContenidoPrincipal = "Tu nivel de contaminación es críticamente alto. Si excede el 80%, la Felicidad de tus ciudadanos caerá rápidamente. Intentá construir más plantas de tratamiento de aire y espacios verdes.",
+                OpcionA_Texto = "Entendido.", 
+                OpcionB_Texto = "", 
+                RespuestaCorrecta = "A",
+                Creado = seedDate,
             }
         );
     }
