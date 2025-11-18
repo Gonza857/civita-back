@@ -53,6 +53,7 @@ namespace CivitaBack.Logica
                 PreguntaTexto = maestro.ContenidoPrincipal,
                 OpcionA_Texto = maestro.OpcionA_Texto,
                 OpcionB_Texto = maestro.OpcionB_Texto,
+                RespuestaCorrecta = maestro.RespuestaCorrecta,
                 EfectoAciertoResumen = FormatoEfectos(maestro.Efectos?.FirstOrDefault(e => e.TipoResultado == TipoResultado.ACIERTO))
             };
 
@@ -132,6 +133,7 @@ namespace CivitaBack.Logica
                 PreguntaTexto = maestroTip.ContenidoPrincipal,
                 OpcionA_Texto = maestroTip.OpcionA_Texto,
                 OpcionB_Texto = "",
+                RespuestaCorrecta = maestroTip.RespuestaCorrecta,
                 EfectoAciertoResumen = ""
             };
 

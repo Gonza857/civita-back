@@ -14,6 +14,7 @@ namespace CivitaBack.Data.DTO
         public string PreguntaTexto { get; set; } = string.Empty; 
         public string OpcionA_Texto { get; set; } = string.Empty;
         public string OpcionB_Texto { get; set; } = string.Empty;
+        public string RespuestaCorrecta { get; set; } = string.Empty;
         public string EfectoAciertoResumen { get; set; } = string.Empty;
 
     }
