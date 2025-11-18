@@ -36,7 +36,7 @@ public class MisionPartidaLogica : IMisionPartidaLogica
         MisionPartida mp = await this._misionPartidaRepositorio.ObtenerUnaMisionDePartida(partida.Id, mision.Id);
         mp.FechaCompletado = DateTime.UtcNow;
         mp.Reclamado = true;
-        await this._misionPartidaRepositorio.Actualizar(mp);
+        await this._misionPartidaRepositorio.MarcarCompletada(mp);
         await this._unidadDeTrabajo.CommitAsync();
     }
 

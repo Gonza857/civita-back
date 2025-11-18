@@ -118,11 +118,11 @@ builder.Services.AddScoped<IMisionPartidaRepositorio, MisionPartidaRepositorio>(
 builder.Services.AddScoped<IRecompensaLogica, RecompensaLogica>();
 builder.Services.AddScoped<IRecompensaRepositorio, RecompensaRepositorio>();
 
+builder.Services.AddScoped<INivelLogica, NivelLogica>();
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 builder.Services.AddScoped<IInicialLogica, InicialLogica>();
 builder.Services.AddScoped<ICicloLogica, CicloLogica>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
-builder.Services.AddScoped<IRecompensaLogica, RecompensaLogica>();
 
 builder.Services.AddSingleton<BackgroundCicloLogica>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundCicloLogica>());

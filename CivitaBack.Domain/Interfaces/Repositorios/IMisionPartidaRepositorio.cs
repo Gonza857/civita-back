@@ -5,6 +5,7 @@ namespace CivitaBack.Domain.Interfaces.Repositorios;
 
 public interface IMisionPartidaRepositorio : IRepositorioBase<MisionPartida>
 {
+    Task MarcarCompletada(MisionPartida mp);
     Task AgregarMisionesPartida(List<Mision> misiones, Partida partida);
     Task<List<MisionPartida>> ObtenerMisionesPartida(int idPartida);
     Task<MisionPartida> ObtenerUnaMisionDePartida(int idPartida, int idMision);

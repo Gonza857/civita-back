@@ -18,6 +18,15 @@ public class MisionPartidaRepositorio
         throw new NotImplementedException();
     }
 
+    public Task MarcarCompletada(MisionPartida mp)
+    {
+        var mpEF = _mapper.Map<MisionPartidaEF>(mp);
+        _context.MisionPartida.Attach(mpEF);
+        _context.Entry(mpEF).Property(e => e.FechaCompletado).IsModified = true;
+        _context.Entry(mpEF).Property(e => e.Reclamado).IsModified = true;
+        return Task.CompletedTask;
+    }
+
     public async Task AgregarMisionesPartida(List<Mision> misiones, Partida partida)
     {
         var misionesPartida = new List<MisionPartida>();
@@ -25,7 +34,7 @@ public class MisionPartidaRepositorio
         {
             var nuevaAsignacion = new MisionPartida
             {
-                Partida = partida,
+                PartidaId = partida.Id,
                 MisionId = mision.Id,
                 FechaEntrega = DateTime.UtcNow,
                 Reclamado = false 
@@ -34,7 +43,7 @@ public class MisionPartidaRepositorio
             misionesPartida.Add(nuevaAsignacion);
         }
         
-        partida.MisionPartidas = misionesPartida;
+        await base.AgregarVarios(misionesPartida);
     }
 
     public async Task<List<MisionPartida>> ObtenerMisionesPartida(int idPartida)
