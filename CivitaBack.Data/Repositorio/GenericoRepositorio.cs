@@ -22,7 +22,7 @@ public abstract class GenericoRepositorio<TDominio, TEf> : IRepositorioBase<TDom
         _dbSet = _context.Set<TEf>(); 
     }
     
-    public async Task Agregar(TDominio entidad)
+    public virtual async Task Agregar(TDominio entidad)
     {
         var entidadEF = _mapper.Map<TEf>(entidad);
         if (entidadEF is AuditableEF auditable)

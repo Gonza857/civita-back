@@ -24,9 +24,8 @@ public class CondicionRepositorio : GenericoRepositorio<Condicion, CondicionEF>,
     public override async Task<List<Condicion>> ObtenerTodos()
     {
         var listaEF = await _dbSet
-            .Where(c => !c.EsRecompensa)
             .Include(c => c.Estructura)
-            .Include(c => c.Recompensa)
+            .Include(c => c.Recompensas)
             .AsNoTracking()
             .ToListAsync();
 
@@ -42,34 +41,25 @@ public class CondicionRepositorio : GenericoRepositorio<Condicion, CondicionEF>,
     {
         return base.Eliminar(id);
     }
+    
 
-    public Task Guardar(Condicion entidad)
+    public override async Task Agregar(Condicion entidad)
     {
-        throw new NotImplementedException();
+        var condicionEf = _mapper.Map<CondicionEF>(entidad);
+        if (condicionEf is AuditableEF auditable)
+        {
+            auditable.Creado = DateTime.UtcNow;
+            auditable.Editado = DateTime.UtcNow; 
+        }
+        var recompensasEf = condicionEf.Recompensas.ToList();
+        condicionEf.Recompensas.Clear();
+        await _dbSet.AddAsync(condicionEf);
+        foreach (var recompensaEF in recompensasEf)
+        {
+            _context.Entry(recompensaEF).State = EntityState.Unchanged; 
+            condicionEf.Recompensas.Add(recompensaEF);
+        }
+        
     }
-
-    public new Task Agregar(Condicion entidad)
-    {
-        return base.Agregar(entidad);
-    }
-
-    public Task AgregarVarios(List<Condicion> entidades)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Guardar()
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<List<Condicion>> ObtenerTodasRecompensas()
-    {
-        var listaEF = await _dbSet
-            .Where(c => c.EsRecompensa)
-            .AsNoTracking()
-            .ToListAsync();
-
-        return MapearLista<Condicion>(listaEF);
-    }
+    
 }

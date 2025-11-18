@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Excepciones;
@@ -33,33 +34,15 @@ public class CondicionController: BaseApiController
         }
     }
     
-
-    [HttpGet("Recompensa")]
-    public async Task<IActionResult> RecompensaListado()
-    {
-        try
-        {
-            var recompensas = await _condicionLogica.ObtenerListadoRecompensas();
-            var recompensasDto = base.MapearLista<CondicionDTO>(recompensas);
-            return Ok(recompensasDto);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem("Ocurrió un error al obtener el listado de Recompensas.");
-        }
-    }
     
     [HttpPost]
-    public async Task<IActionResult> Crear([FromBody] CondicionDTO? condicionNueva)
+    public async Task<IActionResult> Crear([FromBody] CondicionDTO? condicionDto)
     {
-        if (condicionNueva == null)
-            return BadRequest(new { mensaje = "Los datos recibidos son inválidos" });
         try
         {
-            var condicionEntidad = base.Mapear<Condicion>(condicionNueva);
+            var condicionEntidad = base.Mapear<Condicion>(condicionDto);
 
-            await _condicionLogica.Crear(condicionEntidad);
+            await _condicionLogica.Crear(condicionEntidad, condicionDto.RecompensaIds);
             return Ok();
         }
         catch (CondicionExcepcion ex)
@@ -73,27 +56,6 @@ public class CondicionController: BaseApiController
         }
     }
     
-    [HttpPost("Recompensa")]
-    public async Task<IActionResult> CrearRecompensa([FromBody] CondicionDTO? recompensaNueva)
-    {
-        if (recompensaNueva == null)
-            return BadRequest("Los datos recibidos son inválidos");
-        try
-        {
-            var recompensaEntidad = base.Mapear<Condicion>(recompensaNueva);
-            await _condicionLogica.CrearRecompensa(recompensaEntidad);
-            return Created();
-        }
-        catch (CondicionExcepcion ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem("Ocurrió un error al guardar la Recompensa");
-        }
-    }
     
     [HttpDelete("{id}")]
     public async Task<IActionResult> Eliminar(int id)
@@ -127,16 +89,12 @@ public class CondicionController: BaseApiController
     }
     
     [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchCondicion([FromBody] CondicionDTO? condicionDto, int id)
+    public async Task<IActionResult> PatchCondicion([FromBody] ActualizarCondicionDTO? condicionDto, int id)
     {
-        if (condicionDto == null)
-            return BadRequest("Los datos recibidos son inválidos");
-
         try
         {
             var condicionEntidad = base.Mapear<Condicion>(condicionDto);
-
-            await this._condicionLogica.Actualizar(condicionEntidad, id);
+            await this._condicionLogica.Actualizar(condicionEntidad, id, condicionDto.RecompensaIds);
             return Ok();
         }
         catch (CondicionExcepcion ex)

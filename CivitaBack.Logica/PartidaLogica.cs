@@ -182,9 +182,8 @@ public class PartidaLogica : IPartidaLogica
             .Where(l => logrosDto.Any(dto => dto.Id == l.Id))
             .ToList();
 
-        List<Condicion> recompensas = logrosCoincidentes
-            .Where(l => l.Condicion?.Recompensa != null)
-            .Select(l => l.Condicion!.Recompensa!)
+        List<Recompensa> recompensas = logrosCoincidentes
+            .SelectMany(l => l.Condicion.Recompensas)
             .ToList();
 
         Recurso? recursoPartida = await this._recursoRepositorio.ObtenerPorId(partida.Id);

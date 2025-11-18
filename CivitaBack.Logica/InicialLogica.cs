@@ -38,6 +38,8 @@ public class InicialLogica : IInicialLogica
             Usuario = usuario,
             JsonMapa = this.GenerarMapa(),
             UltimaVez = DateTime.UtcNow,
+            Nivel = 0,
+            Experiencia = 0,
         };
         
         partida.Recursos = this.GenerarRecursos();

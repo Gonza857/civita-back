@@ -67,9 +67,8 @@ public class LogroPartidaLogica : ILogroPartidaLogica
         if (logros.Count == 0) return; // No hay nada que reclamar
         
         // 2. Obtener todas las recompensas de esos logros
-        List<Condicion> recompensas = logros
-            .Where(l => l.Condicion?.Recompensa != null)
-            .Select(l => l.Condicion!.Recompensa!)
+        List<Recompensa> recompensas = logros
+            .SelectMany(l => l.Condicion.Recompensas)
             .ToList();
 
         // 3. Aplicar las recompensas al objeto Recurso en memoria
@@ -106,7 +105,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica
     /// Utiliza reflexión de forma optimizada (con un diccionario) para actualizar las propiedades
     /// del objeto Recurso basándose en <c>NombreColumna</c>.
     /// </remarks>
-    private async void AplicarRecompensasRecurso(Recurso recursoPartida, List<Condicion> recompensas)
+    private async void AplicarRecompensasRecurso(Recurso recursoPartida, List<Recompensa> recompensas)
     {
         // Optimización: Cachear propiedades de Recurso en un diccionario
         var propiedadesIntRecurso = typeof(Recurso)

@@ -23,6 +23,8 @@ public class LogroConfiguration : IEntityTypeConfiguration<LogroEF>
         // Relación con Condicion
         builder.HasOne(l => l.Condicion)
             .WithMany()
+            .HasForeignKey(l => l.CondicionId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -299,9 +299,9 @@ public class LogroPartidaLogicaTest
         partida.EstructuraMapa = new List<EstructuraMapa>();
 
         // La recompensa (que es de tipo Condicion) da 100 de Oro
-        Condicion recompensa = TestData.CrearCondicion("EcoCoins", 100);
+        Recompensa recompensa = TestData.CrearRecompensa(500, "EcoCoins");
         Condicion condicion = TestData.CrearCondicion("Energia", 500);
-        condicion.Recompensa = recompensa; // Asignamos la recompensa
+        condicion.Recompensas.Add(recompensa);
 
         TipoLogro tipoLogro = TestData.CrearTipoLogro("Recurso");
         Logro logro1 = TestData.CrearLogro(logroId, tipoLogro, condicion, "Logro de Energía");

@@ -2,7 +2,7 @@
 
 namespace CivitaBack.Domain.Entidades;
 
-public class Condicion : Auditable
+public class Recompensa: Auditable
 {
     public int Id { get; set; }
     public int Cantidad { get; set; }
@@ -11,5 +11,5 @@ public class Condicion : Auditable
     public int? EstructuraId { get; set; }
     public Estructura? Estructura { get; set; }
     
-    public virtual ICollection<Recompensa> Recompensas { get; set; } = new List<Recompensa>();
+    public virtual ICollection<Condicion> Condiciones { get; set; } = new List<Condicion>();
 }

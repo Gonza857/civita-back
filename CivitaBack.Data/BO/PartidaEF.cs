@@ -13,6 +13,8 @@ namespace CivitaBack.Data.BO
         public DateTime? UltimaVez { get; set; }
         public string? JsonMapa { get; set; }
 
+        public int Nivel { get; set; }
+        public int Experiencia { get; set; }
         public int UsuarioId { get; set; }
 
         [JsonIgnore]

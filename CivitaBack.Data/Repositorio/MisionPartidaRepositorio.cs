@@ -79,7 +79,7 @@ public class MisionPartidaRepositorio
         return await _context.MisionPartida
             .Include(mp => mp.Mision)
             .ThenInclude(m => m.Condicion)
-            .ThenInclude(c => c.Recompensa)
+            .ThenInclude(c => c.Recompensas)
             .Where(mp => mp.PartidaId == idPartida && mp.MisionId == idMision)
             .AsNoTracking()
             .FirstOrDefaultAsync();

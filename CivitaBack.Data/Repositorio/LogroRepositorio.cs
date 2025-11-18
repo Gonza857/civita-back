@@ -31,7 +31,7 @@ public class LogroRepositorio
     {
         List<LogroEF> logros = await _context.Logro
            .Include(l => l.Condicion)
-               .ThenInclude(c => c.Recompensa)       // Recompensa de la Condicion
+               .ThenInclude(c => c.Recompensas)       // Recompensa de la Condicion
            .Include(l => l.Condicion)
                .ThenInclude(c => c.Estructura)       // Estructura de la Condicion
            .Include(l => l.TipoLogro)
