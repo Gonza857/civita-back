@@ -48,9 +48,31 @@ public class EventoMaestroConfiguration : IEntityTypeConfiguration<EventoMaestro
                 Id = 2,
                 TipoEvento = TipoEvento.TIP_INFORMATIVO,
                 Titulo = "¡Alerta Roja de Contaminación!",
-                ContenidoPrincipal = "Tu nivel de contaminación es críticamente alto. Si excede el 80%, la Felicidad de tus ciudadanos caerá rápidamente. Intentá construir más plantas de tratamiento de aire y espacios verdes.",
+                ContenidoPrincipal = "Tu nivel de contaminación es críticamente alto. Si excede el 80%, la Felicidad de tus ciudadanos caerá rápidamente. Intentá construir más estructuras que limpien el aire y sumar espacios verdes.",
                 OpcionA_Texto = "Entendido.", 
                 OpcionB_Texto = "", 
+                RespuestaCorrecta = "A",
+                Creado = seedDate,
+            },
+            new EventoMaestroEF
+            {
+                Id = 3,
+                TipoEvento = TipoEvento.TIP_INFORMATIVO,
+                Titulo = "¡Alerta de Energía Crítica!",
+                ContenidoPrincipal = "Tus reservas de energía están peligrosamente bajas. Si caen por debajo del 10%, varias estructuras dejarán de funcionar, afectando la Felicidad y el crecimiento de tu ciudad. Considerá construir más fuentes de energía renovable.",
+                OpcionA_Texto = "Entendido.",
+                OpcionB_Texto = "",
+                RespuestaCorrecta = "A",
+                Creado = seedDate,
+            },
+            new EventoMaestroEF
+            {
+                Id = 4,
+                TipoEvento = TipoEvento.TIP_INFORMATIVO,
+                Titulo = "¡Felicidad en Nivel Crítico!",
+                ContenidoPrincipal = "La Felicidad de tus ciudadanos está peligrosamente baja. Cuando esto ocurre, la población puede comenzar a disminuir y tu ciudad se vuelve menos estable. Revisá si hay suficiente refugio disponible y tratá de reducir los niveles de contaminación para mejorar el ánimo general de la población.",
+                OpcionA_Texto = "Entendido.",
+                OpcionB_Texto = "",
                 RespuestaCorrecta = "A",
                 Creado = seedDate,
             }

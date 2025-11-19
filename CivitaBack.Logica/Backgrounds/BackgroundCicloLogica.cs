@@ -64,8 +64,30 @@ namespace CivitaBack.Logica.Backgrounds
 
                             if (partida.Recursos.Contaminacion > 80)
                             {
-                                var tipDisparado = await eventoLogica.DispararTipContaminacionAsync(partida);
+                                var tipDisparado = await eventoLogica.DispararEventoInformativoAsync(partida, 2);
                             
+                                if (tipDisparado != null)
+                                {
+                                    await _hubContext.Clients.Group(partida.Id.ToString())
+                                        .SendAsync("EventoDisparado", tipDisparado);
+                                }
+                            }
+
+                            if (partida.Recursos.Energia < 10)
+                            {
+                                var tipDisparado = await eventoLogica.DispararEventoInformativoAsync(partida, 3);
+
+                                if (tipDisparado != null)
+                                {
+                                    await _hubContext.Clients.Group(partida.Id.ToString())
+                                        .SendAsync("EventoDisparado", tipDisparado);
+                                }
+                            }
+
+                            if (partida.Recursos.Felicidad < 10)
+                            {
+                                var tipDisparado = await eventoLogica.DispararEventoInformativoAsync(partida, 4);
+
                                 if (tipDisparado != null)
                                 {
                                     await _hubContext.Clients.Group(partida.Id.ToString())

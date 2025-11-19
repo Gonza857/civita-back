@@ -122,15 +122,13 @@ namespace CivitaBack.Logica
             };
         }
 
-        public async Task<EventoDisparadoDTO> DispararTipContaminacionAsync(Partida partida)
+        public async Task<EventoDisparadoDTO> DispararEventoInformativoAsync(Partida partida, int tipId)
         {
-            const int TIP_CONTAMINACION_ID = 2;
-
-            bool yaEnviado = await _eventoRepositorio.ExisteTipEnviadoAsync(partida.Id, TIP_CONTAMINACION_ID);
+            bool yaEnviado = await _eventoRepositorio.ExisteTipEnviadoAsync(partida.Id, tipId);
 
             if (yaEnviado) return null; 
 
-            var maestroTip = await _eventoRepositorio.ObtenerEventoMaestroAsync(TIP_CONTAMINACION_ID);
+            var maestroTip = await _eventoRepositorio.ObtenerEventoMaestroAsync(tipId);
             if (maestroTip == null) throw new EventoException("Evento maestro no encontrado.");
 
             var evento = new Evento
