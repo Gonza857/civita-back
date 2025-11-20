@@ -12,21 +12,20 @@ namespace CivitaBack.Data.EF.Configurations
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
-            builder.Property(e => e.TextoDescripcion).HasMaxLength(500);
-            builder.Property(e => e.TextoAceptar).HasMaxLength(200);
-            builder.Property(e => e.TextoRechazar).HasMaxLength(200);
+            builder.Property(e => e.Contenido).HasMaxLength(500).IsRequired();
+            builder.Property(e => e.RespuestaJugador).HasMaxLength(1); 
 
-            // Relación con EventoMaestro
+            // Relación con EventoMaestro (1:N)
             builder.HasOne(e => e.EventoMaestro)
-                   .WithMany() // si EventoMaestro no tiene colección de Eventos
-                   .HasForeignKey(e => e.EventoMaestroId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany(em => em.Evento) 
+                    .HasForeignKey(e => e.EventoMaestroId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
             // Relación con Partida
             builder.HasOne(e => e.Partida)
-                   .WithMany(p => p.Evento)
-                   .HasForeignKey(e => e.PartidaId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                    .WithMany(p => p.Evento)
+                    .HasForeignKey(e => e.PartidaId)
+                    .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

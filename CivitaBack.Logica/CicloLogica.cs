@@ -10,11 +10,13 @@ namespace CivitaBack.Logica
 
         private readonly IPartidaRepositorio _partidaRepositorio;
         private readonly IUnidadDeTrabajo _uow;
+        private readonly IActualizarRecursosLogica _actualizarRecursosLogica;
 
-        public CicloLogica(IPartidaRepositorio partidaRepositorio, IUnidadDeTrabajo uow)
+        public CicloLogica(IPartidaRepositorio partidaRepositorio, IUnidadDeTrabajo uow, IActualizarRecursosLogica actualizarRecursosLogica)
         {
             _partidaRepositorio = partidaRepositorio;
             _uow = uow;
+            _actualizarRecursosLogica = actualizarRecursosLogica;
         }
 
         public async Task<List<Partida>> EjecutarCicloAsync()
@@ -25,7 +27,7 @@ namespace CivitaBack.Logica
 
             foreach (var partida in partidas)
             {
-                ProcesarPartida(partida);
+                ProcesarRecursosPorEstructurasMapa(partida);
 
                 partida.EstructuraMapa = null;
                 partida.Evento = null;
@@ -43,71 +45,56 @@ namespace CivitaBack.Logica
             return partidas;
         }
 
-        private void ProcesarPartida(Partida partida)
+        private void ProcesarRecursosPorEstructurasMapa(Partida partida)
         {
             if (partida == null || partida.Recursos == null)
                 throw new Exception();
 
-            Recurso recursosPartida = partida.Recursos;
+            int totalEnergia = 0;
+            int totalEcoCoins = 0;
+            int totalFelicidad = 0;
+            int totalContaminacion = 0;
             int nuevaPoblacion = 0;
 
             if (partida.EstructuraMapa != null)
             {
-                foreach (var estructuraEnMapa in partida.EstructuraMapa)
+                foreach (var estructuraMapa in partida.EstructuraMapa)
                 {
-                    if (estructuraEnMapa.Estructura == null || estructuraEnMapa.Estructura.TipoEstructura == null)
+                    if (estructuraMapa.Estructura == null || estructuraMapa.Estructura.TipoEstructura == null)
                         continue;
 
-                    var estructura = estructuraEnMapa.Estructura;
+                    var estructura = estructuraMapa.Estructura;
                     var tipoEstructura = estructura.TipoEstructura;
 
-                    recursosPartida.Energia =
-                        ActualizarRecurso(recursosPartida.Energia, tipoEstructura.EnergiaPorCiclo, true);
-                    recursosPartida.EcoCoins =
-                        ActualizarRecurso(recursosPartida.EcoCoins, tipoEstructura.DineroPorCiclo, false);
-                    recursosPartida.Felicidad =
-                        ActualizarRecurso(recursosPartida.Felicidad, estructura.FelicidadCiclo, true);
-                    recursosPartida.Contaminacion =
-                        ActualizarRecurso(recursosPartida.Contaminacion, estructura.ContaminacionCiclo, true);
+                    totalEnergia += tipoEstructura.EnergiaPorCiclo;
+                    totalEcoCoins += tipoEstructura.DineroPorCiclo;
+                    totalFelicidad += estructura.FelicidadCiclo;
+                    totalContaminacion += estructura.ContaminacionCiclo;
 
                     if (tipoEstructura.Capacidad > 0)
                         nuevaPoblacion += tipoEstructura.Capacidad;
                 }
             }
 
-            if (recursosPartida.Contaminacion > 70)
-            {
-                recursosPartida.Felicidad = ActualizarRecurso(recursosPartida.Felicidad, -5, true);
-            }
-
-            if (recursosPartida.Contaminacion < 10)
-            {
-                recursosPartida.Felicidad = ActualizarRecurso(recursosPartida.Felicidad, 3, true);
-            }
-
             partida.Recursos.Poblacion = nuevaPoblacion;
-        }
 
-        private int ActualizarRecurso(int cantidadInicial, int cambio, bool tieneLimite)
-        {
-            // if (recursoPartida.Nombre.Equals("Contaminación") && recursoPartida.Cantidad > 90)
-            // {
-            //     var felicidad = partida.Recursos.FirstOrDefault(r => r.Nombre == "Felicidad");
-            //  
-            //     if (felicidad != null && felicidad.Cantidad >= 5)
-            //         felicidad.Cantidad -= 5;
-            // }
+            if (partida.Recursos.Contaminacion > 70)
+            {
+                totalFelicidad -= 5;
+            }
 
-            cantidadInicial += cambio;
+            if (partida.Recursos.Contaminacion < 10)
+            {
+                totalFelicidad += 3;
+            }
 
-            if (cantidadInicial < 0)
-                cantidadInicial = 0;
-
-            if (tieneLimite && cantidadInicial > 100)
-                cantidadInicial = 100;
-
-            return cantidadInicial;
-
+            _actualizarRecursosLogica.ActualizarRecursosAsync(
+                partida,
+                totalFelicidad,
+                totalContaminacion,
+                totalEcoCoins,
+                totalEnergia
+            );
         }
     }
 

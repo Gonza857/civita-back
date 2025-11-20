@@ -9,13 +9,13 @@ namespace CivitaBack.Data.DTO
     public class EventoDisparadoDTO
     {
         public int Id { get; set; }
+        public string TipoEvento { get; set; } = "PREGUNTA"; 
         public string Titulo { get; set; } = string.Empty;
-        public string TextoDescripcion { get; set; } = string.Empty;
-        public int EcoCoinsAceptar { get; set; }
-        public int FelicidadAceptar { get; set; }
-        public int ContaminacionAceptar { get; set; }
-        public int FelicidadRechazar { get; set; }
-        public int ContaminacionRechazar { get; set; }
-        
+        public string PreguntaTexto { get; set; } = string.Empty; 
+        public string OpcionA_Texto { get; set; } = string.Empty;
+        public string OpcionB_Texto { get; set; } = string.Empty;
+        public string RespuestaCorrecta { get; set; } = string.Empty;
+        public string EfectoAciertoResumen { get; set; } = string.Empty;
+
     }
 }

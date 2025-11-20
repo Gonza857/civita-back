@@ -2,6 +2,7 @@
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica
@@ -11,6 +12,7 @@ namespace CivitaBack.Logica
         private readonly ITipsRepositorio _tipsRepositorio;
         private readonly ITipoTipRepositorio _tiposTipRepositorio;
         private readonly IUnidadDeTrabajo _uow;
+        private readonly IAccesoUsuarios _accesoUsuarios;
 
         /// <summary>
         /// Inicializa una nueva instancia de la clase <see cref="TipLogica"/>.
@@ -18,11 +20,12 @@ namespace CivitaBack.Logica
         /// <param name="itr">El repositorio de Tips.</param>
         /// <param name="ittr">El repositorio de TipoTip.</param>
         /// <param name="iudt">La unidad de trabajo.</param>
-        public TipLogica(ITipsRepositorio itr, ITipoTipRepositorio ittr, IUnidadDeTrabajo iudt)
+        public TipLogica(ITipsRepositorio itr, ITipoTipRepositorio ittr, IUnidadDeTrabajo iudt, IAccesoUsuarios accesoUsuarios)
         {
             _tipsRepositorio = itr;
             _tiposTipRepositorio = ittr;
             _uow = iudt;
+            _accesoUsuarios = accesoUsuarios;
         }
 
         /// <inheritdoc />
@@ -43,6 +46,8 @@ namespace CivitaBack.Logica
             var tipoTip = await this._tiposTipRepositorio.ObtenerPorId(tip.TipoId);
             if (tipoTip == null)
                 throw new Exception("No se pudo guardar el tip.");
+
+            ValidarAdmin();
 
             var nuevoTip = new Tip
             {
@@ -75,6 +80,8 @@ namespace CivitaBack.Logica
             if (tipDb == null)
                 throw new Exception("No se pudo guardar el tip.");
 
+            ValidarAdmin();
+
             tipDb.TipoTip = tipoTip;
             tipDb.Expresion = tip.Expresion;
             tipDb.ElementoAdicional = tip.ElementoAdicional;
@@ -96,6 +103,12 @@ namespace CivitaBack.Logica
         public async Task<Tip?> ObtenerPorIdTipo(int id)
         {
             return await this._tipsRepositorio.ObtenerPorId(id);
+        }
+
+        private void ValidarAdmin()
+        {
+            if (!_accesoUsuarios.EsDios())
+                throw new AccesoDenegadoExcepcion("Se requieren privilegios de administrador para modificar el catálogo de estructuras.");
         }
     }
 }

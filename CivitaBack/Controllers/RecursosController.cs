@@ -29,6 +29,10 @@ namespace CivitaBack.Api.Controllers
                 var recurso = await this._recursoLogica.ObtenerRecursos(idPartida);
                 return Ok(base.Mapear<RecursoDTO>(recurso));
             }
+            catch (AccesoDenegadoExcepcion ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+            }
             catch (PartidaExcepcion ex)
             {
                 return BadRequest(ex.Message);

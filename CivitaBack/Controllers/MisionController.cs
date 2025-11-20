@@ -51,6 +51,10 @@ public class MisionController : BaseApiController
             await _misionLogica.Crear(misionNueva);
             return Ok();
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (LogroExcepcion ex)
         {
             return BadRequest(ex.Message);
@@ -105,6 +109,10 @@ public class MisionController : BaseApiController
             var mision = base.Mapear<Mision>(misionDto);
             await this._misionLogica.Actualizar(mision, id);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (MisionExcepcion ex)
         {

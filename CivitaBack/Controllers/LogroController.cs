@@ -54,6 +54,10 @@ public class LogroController : BaseApiController
             var logrosDisponiblesParaCumplir = await _logroLogica.ComprobarSiCumpleAlgunLogro(partida, logros);
             return Ok(base.MapearLista<LogroDTO>(logrosDisponiblesParaCumplir));
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (LogroExcepcion ex)
         {
             return BadRequest(ex.Message);
@@ -79,6 +83,10 @@ public class LogroController : BaseApiController
             await _partidaLogica.ReclamarLogros(partida, logrosFiltrados);
             return Ok();
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (LogroExcepcion ex)
         {
             return BadRequest(ex.Message);
@@ -99,6 +107,10 @@ public class LogroController : BaseApiController
             await _logroLogica.Crear(nuevoLogroDominio);
             return Ok();
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (LogroExcepcion ex)
         {
             return BadRequest(ex.Message);
@@ -117,6 +129,10 @@ public class LogroController : BaseApiController
         {
             await _logroLogica.Eliminar(id);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (Exception ex)
         {
@@ -151,6 +167,10 @@ public class LogroController : BaseApiController
             Logro logro = base.Mapear<Logro>(logroDTO);
             await this._logroLogica.Actualizar(logro, id);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (Exception ex)
         {

@@ -1,6 +1,8 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
@@ -9,11 +11,13 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
 {
     private readonly ITipoEstructuraRepositorio _repositorioTipoEstructura;
     private readonly IUnidadDeTrabajo _uow;
+    private readonly IAccesoUsuarios _accesoUsuarios;
     
-    public TipoEstructuraLogica(ITipoEstructuraRepositorio rte, IUnidadDeTrabajo uow)
+    public TipoEstructuraLogica(ITipoEstructuraRepositorio rte, IUnidadDeTrabajo uow, IAccesoUsuarios accesoUsuarios)
     {
         _repositorioTipoEstructura = rte;
         _uow = uow;
+        _accesoUsuarios = accesoUsuarios;
     }
     
     /// <inheritdoc />
@@ -24,6 +28,8 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
         if (tipoEstructuraBuscada == null)
             throw new Exception("Tipo de Estructura no encontrada");
         
+        ValidarAdmin();
+
         tipoEstructuraBuscada.Nombre = tipoEstructura.Nombre;
         tipoEstructuraBuscada.Capacidad = tipoEstructura.Capacidad;
         tipoEstructuraBuscada.Ocupacion = tipoEstructura.Ocupacion;
@@ -39,6 +45,9 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
     {
         if (id <= 0) 
             throw new Exception("No se pudo borrar el Tipo de Estructura");
+
+        ValidarAdmin();
+
         await this._repositorioTipoEstructura.Eliminar(id);
         await this._uow.CommitAsync();
     }
@@ -47,7 +56,9 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
     public async Task<TipoEstructura> Crear(TipoEstructura TipoEstructura)
     {
         this.Validar(TipoEstructura, 1);
-        
+
+        ValidarAdmin();
+
         var tipoEstructura = new TipoEstructura
         {
             Nombre = TipoEstructura.Nombre,
@@ -81,5 +92,11 @@ public class TipoEstructuraLogica : ITipoEstructuraLogica
     {
         if (tipoEstructura == null || idTipoEstructura <= 0) 
             throw new Exception("Ocurrió un error al actualizar el Tipo de Estructura");
+    }
+
+    private void ValidarAdmin()
+    {
+        if (!_accesoUsuarios.EsDios())
+            throw new AccesoDenegadoExcepcion("Se requieren privilegios de administrador para modificar el catálogo de estructuras.");
     }
 }

@@ -1,6 +1,7 @@
 ﻿using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 using Microsoft.Extensions.Configuration;
 
@@ -10,27 +11,30 @@ public class InicialLogica : IInicialLogica
 {
     private readonly IUnidadDeTrabajo _uow;
     private readonly IPartidaRepositorio _partidaRepositorio;
-    private readonly IUsuarioRepositorio _usuarioRepositorio;
     private readonly IMisionPartidaRepositorio _misionPartidaRepositorio;
     private readonly IMisionRepositorio _misionRepositorio;
+    private readonly IAccesoUsuarios _accesoUsuarios;
 
     public InicialLogica(
         IUnidadDeTrabajo uow, 
         IPartidaRepositorio partidaRepositorio, 
         IMisionPartidaRepositorio misionPartidaRepositorio,
         IUsuarioRepositorio usuarioRepositorio,
-        IMisionRepositorio misionRepositorio
+        IMisionRepositorio misionRepositorio,
+        IAccesoUsuarios accesoUsuarios
         )
     {
         _uow = uow;
-        _usuarioRepositorio = usuarioRepositorio;
         _misionPartidaRepositorio = misionPartidaRepositorio;
         _partidaRepositorio = partidaRepositorio;
         _misionRepositorio = misionRepositorio;
+        _accesoUsuarios = accesoUsuarios;
     }
 
     public async Task IniciarPartida(Usuario usuario)
     {
+        _accesoUsuarios.ValidarAcceso(usuario.Id);
+
         var misiones = await this._misionRepositorio.ObtenerTodos();
         
         var partida = new Partida

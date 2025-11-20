@@ -9,6 +9,7 @@ using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica.Interfaces;
 
 namespace CivitaBack.Logica;
 
@@ -21,24 +22,28 @@ public class LogroPartidaLogica : ILogroPartidaLogica
     private readonly IRecursoRepositorio _recursoRepositorio;
     private readonly IUnidadDeTrabajo _uow;
     private readonly ILogger<LogroPartidaLogica> _logger;
-    
+    private readonly IAccesoUsuarios _accesoUsuarios;
+
     public LogroPartidaLogica(
             ILogroPartidaRepositorio rlp, 
             IRecursoRepositorio irr, 
             IUnidadDeTrabajo iudt,
-            ILogger<LogroPartidaLogica> logger
+            ILogger<LogroPartidaLogica> logger,
+            IAccesoUsuarios accesoUsuarios
         )
     {
         _repositorioLogroPartida = rlp;
         _recursoRepositorio = irr;
         _uow = iudt;
         _logger = logger;
+        _accesoUsuarios = accesoUsuarios;
     }
     
     /// <inheritdoc />
     public async Task<List<Logro>> ObtenerLogrosIncompletos(Partida? partida)
     {
         this.ValidarPartida(partida);
+
         return await _repositorioLogroPartida.ObtenerLogrosIncompletos(partida!.Id);
     }
 
@@ -46,6 +51,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica
     public async Task<List<Logro>> ObtenerLogrosCompletados(Partida? partida)
     {
         this.ValidarPartida(partida);
+
         return await _repositorioLogroPartida.ObtenerLogrosCompletos(partida!.Id);
 
     }
@@ -54,6 +60,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica
     public async Task<List<Logro>> ObtenerLogrosParaReclamar(Partida? partida)
     {
         this.ValidarPartida(partida);
+
         return await this.ObtenerLogrosParaReclamables(partida!);
     }
 
@@ -61,7 +68,7 @@ public class LogroPartidaLogica : ILogroPartidaLogica
     public async Task ReclamarLogros(Partida? partidaInput)
     {
         var partidaValidada =  this.ValidarPartida(partidaInput);
-        
+
         // 1. Obtener los logros que cumplen la condición ahora mismo
         var logros = await this.ObtenerLogrosParaReclamables(partidaValidada);
         if (logros.Count == 0) return; // No hay nada que reclamar

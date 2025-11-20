@@ -4,6 +4,7 @@ using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Excepciones;
 using Microsoft.AspNetCore.Mvc;
+using CivitaBack.Logica.Interfaces;
 
 namespace CivitaBack.Api.Controllers;
 
@@ -14,6 +15,7 @@ public class AuthController : BaseApiController
     private readonly IPartidaLogica _partidaLogica;
     private readonly IUsuarioLogica _usuarioLogica;
     private readonly IInicialLogica _inicialLogica;
+    private readonly IConfigurarCookieLogica _configurarCookieLogica;
     private readonly ILogger _logger;
 
     public AuthController(
@@ -21,6 +23,7 @@ public class AuthController : BaseApiController
         IPartidaLogica partidaLogica,
         IUsuarioLogica usuarioLogica,
         IInicialLogica inicialLogica,
+        IConfigurarCookieLogica configurarCookieLogica,
         ILogger<AuthController> logger,
         IMapper mapper) : base(mapper)
     {
@@ -28,6 +31,7 @@ public class AuthController : BaseApiController
         _partidaLogica = partidaLogica;
         _usuarioLogica = usuarioLogica;
         _inicialLogica = inicialLogica;
+        _configurarCookieLogica = configurarCookieLogica;
         _logger = logger;
     }
 
@@ -39,13 +43,15 @@ public class AuthController : BaseApiController
             Usuario usuario = await _authLogica.CrearUsuario(request.NombreUsuario, request.Mail, request.Password);
             await this._inicialLogica.IniciarPartida(usuario);
             Usuario usuarioPartida = await _usuarioLogica.ObtenerPorCorreo(request.Mail);
+
             Partida partida = usuarioPartida.Partida;
 
             string token = await _authLogica.IniciarSesion(request.Mail, request.Password);
 
+            _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddHours(1));
+
             var response = new LoginDTO
             {
-                Token = token,
                 NombreUsuario = usuarioPartida.NombreUsuario!,
                 Mail = usuarioPartida.Mail!,
                 IdUsuario = usuarioPartida.Id!,
@@ -53,6 +59,11 @@ public class AuthController : BaseApiController
             };
 
             return Ok(new { mensaje = "Usuario registrado correctamente!", response });
+        }
+        catch (AutenticacionException ex)
+        {
+            Response.Cookies.Delete("jwt-auth");
+            return Unauthorized(new { error = ex.Message });
         }
         catch (ValidacionRegistroException ex)
         {
@@ -71,27 +82,36 @@ public class AuthController : BaseApiController
         try
         {
             string token = await _authLogica.IniciarSesion(iniciarSesionDto.Mail, iniciarSesionDto.Contrasena);
-            Usuario usuario = await _usuarioLogica.ObtenerPorCorreo(iniciarSesionDto.Mail);
-            Partida partida = await _partidaLogica.ObtenerPorUsuarioId(usuario.Id);
+            Usuario? usuario = await _usuarioLogica.ObtenerPorCorreo(iniciarSesionDto.Mail);
+
+            if (usuario == null)
+            {
+                throw new AutenticacionException("Error interno de autenticación.");
+            }
+
+            Partida? partida = await _partidaLogica.ObtenerPartidaParaLogin(usuario.Id);
+
+            _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddHours(1));
 
             var response = new LoginDTO
             {
-                Token = token,
                 NombreUsuario = usuario.NombreUsuario!,
                 Mail = usuario.Mail!,
-                IdUsuario = usuario.Id!,
-                IdPartida = partida.Id
+                IdUsuario = usuario.Id,
+                IdPartida = partida?.Id ?? 0
             };
 
             return Ok(response);
         }
         catch (AutenticacionException ex)
         {
-            return Unauthorized(ex.Message);
+            // Si hay fallo de autenticación (usuario/contraseña incorrectos), limpiar cookies y devolver 401
+            Response.Cookies.Delete("jwt-auth");
+            return Unauthorized(new { error = ex.Message });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            Response.Cookies.Delete("jwt-auth");
             return Problem("Ocurrió un error al iniciar sesión");
         }
     }

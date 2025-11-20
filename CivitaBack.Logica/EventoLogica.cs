@@ -1,81 +1,151 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Enum;
+using CivitaBack.Domain.Excepciones;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica
 {
-    public interface IEventoLogica
-    {
-        Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida);
-        Task<EventoResueltoDTO> ResolverEventoAsync(int eventoId, bool aceptado);
-
-    }
 
     public class EventoLogica : IEventoLogica
     {
         private readonly IEventoRepositorio _eventoRepositorio;
         private readonly IUnidadDeTrabajo _uow;
-        private readonly IMapper _mapper;
+        private readonly IActualizarRecursosLogica _actualizarRecursosLogica;
+        private readonly IPartidaRepositorio _partidaRepositorio;
 
-        public EventoLogica(IEventoRepositorio eventoRepositorio, IUnidadDeTrabajo uow, IMapper mapper)
+        public EventoLogica(IEventoRepositorio eventoRepositorio, IUnidadDeTrabajo uow, 
+            IActualizarRecursosLogica actualizarRecursosLogica, IPartidaRepositorio partidaRepositorio  )
         {
             _eventoRepositorio = eventoRepositorio;
             _uow = uow;
-            _mapper = mapper;
+            _actualizarRecursosLogica = actualizarRecursosLogica;
+            _partidaRepositorio = partidaRepositorio;
         }
 
         public async Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida)
         {
-            var maestro = await _eventoRepositorio.ObtenerEventoMaestroAsync();
-            if (maestro == null) return null;
+            const int EVENTO_PREGUNTA = 1;
 
-            var evento = _mapper.Map<Evento>(maestro); 
+            var maestro = await _eventoRepositorio.ObtenerEventoMaestroAsync(EVENTO_PREGUNTA);
+            if (maestro == null) throw new EventoException("Evento maestro no encontrado.");
 
-            evento.EventoMaestroId = maestro.Id;
-            evento.EventoMaestro = null; 
-            evento.PartidaId = idPartida;
-            evento.SeDisparo = true;
-            evento.Resuelto = false;
+            var evento = new Evento
+            {
+                PartidaId = idPartida,
+                EventoMaestroId = maestro.Id,
+                Contenido = maestro.ContenidoPrincipal,
+                SeDisparo = true,
+                Resuelto = false
+            };
 
-            var eventoCreado = await _eventoRepositorio.CrearEventoAsync(evento);
+            evento = await _eventoRepositorio.CrearEventoAsync(evento);
 
-            eventoCreado.EventoMaestro = maestro;
+            var dto = new EventoDisparadoDTO
+            {
+                Id = evento.Id,
+                TipoEvento = maestro.TipoEvento.ToString(),
+                Titulo = maestro.Titulo,
+                PreguntaTexto = maestro.ContenidoPrincipal,
+                OpcionA_Texto = maestro.OpcionA_Texto,
+                OpcionB_Texto = maestro.OpcionB_Texto,
+                RespuestaCorrecta = maestro.RespuestaCorrecta,
+                EfectoAciertoResumen = FormatoEfectos(maestro.Efectos?.FirstOrDefault(e => e.TipoResultado == TipoResultado.ACIERTO))
+            };
 
-            var respuestaDTO = _mapper.Map<EventoDisparadoDTO>(eventoCreado);
-
-            return respuestaDTO;
+            return dto;
         }
 
-        public async Task<EventoResueltoDTO> ResolverEventoAsync(int eventoId, bool acepto)
+        public async Task<EventoResueltoDTO> ResolverEventoPreguntaAsync(int eventoId, string respuestaElegida)
         {
             var evento = await _eventoRepositorio.ObtenerEventoConPartidaAsync(eventoId);
-            if (evento == null || evento.Resuelto) throw new Exception($"No se encontró el evento {eventoId}");
 
+            if (evento == null || evento.Resuelto) throw new EventoException("Evento no encontrado o ya resuelto.");
             var partida = evento.Partida;
-            if (partida == null) throw new Exception("Evento sin partida asociada — estado inválido");
+            if (partida == null) throw new PartidaExcepcion("Evento sin partida asociada.");
 
-            // Aplicar efectos según decisión
-            partida.Recursos.EcoCoins = Math.Max(0, partida.Recursos.EcoCoins + (acepto ? evento.EcoCoinsAceptar : 0));
-            partida.Recursos.Felicidad =
-                Math.Clamp(partida.Recursos.Felicidad + (acepto ? evento.FelicidadAceptar : evento.FelicidadRechazar),
-                    0, 100);
-            partida.Recursos.Contaminacion =
-                Math.Clamp(
-                    partida.Recursos.Contaminacion +
-                    (acepto ? evento.ContaminacionAceptar : evento.ContaminacionRechazar), 0, 100);
+            bool esCorrecta = (respuestaElegida == evento.EventoMaestro.RespuestaCorrecta);
+            TipoResultado tipoResultado = esCorrecta ? TipoResultado.ACIERTO : TipoResultado.FALLO;
+
+            var efectoAplicable = evento.EventoMaestro.Efectos?
+                .FirstOrDefault(e => e.TipoResultado == tipoResultado);
+
+            if (efectoAplicable == null) throw new EventoException("Configuración de efectos faltante.");
+
+            _actualizarRecursosLogica.ActualizarRecursosAsync(
+                partida,
+                efectoAplicable.Felicidad,
+                efectoAplicable.Contaminacion,
+                efectoAplicable.EcoCoins,
+                efectoAplicable.Energia 
+            );
 
             evento.Resuelto = true;
+            evento.RespuestaJugador = respuestaElegida;
+            evento.EcoCoinsAplicada = efectoAplicable.EcoCoins;
+            evento.FelicidadAplicada = efectoAplicable.Felicidad;
+            evento.ContaminacionAplicada = efectoAplicable.Contaminacion;
+            evento.EnergiaAplicada = efectoAplicable.Energia;
+            evento.ExperienciaAplicada = efectoAplicable.Experiencia;
 
+            await _eventoRepositorio.Actualizar(evento);
             await this._uow.CommitAsync();
 
-            var resultadoDTO = _mapper.Map<EventoResueltoDTO>(
-        evento,
-        opt => opt.Items.Add("Aceptado", acepto)
-    );
+            var mensajeFinal = esCorrecta ? "¡Respuesta correcta! Recompensas aplicadas." : "Respuesta incorrecta. Penalización aplicada.";
 
-            return resultadoDTO;
+            return new EventoResueltoDTO
+            {
+                Id = evento.Id,
+                TextoRespuesta = mensajeFinal, 
+                PartidaId = partida.Id
+            };
+        }
+
+        public async Task<EventoDisparadoDTO> DispararTipContaminacionAsync(Partida partida)
+        {
+            const int TIP_CONTAMINACION_ID = 2;
+
+            bool yaEnviado = await _eventoRepositorio.ExisteTipEnviadoAsync(partida.Id, TIP_CONTAMINACION_ID);
+
+            if (yaEnviado) return null; 
+
+            var maestroTip = await _eventoRepositorio.ObtenerEventoMaestroAsync(TIP_CONTAMINACION_ID);
+            if (maestroTip == null) throw new EventoException("Evento maestro no encontrado.");
+
+            var evento = new Evento
+            {
+                PartidaId = partida.Id,
+                EventoMaestroId = maestroTip.Id,
+                Contenido = maestroTip.ContenidoPrincipal,
+                SeDisparo = true,
+                Resuelto = true, 
+            };
+
+            var dto = new EventoDisparadoDTO
+            {
+                Id = evento.Id,
+                TipoEvento = maestroTip.TipoEvento.ToString(),
+                Titulo = maestroTip.Titulo,
+                PreguntaTexto = maestroTip.ContenidoPrincipal,
+                OpcionA_Texto = maestroTip.OpcionA_Texto,
+                OpcionB_Texto = "",
+                RespuestaCorrecta = maestroTip.RespuestaCorrecta,
+                EfectoAciertoResumen = ""
+            };
+
+            await _eventoRepositorio.CrearEventoAsync(evento);
+
+            return dto;
+        }
+
+        public static string FormatoEfectos(EfectoEvento? ef)
+        {
+            if (ef == null) return string.Empty;
+            return $"+{ef.EcoCoins} EcoCoins, +{ef.Felicidad} Felicidad, {ef.Contaminacion} Contaminación, +{ef.Energia} Energía";
         }
     }
 }

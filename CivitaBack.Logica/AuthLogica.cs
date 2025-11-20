@@ -1,5 +1,4 @@
-﻿using CivitaBack.Data.DTO;
-using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Logica.Helpers;
@@ -80,7 +79,8 @@ namespace CivitaBack.Logica
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                 new Claim(ClaimTypes.Name, usuario.NombreUsuario),
-                new Claim(ClaimTypes.Email, usuario.Mail)
+                new Claim(ClaimTypes.Email, usuario.Mail),
+                new Claim("EsDios", usuario.EsDios.ToString())
             };
 
             var token = new JwtSecurityToken(

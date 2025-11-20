@@ -1,27 +1,57 @@
-using CivitaBack.Data.BO;
+using CivitaBack.Api.Security;
 using CivitaBack.Data.EF;
 using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Enum;
+using CivitaBack.Domain.Interfaces.Logica;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
 using CivitaBack.Logica.Backgrounds;
+using CivitaBack.Logica.Hubs;
+using CivitaBack.Logica.Interfaces;
+using CivitaBack.Utils;
+using Hangfire;
+using Hangfire.Common;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
-using CivitaBack.Domain.Enum;
-using CivitaBack.Domain.Interfaces.Logica;
-using CivitaBack.Logica.Hubs;
-using CivitaBack.Domain.Interfaces.Repositorios;
-using CivitaBack.Utils;
-using Hangfire;
-using Hangfire.PostgreSql;
-using Hangfire.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    // 🔑 1. Definir el Esquema de Seguridad (Bearer JWT)
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Ingresa el token JWT de la forma: Bearer {tu token}",
+    });
+
+    // 2. Aplicar el Requisito de Seguridad Globalmente
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {} // Indica que aplica a todos los endpoints
+        }
+    });
+});
 
 // CORS para Vite Dev
 builder.Services.AddCors(options =>
@@ -69,9 +99,18 @@ builder.Services.AddHangfire((sp, config) =>
     });
 });
 builder.Services.AddHangfireServer();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IAccesoUsuarios, AccesoUsuarios>();
+
+builder.Services.AddScoped<IConfigurarCookieLogica, ConfigurarCookieLogica>();
 
 builder.Services.AddScoped<IPartidaLogica, PartidaLogica>();
 builder.Services.AddScoped<IPartidaRepositorio, PartidaRepositorio>();
+
+builder.Services.AddScoped<IMapaLogica, MapaLogica>();
+
+builder.Services.AddScoped<IActualizarRecursosLogica, ActualizarRecursosLogica>();
 
 builder.Services.AddScoped<ITipoLogroLogica, TipoLogroLogica>();
 builder.Services.AddScoped<ITipoLogroRepositorio, TipoLogroRepositorio>();
@@ -123,6 +162,8 @@ builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 builder.Services.AddScoped<IInicialLogica, InicialLogica>();
 builder.Services.AddScoped<ICicloLogica, CicloLogica>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
+builder.Services.AddScoped<IRecompensaLogica, RecompensaLogica>();
+builder.Services.AddScoped<ICompraEstructurasLogica, CompraEstructurasLogica>();
 
 builder.Services.AddSingleton<BackgroundCicloLogica>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundCicloLogica>());
@@ -146,6 +187,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Intenta leer el valor del token de la cookie "jwt-auth"
+                context.Request.Cookies.TryGetValue("jwt-auth", out string? token);
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    // Si encontramos el token en la cookie, lo asignamos al contexto.Token.
+                    // Esto hace que el middleware de JWT lo procese como si viniera del encabezado 'Authorization: Bearer'.
+                    context.Token = token;
+                }
+
+                return Task.CompletedTask;
+            }
         };
     });
 

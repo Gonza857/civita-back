@@ -1,8 +1,9 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
-using CivitaBack.Domain.Excepciones;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -19,6 +20,8 @@ public class LogroPartidaLogicaTest
 
     private readonly ILogroPartidaLogica _logroPartidaLogica;
 
+    private readonly Mock<IAccesoUsuarios> _mockAccesoUsuarios;
+
     public LogroPartidaLogicaTest()
     {
         // Creamos TODOS los mocks de las dependencias
@@ -26,13 +29,15 @@ public class LogroPartidaLogicaTest
         _mockRecursoRepo = new Mock<IRecursoRepositorio>();
         _mockUow = new Mock<IUnidadDeTrabajo>();
         _mockLogger = new Mock<ILogger<LogroPartidaLogica>>(); // Logger
+        _mockAccesoUsuarios = new Mock<IAccesoUsuarios>();
 
         // Inyectamos todos los mocks en la clase de lógica (SUT)
         _logroPartidaLogica = new LogroPartidaLogica(
             _mockLogroPartidaRepo.Object,
             _mockRecursoRepo.Object,
             _mockUow.Object,
-            _mockLogger.Object
+            _mockLogger.Object,
+            _mockAccesoUsuarios.Object
         );
 
         // --- Mock por defecto para el Unit of Work ---

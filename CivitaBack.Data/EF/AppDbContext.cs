@@ -27,6 +27,8 @@ public partial class AppDbContext : DbContext
     public DbSet<MisionEF> Mision { get; set; }
     
     public DbSet<MisionPartidaEF> MisionPartida { get; set; }
+
+    public DbSet<EfectoEventoEF> EfectoEvento { get; set; }
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 

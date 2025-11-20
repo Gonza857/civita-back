@@ -12,11 +12,12 @@ namespace CivitaBack.Data.Repositorio
     {
         public EventoRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
-        public async Task<EventoMaestro?> ObtenerEventoMaestroAsync()
+        public async Task<EventoMaestro?> ObtenerEventoMaestroAsync(int idMaestro)
         {           
             var eventoMaestroEF = await _context.EventoMaestro
+                .Include(e => e.Efectos)
                 .AsNoTracking()
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(e => e.Id == idMaestro);
 
             return Mapear<EventoMaestro>(eventoMaestroEF);
         }
@@ -34,7 +35,8 @@ namespace CivitaBack.Data.Repositorio
 
         public async Task<Evento?> ObtenerEventoConPartidaAsync(int eventoId)
         {
-            var eventoEF = await _context.Evento 
+            var eventoEF = await _dbSet
+                .Include(e => e.EventoMaestro).ThenInclude(em => em.Efectos)
                  .Include(e => e.Partida).ThenInclude(p => p.Recursos)
                  .Where(e => e.Id == eventoId)
                  .AsNoTracking()
@@ -51,6 +53,13 @@ namespace CivitaBack.Data.Repositorio
             .AsNoTracking()
             .FirstOrDefaultAsync();
             return evento == null ? null : base.Mapear<Evento>(evento);
+        }
+
+        public async Task<bool> ExisteTipEnviadoAsync(int partidaId, int eventoMaestroId)
+        {
+            return await _dbSet.AsNoTracking()
+                    .AnyAsync(e => e.PartidaId == partidaId &&
+                                   e.EventoMaestroId == eventoMaestroId);
         }
     }
 }

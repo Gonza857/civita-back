@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,10 @@ public class LogroPartidaController : BaseApiController
             Partida? partida = await this._partidaLogica.ObtenerPartidaPorIdInterno(idUsuario);
             await _logroPartidaLogica.ReclamarLogros(partida);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (Exception e)
         {
@@ -57,6 +62,10 @@ public class LogroPartidaController : BaseApiController
             });
 
             return Ok(base.MapearLista<LogroDTO>(logros));
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (ArgumentException ex) // Captura el "churrasco"
         {

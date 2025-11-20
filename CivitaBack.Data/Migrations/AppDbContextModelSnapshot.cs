@@ -52,6 +52,86 @@ namespace CivitaBack.Data.Migrations
                     b.ToTable("Condicion");
                 });
 
+            modelBuilder.Entity("CivitaBack.Data.BO.EfectoEventoEF", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Contaminacion")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("Creado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EcoCoins")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("Editado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Energia")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("EventoMaestroId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Experiencia")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Felicidad")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TipoResultado")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventoMaestroId");
+
+                    b.ToTable("EfectoEvento");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Contaminacion = -4,
+                            Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EcoCoins = 50,
+                            Energia = 0,
+                            EventoMaestroId = 1,
+                            Experiencia = 50,
+                            Felicidad = 3,
+                            TipoResultado = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Contaminacion = 3,
+                            Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EcoCoins = -20,
+                            Energia = 0,
+                            EventoMaestroId = 1,
+                            Experiencia = 0,
+                            Felicidad = -2,
+                            TipoResultado = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Contaminacion = 0,
+                            Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EcoCoins = 0,
+                            Energia = 0,
+                            EventoMaestroId = 2,
+                            Experiencia = 0,
+                            Felicidad = 0,
+                            TipoResultado = 1
+                        });
+                });
+
             modelBuilder.Entity("CivitaBack.Data.BO.EstructuraEF", b =>
                 {
                     b.Property<int>("Id")
@@ -236,53 +316,47 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ContaminacionAceptar")
+                    b.Property<int>("ContaminacionAplicada")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ContaminacionRechazar")
-                        .HasColumnType("integer");
+                    b.Property<string>("Contenido")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateTime>("Creado")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("EcoCoinsAceptar")
+                    b.Property<int>("EcoCoinsAplicada")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("EnergiaAplicada")
+                        .HasColumnType("integer");
+
                     b.Property<int>("EventoMaestroId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FelicidadAceptar")
+                    b.Property<int>("ExperienciaAplicada")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FelicidadRechazar")
+                    b.Property<int>("FelicidadAplicada")
                         .HasColumnType("integer");
 
                     b.Property<int>("PartidaId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("RespuestaJugador")
+                        .HasMaxLength(1)
+                        .HasColumnType("character varying(1)");
 
                     b.Property<bool>("Resuelto")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("SeDisparo")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("TextoAceptar")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("TextoDescripcion")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("TextoRechazar")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
 
@@ -301,45 +375,39 @@ namespace CivitaBack.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ContaminacionAceptar")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ContaminacionRechazar")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("EcoCoinsAceptar")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("Editado")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("FelicidadAceptar")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("FelicidadRechazar")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Nombre")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("TextoAceptar")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("TextoDescripcion")
+                    b.Property<string>("ContenidoPrincipal")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<string>("TextoRechazar")
+                    b.Property<DateTime>("Creado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Editado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OpcionA_Texto")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<string>("OpcionB_Texto")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<string>("RespuestaCorrecta")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("character varying(1)");
+
+                    b.Property<int>("TipoEvento")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -349,16 +417,24 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 1,
-                            ContaminacionAceptar = -10,
-                            ContaminacionRechazar = 20,
+                            ContenidoPrincipal = "Si tenés que recorrer 5 km en la ciudad, ¿qué opción genera la MENOR cantidad de emisiones de CO₂ (Dióxido de carbono) por persona?",
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EcoCoinsAceptar = -100,
-                            FelicidadAceptar = 10,
-                            FelicidadRechazar = -10,
-                            Nombre = "Separación de residuos",
-                            TextoAceptar = "En Argentina, solo el 3% de los residuos se reciclan. Separar la basura reduce rellenos sanitarios y emisiones de metano.",
-                            TextoDescripcion = "Los vecinos solicitan un sistema de reciclaje en la ciudad debido a la alta contaminación.",
-                            TextoRechazar = "Cuando no se recicla, los rellenos sanitarios crecen y emiten metano, un gas 28 veces peor que el CO₂ para el clima."
+                            OpcionA_Texto = "A) Ir en colectivo con 30 personas más.",
+                            OpcionB_Texto = "B) Usar un auto moderno, solo con el conductor.",
+                            RespuestaCorrecta = "A",
+                            TipoEvento = 1,
+                            Titulo = "¿Cómo me muevo hoy?"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ContenidoPrincipal = "Tu nivel de contaminación es críticamente alto. Si excede el 80%, la Felicidad de tus ciudadanos caerá rápidamente. Intentá construir más plantas de tratamiento de aire y espacios verdes.",
+                            Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            OpcionA_Texto = "Entendido.",
+                            OpcionB_Texto = "",
+                            RespuestaCorrecta = "A",
+                            TipoEvento = 2,
+                            Titulo = "¡Alerta Roja de Contaminación!"
                         });
                 });
 
@@ -1027,6 +1103,9 @@ namespace CivitaBack.Data.Migrations
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("EsDios")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("HashDeContrasena")
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
@@ -1069,6 +1148,17 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("Estructura");
                 });
 
+            modelBuilder.Entity("CivitaBack.Data.BO.EfectoEventoEF", b =>
+                {
+                    b.HasOne("CivitaBack.Data.BO.EventoMaestroEF", "EventoMaestro")
+                        .WithMany("Efectos")
+                        .HasForeignKey("EventoMaestroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventoMaestro");
+                });
+
             modelBuilder.Entity("CivitaBack.Data.BO.EstructuraEF", b =>
                 {
                     b.HasOne("CivitaBack.Data.BO.TipoEstructuraEF", "TipoEstructura")
@@ -1104,7 +1194,7 @@ namespace CivitaBack.Data.Migrations
                     b.HasOne("CivitaBack.Data.BO.EventoMaestroEF", "EventoMaestro")
                         .WithMany("Evento")
                         .HasForeignKey("EventoMaestroId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CivitaBack.Data.BO.PartidaEF", "Partida")
@@ -1288,6 +1378,8 @@ namespace CivitaBack.Data.Migrations
 
             modelBuilder.Entity("CivitaBack.Data.BO.EventoMaestroEF", b =>
                 {
+                    b.Navigation("Efectos");
+
                     b.Navigation("Evento");
                 });
 

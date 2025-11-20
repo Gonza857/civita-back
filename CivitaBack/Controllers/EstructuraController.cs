@@ -48,6 +48,10 @@ public class EstructuraController : BaseApiController
             await _estructuraLogica.Crear(estructura);
             return Created();
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
@@ -62,6 +66,10 @@ public class EstructuraController : BaseApiController
         {
             await _estructuraLogica.Eliminar(id);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (Exception ex)
         {
@@ -96,6 +104,10 @@ public class EstructuraController : BaseApiController
             var estructura = base.Mapear<Estructura>(estructuraDto);
             await this._estructuraLogica.Actualizar(estructura, id);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (EstructuraExcepcion ex)
         {

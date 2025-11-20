@@ -6,7 +6,7 @@ using CivitaBack.Logica;
 using CivitaBack.Utils;
 using Moq;
 
-namespace CivitaBack.Tests.Logica;
+namespace CivitaBack.Tests;
 
 public class MisionPartidaLogicaTest
 {
@@ -128,5 +128,35 @@ public class MisionPartidaLogicaTest
         // Assert
         Assert.Same(misionesEsperadas, resultado);
         _mockMisionPartidaRepositorio.Verify(r => r.ObtenerMisionesMes(1), Times.Once);
+    }
+
+    [Fact]
+    public async Task MarcarMisionCompletada_DebeMarcarMisionComoCompletada()
+    {
+        // Arrange
+        var partida = new Partida { Id = 1 };
+        var mision = new Mision { Id = 1, Titulo = "Test" };
+        var misionPartida = new MisionPartida
+        {
+            PartidaId = 1,
+            MisionId = 1,
+            FechaCompletado = null,
+            Reclamado = false
+        };
+
+        _mockMisionPartidaRepositorio.Setup(r => r.ObtenerUnaMisionDePartida(1, 1))
+            .ReturnsAsync(misionPartida);
+        _mockMisionPartidaRepositorio.Setup(r => r.Actualizar(It.IsAny<MisionPartida>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _misionPartidaLogica.MarcarMisionCompletada(mision, partida);
+
+        // Assert
+        _mockMisionPartidaRepositorio.Verify(r => r.ObtenerUnaMisionDePartida(1, 1), Times.Once);
+        _mockMisionPartidaRepositorio.Verify(r => r.Actualizar(It.Is<MisionPartida>(mp => 
+            mp.FechaCompletado != null && mp.Reclamado == true
+        )), Times.Once);
+        _mockUnidadDeTrabajo.Verify(u => u.CommitAsync(), Times.Once);
     }
 }
