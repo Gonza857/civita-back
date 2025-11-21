@@ -17,6 +17,8 @@ public class AuthController : BaseApiController
     private readonly IInicialLogica _inicialLogica;
     private readonly IConfigurarCookieLogica _configurarCookieLogica;
     private readonly ILogger _logger;
+    
+    private readonly IAccesoUsuarios _accesoUsuarios;
 
     public AuthController(
         IAuthLogica authLogica,
@@ -25,7 +27,8 @@ public class AuthController : BaseApiController
         IInicialLogica inicialLogica,
         IConfigurarCookieLogica configurarCookieLogica,
         ILogger<AuthController> logger,
-        IMapper mapper) : base(mapper)
+        IMapper mapper,
+        IAccesoUsuarios iau) : base(mapper)
     {
         _authLogica = authLogica;
         _partidaLogica = partidaLogica;
@@ -33,6 +36,7 @@ public class AuthController : BaseApiController
         _inicialLogica = inicialLogica;
         _configurarCookieLogica = configurarCookieLogica;
         _logger = logger;
+        _accesoUsuarios = iau;
     }
 
     [HttpPost("registro")]
@@ -73,6 +77,26 @@ public class AuthController : BaseApiController
         {
             _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al realizar el registro.");
+        }
+    }
+
+    [HttpGet("Validar")]
+    public async Task<IActionResult> Validar()
+    {
+        try
+        {
+            int idUsuario = this._accesoUsuarios.ObtenerIdUsuarioActual();
+            var usuario = await this._usuarioLogica.ObtenerPorId(idUsuario);
+            var dto = base.Mapear<UsuarioDTO>(usuario);
+            return Ok(dto);
+        }
+        catch (DominioException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al validar el usuario");
         }
     }
 

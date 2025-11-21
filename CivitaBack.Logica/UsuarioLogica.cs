@@ -14,10 +14,10 @@ namespace CivitaBack.Logica
             _repositorioUsuario = repositorioUsuario;
         }
 
-        public Task<Usuario> ObtenerPorId(int id)
+        public async Task<Usuario> ObtenerPorId(int id)
         {
-            Task<Usuario?> usuario = this._repositorioUsuario.ObtenerPorId(id);
-            if (usuario == null) throw new Exception("No se encontró el usuario");
+            Usuario? usuario = await this._repositorioUsuario.ObtenerPorId(id);
+            if (usuario == null) throw new DominioException("No se encontró el usuario");
             return usuario;
         }
 
