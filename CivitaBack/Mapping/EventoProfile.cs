@@ -15,10 +15,11 @@ namespace CivitaBack.Api.Mapping
             .ForMember(dest => dest.EventoMaestro, opt => opt.Ignore())
             .ForMember(dest => dest.EventoMaestroId, opt => opt.MapFrom(src => src.EventoMaestro != null ? src.EventoMaestro.Id : src.EventoMaestroId));*/
 
-            CreateMap<Evento, EventoEF>();
-
-            CreateMap<EventoEF, Evento>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
+            CreateMap<Evento, EventoEF>()
+            .ForMember(dest => dest.RespuestaJugador, opt => opt.MapFrom(src => src.RespuestaJugador))
+            .ForMember(dest => dest.EventoMaestro, opt => opt.Ignore())
+            .ForMember(dest => dest.Partida, opt => opt.Ignore())
+            .ReverseMap();
 
             CreateMap<EventoMaestro, EventoMaestroEF>().ReverseMap();
             CreateMap<EfectoEvento, EfectoEventoEF>().ReverseMap();
@@ -52,12 +53,12 @@ namespace CivitaBack.Api.Mapping
             );
         }
 
-            private string FormatearEfectos(EfectoEvento? ef)
-            {
-                if (ef == null) return string.Empty;
-             
-                return $"+{ef.EcoCoins} EcoCoins, +{ef.Felicidad} Felicidad, {ef.Contaminacion} Contaminación, +{ef.Energia} Energía";
-            }
+        private string FormatearEfectos(EfectoEvento? ef)
+        {
+            if (ef == null) return string.Empty;
+
+            return $"+{ef.EcoCoins} EcoCoins, +{ef.Felicidad} Felicidad, {ef.Contaminacion} Contaminación, +{ef.Energia} Energía";
+        }
     }
 
 }

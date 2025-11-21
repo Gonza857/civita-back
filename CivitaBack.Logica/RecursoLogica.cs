@@ -41,7 +41,7 @@ public class RecursoLogica : IRecursoLogica
         if (recursoPartida == null)
             throw new PartidaExcepcion("No se encontraron recursos para la partida especificada.");
 
-        _accesoUsuarios.ValidarAcceso(recursoPartida.Partida.UsuarioId);
+        //_accesoUsuarios.ValidarAcceso(recursoPartida.Partida.UsuarioId);
 
         return recursoPartida;
     }

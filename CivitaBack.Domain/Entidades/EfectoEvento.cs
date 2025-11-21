@@ -14,10 +14,5 @@ namespace CivitaBack.Domain.Entidades
         public int Contaminacion { get; set; }
         public int Energia { get; set; }
         public int Experiencia { get; set; }
-
-        public static implicit operator string?(EfectoEvento? v)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

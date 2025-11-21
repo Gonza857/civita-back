@@ -17,14 +17,16 @@ namespace CivitaBack.Logica
         private readonly IUnidadDeTrabajo _uow;
         private readonly IActualizarRecursosLogica _actualizarRecursosLogica;
         private readonly IPartidaRepositorio _partidaRepositorio;
+        private readonly IMapper _mapper;
 
         public EventoLogica(IEventoRepositorio eventoRepositorio, IUnidadDeTrabajo uow, 
-            IActualizarRecursosLogica actualizarRecursosLogica, IPartidaRepositorio partidaRepositorio  )
+            IActualizarRecursosLogica actualizarRecursosLogica, IPartidaRepositorio partidaRepositorio, IMapper mapper  )
         {
             _eventoRepositorio = eventoRepositorio;
             _uow = uow;
             _actualizarRecursosLogica = actualizarRecursosLogica;
             _partidaRepositorio = partidaRepositorio;
+            _mapper = mapper;
         }
 
         public async Task<EventoDisparadoDTO> DispararEventoAsync(int idPartida)
@@ -92,28 +94,41 @@ namespace CivitaBack.Logica
             evento.EnergiaAplicada = efectoAplicable.Energia;
             evento.ExperienciaAplicada = efectoAplicable.Experiencia;
 
+            evento.Partida = null;
+
             await _eventoRepositorio.Actualizar(evento);
+
+            if (partida.Recursos != null)
+            {
+                partida.Recursos.Partida = null; 
+            }
+            partida.Usuario = null; 
+            partida.Evento = null;
+
+            await _partidaRepositorio.Actualizar(partida);
+
             await this._uow.CommitAsync();
 
             var mensajeFinal = esCorrecta ? "¡Respuesta correcta! Recompensas aplicadas." : "Respuesta incorrecta. Penalización aplicada.";
+
+            var recursosDTO = _mapper.Map<RecursoDTO>(partida.Recursos);
 
             return new EventoResueltoDTO
             {
                 Id = evento.Id,
                 TextoRespuesta = mensajeFinal, 
-                PartidaId = partida.Id
+                PartidaId = partida.Id,
+                RecursosActualizados = recursosDTO
             };
         }
 
-        public async Task<EventoDisparadoDTO> DispararTipContaminacionAsync(Partida partida)
+        public async Task<EventoDisparadoDTO> DispararEventoInformativoAsync(Partida partida, int tipId)
         {
-            const int TIP_CONTAMINACION_ID = 2;
-
-            bool yaEnviado = await _eventoRepositorio.ExisteTipEnviadoAsync(partida.Id, TIP_CONTAMINACION_ID);
+            bool yaEnviado = await _eventoRepositorio.ExisteTipEnviadoAsync(partida.Id, tipId);
 
             if (yaEnviado) return null; 
 
-            var maestroTip = await _eventoRepositorio.ObtenerEventoMaestroAsync(TIP_CONTAMINACION_ID);
+            var maestroTip = await _eventoRepositorio.ObtenerEventoMaestroAsync(tipId);
             if (maestroTip == null) throw new EventoException("Evento maestro no encontrado.");
 
             var evento = new Evento
