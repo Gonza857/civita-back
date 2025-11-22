@@ -14,6 +14,7 @@ namespace CivitaBack.Data.BO
         public string? JsonMapa { get; set; }
 
         public int UsuarioId { get; set; }
+        public bool EstaPausada { get; set; }
 
         [JsonIgnore]
         public UsuarioEF? Usuario { get; set; }

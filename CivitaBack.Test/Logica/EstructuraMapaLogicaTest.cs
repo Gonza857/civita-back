@@ -68,9 +68,7 @@ public class EstructuraMapaLogicaTest
             estructuraMapa.PartidaId,
             estructuraMapa.EstructuraId,
             estructuraMapa.X,
-            estructuraMapa.Y,
-            estructuraMapa.Width,
-            estructuraMapa.Height
+            estructuraMapa.Y
         )).ReturnsAsync(estructuraEncontrada);
         _mockEstructuraMapaRepositorio.Setup(r => r.EliminarAsync(estructuraEncontrada))
             .Returns(Task.CompletedTask);
@@ -83,9 +81,7 @@ public class EstructuraMapaLogicaTest
             estructuraMapa.PartidaId,
             estructuraMapa.EstructuraId,
             estructuraMapa.X,
-            estructuraMapa.Y,
-            estructuraMapa.Width,
-            estructuraMapa.Height
+            estructuraMapa.Y
         ), Times.Once);
         _mockEstructuraMapaRepositorio.Verify(r => r.EliminarAsync(estructuraEncontrada), Times.Once);
         _mockUow.Verify(u => u.CommitAsync(), Times.Once);
@@ -106,8 +102,6 @@ public class EstructuraMapaLogicaTest
         };
 
         _mockEstructuraMapaRepositorio.Setup(r => r.ObtenerCoincidenteAsync(
-            It.IsAny<int>(),
-            It.IsAny<int>(),
             It.IsAny<int>(),
             It.IsAny<int>(),
             It.IsAny<int>(),

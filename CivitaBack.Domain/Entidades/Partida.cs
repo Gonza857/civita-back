@@ -10,6 +10,7 @@ public class Partida : Auditable
     public string? JsonMapa { get; set; }
 
     public int UsuarioId { get; set; }
+    public bool EstaPausada { get; set; }
     public Usuario? Usuario { get; set; }
 
     public Recurso? Recursos { get; set; }
