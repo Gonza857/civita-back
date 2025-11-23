@@ -2,6 +2,7 @@ using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
+using CivitaBack.Logica.Backgrounds;
 using CivitaBack.Utils;
 using Moq;
 
@@ -13,17 +14,20 @@ public class CicloLogicaTest
     private readonly Mock<IUnidadDeTrabajo> _mockUow;
     private readonly Mock<IActualizarRecursosLogica> _mockActualizarRecursosLogica;
     private readonly ICicloLogica _cicloLogica;
+    private readonly Mock<BackgroundCicloLogica> _backgroundCicloLogica;
 
     public CicloLogicaTest()
     {
         _mockPartidaRepositorio = new Mock<IPartidaRepositorio>();
         _mockUow = new Mock<IUnidadDeTrabajo>();
         _mockActualizarRecursosLogica = new Mock<IActualizarRecursosLogica>();
+        _backgroundCicloLogica = new Mock<BackgroundCicloLogica>();
 
         _cicloLogica = new CicloLogica(
             _mockPartidaRepositorio.Object,
             _mockUow.Object,
-            _mockActualizarRecursosLogica.Object
+            _mockActualizarRecursosLogica.Object,
+            _backgroundCicloLogica.Object
         );
 
         _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(1);

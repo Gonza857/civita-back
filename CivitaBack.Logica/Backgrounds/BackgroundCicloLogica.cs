@@ -27,9 +27,6 @@ namespace CivitaBack.Logica.Backgrounds
             _hubContext = hubContext;
         }
 
-        public void Pausar() => _pauseEvent.Reset();
-        public void Continuar() => _pauseEvent.Set();
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("🟢 CicloBackgroundService iniciado a las {Hora}", DateTime.Now);
@@ -53,6 +50,9 @@ namespace CivitaBack.Logica.Backgrounds
                         // 3. Enviar los recursos a cada grupo de SignalR
                         foreach (var partida in partidas)
                         {
+                            if (partida.EstaPausada)
+                                continue;
+
                             var payload = new RecursoDTO
                             {
                                 Energia = partida.Recursos.Energia,
