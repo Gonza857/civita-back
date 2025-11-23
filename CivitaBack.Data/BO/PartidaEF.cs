@@ -16,6 +16,7 @@ namespace CivitaBack.Data.BO
         public int Nivel { get; set; }
         public int Experiencia { get; set; }
         public int UsuarioId { get; set; }
+        public bool EstaPausada { get; set; }
 
         [JsonIgnore]
         public UsuarioEF? Usuario { get; set; }

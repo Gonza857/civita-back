@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Data.Repositorio;
 
-public class EstructuraMapaRepositorio 
+public class EstructuraMapaRepositorio
     : GenericoRepositorio<EstructuraMapa, EstructuraMapaEF>, IEstructuraMapaRepositorio
 {
     public EstructuraMapaRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
@@ -48,17 +48,15 @@ public class EstructuraMapaRepositorio
         await base.AgregarVarios(estructuras);
     }
 
-    public async Task<EstructuraMapa?> ObtenerCoincidenteAsync(int partidaId, int estructuraId, int x, int y, int width, int height)
+    public async Task<EstructuraMapa?> ObtenerCoincidenteAsync(int partidaId, int estructuraId, int x, int y)
     {
         var entidadEF = await _dbSet
             .AsNoTracking()
-            .FirstOrDefaultAsync(e =>
-                e.PartidaId == partidaId &&
-                e.EstructuraId == estructuraId &&
-                e.X == x &&
-                e.Y == y &&
-                e.Width == width &&
-                e.Height == height
+            .FirstOrDefaultAsync(e => 
+            e.PartidaId == partidaId &&
+            e.EstructuraId == estructuraId &&
+            e.X == x &&
+            e.Y == y 
             );
 
         return Mapear<EstructuraMapa>(entidadEF);
