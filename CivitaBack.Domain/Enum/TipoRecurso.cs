@@ -5,7 +5,8 @@ public enum TipoRecurso
     Energia,
     Felicidad,
     Contaminacion,
-    EcoCoins
+    EcoCoins,
+    Experiencia
 }
 
 public static class TipoRecursoHelper

@@ -39,6 +39,27 @@ namespace CivitaBack.Logica
             return usuario;
         }
 
+        public Usuario CrearUsuarioInicial(string nombreUsuario, Usuario? usuario)
+        {
+            if (usuario != null)
+                throw new DominioException("Usuario ya existe");
+            
+            var nuevoUsuario = new Usuario
+            {
+                NombreUsuario = nombreUsuario,
+            };
+
+            return nuevoUsuario;
+        }
+
+        public async Task<Usuario> IniciarSesion(string nombreUsuario)
+        {
+            Usuario? usuario = await _repositorioUsuario.ObtenerUsuarioPorNombre(nombreUsuario);
+            if (usuario == null)
+                throw new DominioException("Usuario inexistente.");
+            return usuario;
+        }
+
         public async Task<string> IniciarSesion(string mail, string contrasena)
         {
             this.ValidarUsuarioIniciarSesion(mail, contrasena);
@@ -70,17 +91,19 @@ namespace CivitaBack.Logica
                 throw new ValidacionRegistroException("El correo ya está en uso.");
         }
 
-        private string GenerarToken(Usuario usuario)
+        public string GenerarToken(Usuario usuario)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            
+            var claimRol = new Claim(
+                ClaimTypes.Role, usuario.EsDios ? "Admin" : usuario.Mail == null ? "Desconocido" : "Jugador");
 
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                 new Claim(ClaimTypes.Name, usuario.NombreUsuario),
-                new Claim(ClaimTypes.Email, usuario.Mail),
-                new Claim("EsDios", usuario.EsDios.ToString())
+                claimRol
             };
 
             var token = new JwtSecurityToken(

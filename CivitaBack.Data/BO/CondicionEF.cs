@@ -13,9 +13,6 @@ public class CondicionEF : AuditableEF
     public int? EstructuraId { get; set; }
     public EstructuraEF? Estructura { get; set; }
 
-    public bool EsRecompensa { get; set; } = false;
-    public int? RecompensaId { get; set; }     // 👉 FK a otra condición
-    public CondicionEF? Recompensa { get; set; } // 👉 navegación hacia esa "otra" condición
+    public virtual ICollection<RecompensaEF> Recompensas { get; set; } = new List<RecompensaEF>();
 
-    public ICollection<CondicionEF>? CondicionesAsociadas { get; set; } // 👉 navegación inversa
 }

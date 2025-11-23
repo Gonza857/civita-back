@@ -75,7 +75,6 @@ public class LogroPartidaController : BaseApiController
         catch (Exception ex)
         {
             // _logger.LogError(ex, "Error al obtener logros para partida {PartidaId}", partidaId);
-            // Esto devuelve un 500 Internal Server Error
             return Problem("Error al obtener logros");
         }
     }

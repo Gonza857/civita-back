@@ -154,6 +154,10 @@ builder.Services.AddScoped<IMisionRepositorio, MisionRepositorio>();
 builder.Services.AddScoped<IMisionPartidaLogica, MisionPartidaLogica>();
 builder.Services.AddScoped<IMisionPartidaRepositorio, MisionPartidaRepositorio>();
 
+builder.Services.AddScoped<IRecompensaLogica, RecompensaLogica>();
+builder.Services.AddScoped<IRecompensaRepositorio, RecompensaRepositorio>();
+
+builder.Services.AddScoped<INivelLogica, NivelLogica>();
 builder.Services.AddScoped<IAuthLogica, AuthLogica>();
 builder.Services.AddScoped<IInicialLogica, InicialLogica>();
 builder.Services.AddScoped<ICicloLogica, CicloLogica>();

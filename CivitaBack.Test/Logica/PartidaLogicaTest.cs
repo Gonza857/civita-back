@@ -626,10 +626,13 @@ public class PartidaLogicaTest
                 Titulo = "Logro 1",
                 Condicion = new Condicion
                 {
-                    Recompensa = new Condicion
+                    Recompensas = new List<Recompensa>
                     {
-                        NombreColumna = "EcoCoins",
-                        Cantidad = 50
+                        new Recompensa
+                        {
+                            NombreColumna = "EcoCoins",
+                            Cantidad = 50
+                        }
                     }
                 }
             }

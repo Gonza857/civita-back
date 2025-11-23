@@ -17,7 +17,7 @@ namespace CivitaBack.Domain.Interfaces.Logica
         /// </summary>
         /// <param name="entidad">La entidad Condicion con los datos para crear.</param>
         /// <exception cref="CondicionExcepcion">Si los datos de la condición son inválidos o la Estructura asociada no existe.</exception>
-        Task Crear(Condicion entidad);
+        Task Crear(Condicion entidad, List<int> recompensasIds);
 
         /// <summary>
         /// Obtiene un listado de todas las Condiciones (que no son Recompensas).
@@ -38,20 +38,7 @@ namespace CivitaBack.Domain.Interfaces.Logica
         /// <param name="condicion">La entidad Condicion con los datos actualizados.</param>
         /// <param name="id">El ID de la Condicion a actualizar.</param>
         /// <exception cref="CondicionExcepcion">Si los datos son inválidos o no se encuentra la Condicion o Recompensa asociada.</exception>
-        Task Actualizar(Condicion condicion, int id);
-
-        /// <summary>
-        /// Obtiene un listado de todas las Condiciones que SÍ son Recompensas.
-        /// </summary>
-        /// <returns>Una lista de entidades Condicion marcadas como Recompensa.</returns>
-        Task<List<Condicion>> ObtenerListadoRecompensas();
-
-        /// <summary>
-        /// Crea una nueva Recompensa (una Condicion marcada como EsRecompensa = true).
-        /// </summary>
-        /// <param name="recompensa">La entidad Condicion con los datos para crear la recompensa.</param>
-        /// <exception cref="CondicionExcepcion">Si los datos de la recompensa son inválidos o la Estructura asociada no existe.</exception>
-        Task CrearRecompensa(Condicion recompensa);
+        Task Actualizar(Condicion condicion, int id, List<int> recompensasIds);
 
         List<Condicion> FiltrarCondicionSiCumple(Condicion condicion, Partida partida);
         public List<Condicion> FiltrarCondicionesSiCumplen(List<Condicion> condiciones, Partida partida);

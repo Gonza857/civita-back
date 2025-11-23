@@ -8,6 +8,9 @@ public class Partida : Auditable
 
     public DateTime? UltimaVez { get; set; }
     public string? JsonMapa { get; set; }
+    
+    public int Nivel { get; set; }
+    public int Experiencia { get; set; }
 
     public int UsuarioId { get; set; }
     public bool EstaPausada { get; set; }

@@ -1,4 +1,5 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Interfaces;
@@ -33,7 +34,7 @@ public class InicialLogica : IInicialLogica
 
     public async Task IniciarPartida(Usuario usuario)
     {
-        _accesoUsuarios.ValidarAcceso(usuario.Id);
+        // _accesoUsuarios.ValidarAcceso(usuario.Id);
 
         var misiones = await this._misionRepositorio.ObtenerTodos();
         
@@ -42,10 +43,14 @@ public class InicialLogica : IInicialLogica
             Usuario = usuario,
             JsonMapa = this.GenerarMapa(),
             UltimaVez = DateTime.UtcNow,
+            Nivel = 0,
+            Experiencia = 0,
         };
         
         partida.Recursos = this.GenerarRecursos();
         await this._partidaRepositorio.Agregar(partida);
+        await this._uow.CommitAsync();
+        
         await this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida);
         await this._uow.CommitAsync();
     }

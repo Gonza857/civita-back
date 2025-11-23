@@ -39,46 +39,17 @@ namespace CivitaBack.Data.Migrations
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("EsRecompensa")
-                        .HasColumnType("boolean");
-
                     b.Property<int?>("EstructuraId")
                         .HasColumnType("integer");
 
                     b.Property<string>("NombreColumna")
                         .HasColumnType("text");
 
-                    b.Property<int?>("RecompensaId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EstructuraId");
 
-                    b.HasIndex("RecompensaId");
-
                     b.ToTable("Condicion");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Cantidad = 4444,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EsRecompensa = true,
-                            NombreColumna = "EcoCoins"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Cantidad = 1,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EsRecompensa = false,
-                            EstructuraId = 1,
-                            RecompensaId = 1
-                        });
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.EfectoEventoEF", b =>
@@ -656,11 +627,17 @@ namespace CivitaBack.Data.Migrations
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("Experiencia")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("EstaPausada")
                         .HasColumnType("boolean");
 
                     b.Property<string>("JsonMapa")
                         .HasColumnType("text");
+
+                    b.Property<int>("Nivel")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UltimaVez")
                         .HasColumnType("timestamp with time zone");
@@ -674,6 +651,37 @@ namespace CivitaBack.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Partida");
+                });
+
+            modelBuilder.Entity("CivitaBack.Data.BO.RecompensaEF", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("Creado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Editado")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("EstructuraId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("NombreColumna")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EstructuraId");
+
+                    b.ToTable("Recompensa");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.RecursoEF", b =>
@@ -774,6 +782,9 @@ namespace CivitaBack.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
+
+                    b.Property<int?>("Orden")
+                        .HasColumnType("integer");
 
                     b.Property<int>("TipoId")
                         .HasColumnType("integer");
@@ -1140,6 +1151,21 @@ namespace CivitaBack.Data.Migrations
                     b.ToTable("Usuario");
                 });
 
+            modelBuilder.Entity("CondicionEFRecompensaEF", b =>
+                {
+                    b.Property<int>("CondicionesId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RecompensasId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CondicionesId", "RecompensasId");
+
+                    b.HasIndex("RecompensasId");
+
+                    b.ToTable("CondicionRecompensa", (string)null);
+                });
+
             modelBuilder.Entity("CivitaBack.Data.BO.CondicionEF", b =>
                 {
                     b.HasOne("CivitaBack.Data.BO.EstructuraEF", "Estructura")
@@ -1147,14 +1173,7 @@ namespace CivitaBack.Data.Migrations
                         .HasForeignKey("EstructuraId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("CivitaBack.Data.BO.CondicionEF", "Recompensa")
-                        .WithMany("CondicionesAsociadas")
-                        .HasForeignKey("RecompensaId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Estructura");
-
-                    b.Navigation("Recompensa");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.EfectoEventoEF", b =>
@@ -1296,6 +1315,15 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("CivitaBack.Data.BO.RecompensaEF", b =>
+                {
+                    b.HasOne("CivitaBack.Data.BO.EstructuraEF", "Estructura")
+                        .WithMany()
+                        .HasForeignKey("EstructuraId");
+
+                    b.Navigation("Estructura");
+                });
+
             modelBuilder.Entity("CivitaBack.Data.BO.RecursoEF", b =>
                 {
                     b.HasOne("CivitaBack.Data.BO.PartidaEF", "Partida")
@@ -1356,9 +1384,19 @@ namespace CivitaBack.Data.Migrations
                     b.Navigation("Tip");
                 });
 
-            modelBuilder.Entity("CivitaBack.Data.BO.CondicionEF", b =>
+            modelBuilder.Entity("CondicionEFRecompensaEF", b =>
                 {
-                    b.Navigation("CondicionesAsociadas");
+                    b.HasOne("CivitaBack.Data.BO.CondicionEF", null)
+                        .WithMany()
+                        .HasForeignKey("CondicionesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CivitaBack.Data.BO.RecompensaEF", null)
+                        .WithMany()
+                        .HasForeignKey("RecompensasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.EstructuraEF", b =>

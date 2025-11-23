@@ -44,4 +44,6 @@ public interface ITipLogica
     /// <param name="id">El ID del Tip a buscar.</param>
     /// <returns>La entidad Tip encontrada, o null si no existe.</returns>
     Task<Tip?> ObtenerPorIdTipo(int id);
+    
+    Task Eliminar(int id);
 }

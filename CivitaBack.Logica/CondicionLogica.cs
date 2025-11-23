@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Data;
+using System.Reflection;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Enum;
 using CivitaBack.Domain.Excepciones;
@@ -13,12 +14,18 @@ public class CondicionLogica : ICondicionLogica
     private readonly ICondicionRepositorio _condicionRepositorio;
     private readonly IEstructuraRepositorio _estructuraRepositorio;
     private readonly IUnidadDeTrabajo _uow;
+    private readonly IRecompensaRepositorio _recompensaRepositorio;
 
-    public CondicionLogica(ICondicionRepositorio icr, IEstructuraRepositorio ier, IUnidadDeTrabajo uow)
+    public CondicionLogica(
+        ICondicionRepositorio icr, 
+        IEstructuraRepositorio ier, 
+        IUnidadDeTrabajo uow,
+        IRecompensaRepositorio irr)
     {
         _condicionRepositorio = icr;
         _estructuraRepositorio = ier;
         _uow = uow;
+        _recompensaRepositorio = irr;
     }
 
     /// <inheritdoc />
@@ -31,10 +38,16 @@ public class CondicionLogica : ICondicionLogica
     }
 
     /// <inheritdoc />
-    public async Task Crear(Condicion condicion)
+    public async Task Crear(Condicion condicion, List<int> recompensasIds)
     {
+        List<Recompensa> recompensasDb = await this._recompensaRepositorio.ObtenerVariosPorIds(recompensasIds);
+        
+        if (recompensasDb.Count != recompensasIds.Count)
+            throw new DominioException("No se encontrarón las recompensas");
+        
+        condicion.Recompensas = recompensasDb;
+
         await ProcesarCamposExcluyentes(condicion);
-        condicion.EsRecompensa = false;
         await _condicionRepositorio.Agregar(condicion);
         await _uow.CommitAsync();
     }
@@ -57,56 +70,26 @@ public class CondicionLogica : ICondicionLogica
     }
 
     /// <inheritdoc />
-    public async Task Actualizar(Condicion condicionNuevosDatos, int id)
+    public async Task Actualizar(Condicion condicionNuevosDatos, int id, List<int> recompensasIds)
     {
-        // 1. Obtener la entidad de la BD
+        await this.ProcesarCamposExcluyentes(condicionNuevosDatos);
+        this.ValidarIds(recompensasIds);
+        
         Condicion? condicionDb = await _condicionRepositorio.ObtenerPorId(id);
         if (condicionDb == null)
-            throw new CondicionExcepcion($"No se encontró la Condicion con Id {id} para actualizar.");
+            throw new DataException($"No se encontró la Condicion con Id {id} para actualizar.");
+        
+        List<Recompensa> recompensasDb = await this._recompensaRepositorio.ObtenerVariosPorIds(recompensasIds);
 
-        // 2. Validar y procesar los datos de entrada
-        await ProcesarCamposExcluyentes(condicionNuevosDatos);
-
-        // 3. Mapear los cambios a la entidad de la BD
+        if (recompensasDb.Count != recompensasIds.Count)
+            throw new DominioException("No se encontrarón las recompensas");
+        
         condicionDb.Cantidad = condicionNuevosDatos.Cantidad;
         condicionDb.NombreColumna = condicionNuevosDatos.NombreColumna;
         condicionDb.EstructuraId = condicionNuevosDatos.EstructuraId;
-
-        // 4. Manejar la Recompensa asociada
-        if (condicionNuevosDatos.RecompensaId.HasValue)
-        {
-            Condicion? recompensaDb = await _condicionRepositorio.ObtenerPorId(condicionNuevosDatos.RecompensaId.Value);
-            if (recompensaDb == null)
-                throw new CondicionExcepcion("No se encontró la recompensa para asociar");
-
-            condicionDb.Recompensa = recompensaDb; // EF usa esto para setear el Id
-        }
-        else
-        {
-            condicionDb.Recompensa = null;
-            condicionDb.RecompensaId = null;
-        }
-
-        // 5. Guardar
+        condicionDb.Recompensas = recompensasDb;
+        
         await _condicionRepositorio.Actualizar(condicionDb);
-        await _uow.CommitAsync();
-    }
-
-    /// <inheritdoc />
-    public async Task<List<Condicion>> ObtenerListadoRecompensas()
-    {
-        return await _condicionRepositorio.ObtenerTodasRecompensas();
-    }
-
-    /// <inheritdoc />
-    public async Task CrearRecompensa(Condicion recompensa)
-    {
-        // 1. Valida y procesa la entidad
-        await ProcesarCamposExcluyentes(recompensa);
-        recompensa.EsRecompensa = true;
-
-        // 2. Guarda
-        await _condicionRepositorio.Agregar(recompensa);
         await _uow.CommitAsync();
     }
 
@@ -214,6 +197,14 @@ public class CondicionLogica : ICondicionLogica
 
         if (condicion.Cantidad < 0)
             throw new CondicionExcepcion("La cantidad no puede ser menor a 0");
+    }
+
+    private void ValidarIds(List<int> ids)
+    {
+        ids.ForEach((id) =>
+        {
+            if (id <= 0) throw new DominioException("Las recompensas recibidas son inválidas");
+        });
     }
 
     /// <summary>

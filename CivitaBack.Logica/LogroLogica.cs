@@ -96,17 +96,15 @@ public class LogroLogica : ILogroLogica
     /// <summary>
     /// Guarda un logro
     /// </summary>
-    /// <param name="logroDTO">LogroDTO</param>
+    /// <param name="Logro">entidad</param>
     public async Task Crear(Logro entidad)
     {
-        ValidarAdmin();
-
         this.ValidarLogro(entidad);
-        TipoLogro? tipoLogro = await this.repositorioTipoLogro.ObtenerPorId(entidad.TipoLogro.Id);
+        TipoLogro? tipoLogro = await this.repositorioTipoLogro.ObtenerPorId(entidad.TipoLogroId);
         if (tipoLogro == null) 
             throw new LogroExcepcion("No se proporcionó Tipo de Logro.");
 
-        Condicion? condicion = await this._condicionRepositorio.ObtenerPorId(entidad.Condicion.Id);
+        Condicion? condicion = await this._condicionRepositorio.ObtenerPorId(entidad.CondicionId);
         if (condicion == null)
             throw new LogroExcepcion("No se proporcionó condición.");
 
@@ -114,8 +112,8 @@ public class LogroLogica : ILogroLogica
         {
             Titulo = entidad.Titulo,
             Descripcion = entidad.Descripcion,
-            TipoLogro = tipoLogro,
-            Condicion = condicion
+            TipoLogroId = tipoLogro.Id,
+            CondicionId = condicion.Id
             
         };
         
