@@ -3,6 +3,7 @@ using CivitaBack.Domain.Enum;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
@@ -13,17 +14,20 @@ public class MisionLogica : IMisionLogica
     private readonly IMisionPartidaRepositorio _misionPartidaRepositorio;
     private readonly ICondicionRepositorio _condicionRepositorio;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
+    private readonly IAccesoUsuarios _accesoUsuarios;
     
     public MisionLogica(
         IMisionRepositorio imr, 
         ICondicionRepositorio condicionRepositorio, 
         IUnidadDeTrabajo unidadDeTrabajo,
-        IMisionPartidaRepositorio impr)
+        IMisionPartidaRepositorio impr,
+        IAccesoUsuarios accesoUsuarios)
     {
         this._misionRepositorio = imr;
         this._condicionRepositorio = condicionRepositorio;
         this._unidadDeTrabajo = unidadDeTrabajo;
         this._misionPartidaRepositorio = impr;
+        this._accesoUsuarios = accesoUsuarios;
     }
 
     public async Task ResetMisiones(TipoMision tipoMision)
@@ -52,6 +56,8 @@ public class MisionLogica : IMisionLogica
         var condicion = await this._condicionRepositorio.ObtenerPorId(mision.CondicionId);
         this.ValidarCondicion(condicion);
 
+        ValidarAdmin();
+
         Mision nueva = new Mision
         {
             CondicionId = condicion.Id,
@@ -71,7 +77,9 @@ public class MisionLogica : IMisionLogica
         this.ValidarCondicion(condicion);
         var misionDb = await this.ObtenerPorId(idMision);
         this.ValidarMision(misionDb);
-        
+
+        ValidarAdmin();
+
         misionDb.Descripcion = mision.Descripcion;
         misionDb.Disponible = mision.Disponible;
         misionDb.Titulo = mision.Titulo;
@@ -133,5 +141,11 @@ public class MisionLogica : IMisionLogica
     {
         if (condicion == null)
             throw new MisionExcepcion("Ocurrió un error al guardar la misión");
+    }
+
+    private void ValidarAdmin()
+    {
+        if (!_accesoUsuarios.EsDios())
+            throw new AccesoDenegadoExcepcion("Se requieren privilegios de administrador para modificar las misiones.");
     }
 }

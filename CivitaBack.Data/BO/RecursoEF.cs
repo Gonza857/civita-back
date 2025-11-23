@@ -17,22 +17,5 @@ public class RecursoEF : AuditableEF
     public int PartidaId { get; set; }
     [JsonIgnore]
     public PartidaEF? Partida { get; set; }
-
-    public RecursoEF() { }
-
-    public RecursoEF(
-        int energia, 
-        int contaminacion, 
-        int felicidad, 
-        int ecoCoins, 
-        PartidaEF partida)
-    {
-        Energia = energia;
-        Contaminacion = contaminacion;
-        Felicidad = felicidad;
-        EcoCoins = ecoCoins;
-        PartidaId = partida.Id;
-    }
-
     
 }

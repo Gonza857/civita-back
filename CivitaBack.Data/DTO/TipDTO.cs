@@ -12,6 +12,7 @@ namespace CivitaBack.Data.DTO
         public bool EfectoFiltro { get; set; }
         public int TipoId {  get; set; }
         public string? TipoTipDescripcion { get; set; }
+        public int? Orden { get; set; }
         public List<TipEnPartidaEF>? TipEnPartida { get; set; }
     }
 }

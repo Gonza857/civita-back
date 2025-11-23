@@ -3,6 +3,7 @@ using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
+using CivitaBack.Logica;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
@@ -15,6 +16,7 @@ public class MisionPartidaController : BaseApiController
     private readonly IMisionPartidaLogica _misionPartidaLogica;
     private readonly IRecompensaLogica _recompensaLogica;
     private readonly ICondicionLogica _condicionLogica;
+    private readonly INivelLogica _nivelLogica;
 
     private readonly ILogger<MisionController> _logger;
     
@@ -25,7 +27,8 @@ public class MisionPartidaController : BaseApiController
         IRecompensaLogica recompensaLogica,
         ICondicionLogica condicionLogica,
         ILogger<MisionController> logger,
-        IMapper mapper
+        IMapper mapper,
+        INivelLogica nivelLogica
         ) : base(mapper)
     {
         this._partidaLogica = partidaLogica;
@@ -34,6 +37,7 @@ public class MisionPartidaController : BaseApiController
         this._recompensaLogica = recompensaLogica;
         this._condicionLogica = condicionLogica;
         this._logger = logger;
+        this._nivelLogica = nivelLogica;
     }
     
     // Asignar misiones disponible a una partida
@@ -63,10 +67,14 @@ public class MisionPartidaController : BaseApiController
             Partida partida = await this._partidaLogica.ObtenerPorId(idPartida);
             var mision = await this._misionPartidaLogica.ObtenerMisionPartidaPorId(partida.Id, idMision);
             var condicionesQueCumple = this._condicionLogica.FiltrarCondicionSiCumple(mision.Condicion, partida);
+            
             if (condicionesQueCumple.Count == 0)
                 return BadRequest("No tenes misiones listas para reclamar");
-            await this._recompensaLogica.ReclamarRecompensa(mision.Condicion.Recompensa!, partida);
+            
+            await this._recompensaLogica.ReclamarRecompensas(mision.Condicion.Recompensas.ToList(), partida);
             await this._misionPartidaLogica.MarcarMisionCompletada(mision, partida);
+            // await this._nivelLogica
+            
             return Ok();
         }
         catch (CondicionExcepcion ex)

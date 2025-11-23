@@ -12,12 +12,21 @@ public class TipRepositorio
 {
     public TipRepositorio(AppDbContext context, IMapper mapper) : base(context, mapper) { }
 
-    public async Task<List<Tip>> ObtenerMsjPorIdTipo(int idTipo)
+    public async Task<List<Tip>> ObtenerMsjPorIdTipo(int idTipo, bool ascendente = true)
     {
-        var tipEf =  await _context.Tip
+        IQueryable<TipEF> consulta = _context.Tip
             .Include(x => x.TipoTip)
-            .Where(x => x.TipoId == idTipo)
+            .Where(x => x.TipoId == idTipo);
+        
+        if (ascendente)
+            consulta = consulta.OrderBy(x => x.Orden); 
+        else
+            consulta = consulta.OrderByDescending(x => x.Orden);
+        
+        List<TipEF> tipEf = await consulta
+            .AsNoTracking()
             .ToListAsync();
+        
         return base.MapearLista<Tip>(tipEf);
     }
 

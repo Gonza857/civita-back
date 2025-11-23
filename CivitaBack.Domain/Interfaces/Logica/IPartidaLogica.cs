@@ -9,14 +9,9 @@ public interface IPartidaLogica
     Task Actualizar(Partida partida, Usuario usuario);
     Task<List<Partida>> ObtenerPartidas();
     Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario);
-
-    // 🆕 Métodos de mapa
-    Task ActualizarMapaDePartidaAsync(int partidaId, string jsonMapa, List<EstructuraMapa>? estructuras);
     
-    Task ReclamarLogros(Partida partida, List<Logro> logros);
-    Task<Partida?> ObtenerMapaAsync(int partidaId);
-    
+    Task ReclamarLogros(Partida partida, List<Logro> logros);    
     Task<Partida> ObtenerPorId(int idPartida);
 
-    Task<int> ComprarEstructuraAsync(int partidaId, int estructuraId);
+    Task<Partida> ObtenerPartidaParaLogin(int idUsuario);
 }

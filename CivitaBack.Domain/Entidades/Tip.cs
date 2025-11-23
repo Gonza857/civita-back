@@ -10,6 +10,8 @@ public class Tip : Auditable
     public string? ElementoAdicional { get; set; }
     public bool EfectoFiltro { get; set; }
 
+    public int? Orden { get; set; }
+
     public int TipoId { get; set; }
     public TipoTip TipoTip { get; set; }
 

@@ -46,9 +46,8 @@ public class PartidaRepositorio
             JsonMapa = contenidoMapa,
             UltimaVez = DateTime.UtcNow
         };
-
+        
         await base.Agregar(partida);
-        await _context.SaveChangesAsync();
         return partida;
     }
 

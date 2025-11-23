@@ -4,6 +4,7 @@ using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Excepciones;
 using Microsoft.AspNetCore.Mvc;
+using CivitaBack.Logica.Interfaces;
 
 namespace CivitaBack.Api.Controllers;
 
@@ -14,21 +15,28 @@ public class AuthController : BaseApiController
     private readonly IPartidaLogica _partidaLogica;
     private readonly IUsuarioLogica _usuarioLogica;
     private readonly IInicialLogica _inicialLogica;
+    private readonly IConfigurarCookieLogica _configurarCookieLogica;
     private readonly ILogger _logger;
+    
+    private readonly IAccesoUsuarios _accesoUsuarios;
 
     public AuthController(
         IAuthLogica authLogica,
         IPartidaLogica partidaLogica,
         IUsuarioLogica usuarioLogica,
         IInicialLogica inicialLogica,
+        IConfigurarCookieLogica configurarCookieLogica,
         ILogger<AuthController> logger,
-        IMapper mapper) : base(mapper)
+        IMapper mapper,
+        IAccesoUsuarios iau) : base(mapper)
     {
         _authLogica = authLogica;
         _partidaLogica = partidaLogica;
         _usuarioLogica = usuarioLogica;
         _inicialLogica = inicialLogica;
+        _configurarCookieLogica = configurarCookieLogica;
         _logger = logger;
+        _accesoUsuarios = iau;
     }
 
     [HttpPost("registro")]
@@ -36,25 +44,18 @@ public class AuthController : BaseApiController
     {
         try
         {
-            Usuario usuario = await _authLogica.CrearUsuario(request.NombreUsuario, request.Mail, request.Password);
+            Usuario? usuarioExistente = await this._usuarioLogica.ObtenerUsuarioPorNombre(request.NombreUsuario);
+            Usuario usuario = this._authLogica.CrearUsuarioInicial(request.NombreUsuario, usuarioExistente);
             await this._inicialLogica.IniciarPartida(usuario);
-            Usuario usuarioPartida = await _usuarioLogica.ObtenerPorCorreo(request.Mail);
-            Partida partida = usuarioPartida.Partida;
-
-            string token = await _authLogica.IniciarSesion(request.Mail, request.Password);
-
-            var response = new LoginDTO
-            {
-                Token = token,
-                NombreUsuario = usuarioPartida.NombreUsuario!,
-                Mail = usuarioPartida.Mail!,
-                IdUsuario = usuarioPartida.Id!,
-                IdPartida = partida.Id
-            };
-
-            return Ok(new { mensaje = "Usuario registrado correctamente!", response });
+            
+            var usuarioRegistrado = await this._authLogica.IniciarSesion(request.NombreUsuario);
+            var token = this._authLogica.GenerarToken(usuarioRegistrado);
+            
+            _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddDays(7));
+            
+            return Ok(new {id = usuarioRegistrado.Id});
         }
-        catch (ValidacionRegistroException ex)
+        catch (DominioException ex)
         {
             return BadRequest(ex.Message);
         }
@@ -65,33 +66,62 @@ public class AuthController : BaseApiController
         }
     }
 
+    [HttpGet("Validar")]
+    public async Task<IActionResult> Validar()
+    {
+        try
+        {
+            int idUsuario = this._accesoUsuarios.ObtenerIdUsuarioActual();
+            var usuario = await this._usuarioLogica.ObtenerPorId(idUsuario);
+            var dto = base.Mapear<UsuarioDTO>(usuario);
+            return Ok(dto);
+        }
+        catch (DominioException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al validar el usuario");
+        }
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] IniciarSesionDTO iniciarSesionDto)
     {
         try
         {
             string token = await _authLogica.IniciarSesion(iniciarSesionDto.Mail, iniciarSesionDto.Contrasena);
-            Usuario usuario = await _usuarioLogica.ObtenerPorCorreo(iniciarSesionDto.Mail);
-            Partida partida = await _partidaLogica.ObtenerPorUsuarioId(usuario.Id);
+            Usuario? usuario = await _usuarioLogica.ObtenerPorCorreo(iniciarSesionDto.Mail);
+
+            if (usuario == null)
+            {
+                throw new AutenticacionException("Error interno de autenticación.");
+            }
+
+            Partida? partida = await _partidaLogica.ObtenerPartidaParaLogin(usuario.Id);
+
+            _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddHours(1));
 
             var response = new LoginDTO
             {
-                Token = token,
                 NombreUsuario = usuario.NombreUsuario!,
                 Mail = usuario.Mail!,
-                IdUsuario = usuario.Id!,
-                IdPartida = partida.Id
+                IdUsuario = usuario.Id,
+                IdPartida = partida?.Id ?? 0
             };
 
             return Ok(response);
         }
         catch (AutenticacionException ex)
         {
-            return Unauthorized(ex.Message);
+            // Si hay fallo de autenticación (usuario/contraseña incorrectos), limpiar cookies y devolver 401
+            Response.Cookies.Delete("jwt-auth");
+            return Unauthorized(new { error = ex.Message });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            Response.Cookies.Delete("jwt-auth");
             return Problem("Ocurrió un error al iniciar sesión");
         }
     }

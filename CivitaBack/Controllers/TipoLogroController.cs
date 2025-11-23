@@ -2,8 +2,10 @@
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
+using CivitaBack.Logica.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -49,6 +51,10 @@ public class TipoLogroController : BaseApiController
             var tipoLogroGuardado = await _tipoLogroLogica.Guardar(base.Mapear<TipoLogro>(nuevoTipoLogro));
             return Ok(base.Mapear<TipoLogroDTO>(tipoLogroGuardado));
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
@@ -59,11 +65,15 @@ public class TipoLogroController : BaseApiController
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Eliminar(int id) 
-    {
+    {       
         try
         {
             await this._tipoLogroLogica.Eliminar(id);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (Exception ex)
         {
@@ -97,6 +107,10 @@ public class TipoLogroController : BaseApiController
         {
             await this._tipoLogroLogica.Actualizar(base.Mapear<TipoLogro>(tipoLogroDTO), id);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (Exception ex)
         {

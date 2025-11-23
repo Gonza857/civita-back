@@ -1,5 +1,5 @@
-﻿using CivitaBack.Data.BO;
-using CivitaBack.Data.DTO;
+﻿using CivitaBack.Data.DTO;
+using CivitaBack.Domain.Entidades;
 
 public class EstructuraCondicionDTO
 {
@@ -15,15 +15,7 @@ public class CondicionDTO
     public bool EsRecompensa { get; set; }
     public int? EstructuraId { get; set; }      // solo si es estructura
     public EstructuraCondicionDTO? Estructura { get; set; }
-
-    // Propiedad que apunta a la recompensa asociada (si tiene)
-    public int? RecompensaId { get; set; }
-    public CondicionDTO? Recompensa { get; set; }
-
-    // ✅ Propiedad calculada para mostrar en la tabla del front
-    // public string RecompensaDescripcion => Recompensa != null 
-    //     ? (!string.IsNullOrWhiteSpace(Recompensa.NombreColumna)
-    //         ? $"{Recompensa.NombreColumna} - {Recompensa.Cantidad}"
-    //         : $"{Recompensa.Estructura?.Nombre} - {Recompensa.Cantidad}")
-    //     : string.Empty;
+    public List<RecompensaDTO> Recompensas { get; set; } = new List<RecompensaDTO>();
+    
+    public List<int> RecompensaIds { get; set; } = new List<int>();
 }

@@ -1,8 +1,9 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
-using CivitaBack.Domain.Excepciones;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -19,6 +20,8 @@ public class LogroPartidaLogicaTest
 
     private readonly ILogroPartidaLogica _logroPartidaLogica;
 
+    private readonly Mock<IAccesoUsuarios> _mockAccesoUsuarios;
+
     public LogroPartidaLogicaTest()
     {
         // Creamos TODOS los mocks de las dependencias
@@ -26,13 +29,15 @@ public class LogroPartidaLogicaTest
         _mockRecursoRepo = new Mock<IRecursoRepositorio>();
         _mockUow = new Mock<IUnidadDeTrabajo>();
         _mockLogger = new Mock<ILogger<LogroPartidaLogica>>(); // Logger
+        _mockAccesoUsuarios = new Mock<IAccesoUsuarios>();
 
         // Inyectamos todos los mocks en la clase de lógica (SUT)
         _logroPartidaLogica = new LogroPartidaLogica(
             _mockLogroPartidaRepo.Object,
             _mockRecursoRepo.Object,
             _mockUow.Object,
-            _mockLogger.Object
+            _mockLogger.Object,
+            _mockAccesoUsuarios.Object
         );
 
         // --- Mock por defecto para el Unit of Work ---
@@ -298,10 +303,10 @@ public class LogroPartidaLogicaTest
         partida.Recursos = TestData.CrearRecurso(partida, 500, 0, 0, 0); // 500 Energía, 0 Oro
         partida.EstructuraMapa = new List<EstructuraMapa>();
 
-        // La recompensa (que es de tipo Condicion) da 100 de Oro
-        Condicion recompensa = TestData.CrearCondicion("EcoCoins", 100);
+        // La recompensa (que es de tipo Condicion) da 500 de Oro
+        Recompensa recompensa = TestData.CrearRecompensa(500, "EcoCoins");
         Condicion condicion = TestData.CrearCondicion("Energia", 500);
-        condicion.Recompensa = recompensa; // Asignamos la recompensa
+        condicion.Recompensas.Add(recompensa);
 
         TipoLogro tipoLogro = TestData.CrearTipoLogro("Recurso");
         Logro logro1 = TestData.CrearLogro(logroId, tipoLogro, condicion, "Logro de Energía");
@@ -318,7 +323,7 @@ public class LogroPartidaLogicaTest
         // Assert
 
         // 1. ¿Se aplicó la recompensa? (El Oro subió a 100)
-        Assert.Equal(100, partida.Recursos.EcoCoins);
+        Assert.Equal(500, partida.Recursos.EcoCoins);
 
         // 2. ¿Se preparó la actualización de Recursos UNA VEZ?
         _mockRecursoRepo.Verify(

@@ -10,11 +10,6 @@ public class Condicion : Auditable
 
     public int? EstructuraId { get; set; }
     public Estructura? Estructura { get; set; }
-
-    public bool EsRecompensa { get; set; } = false;
-
-    // Self-reference
-    public int? RecompensaId { get; set; }
-    public Condicion? Recompensa { get; set; }
-    public ICollection<Condicion>? CondicionesAsociadas { get; set; }
+    
+    public virtual ICollection<Recompensa> Recompensas { get; set; } = new List<Recompensa>();
 }

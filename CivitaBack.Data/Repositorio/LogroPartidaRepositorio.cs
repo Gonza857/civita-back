@@ -25,6 +25,7 @@ public class LogroPartidaRepositorio
     {
         List<LogroEF> logros = await _context.Logro
             .Include(l => l.TipoLogro)
+            .Include(l => l.Condicion)
             .Where(l => !l.LogroPartidas.Any(lp => lp.PartidaId == partidaId))
             .ToListAsync();
         return base.MapearLista<Logro>(logros);

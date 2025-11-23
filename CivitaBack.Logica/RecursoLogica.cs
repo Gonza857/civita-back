@@ -3,6 +3,7 @@ using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Utils;
+using CivitaBack.Logica.Interfaces;
 
 namespace CivitaBack.Logica;
 
@@ -10,25 +11,25 @@ public class RecursoLogica : IRecursoLogica
 {
     private readonly IRecursoRepositorio _repositorioRecurso;
     private readonly IUnidadDeTrabajo _uow;
+    private readonly IAccesoUsuarios _accesoUsuarios;
 
-    public RecursoLogica(IRecursoRepositorio rr, IUnidadDeTrabajo uow)
+    public RecursoLogica(IRecursoRepositorio rr, IUnidadDeTrabajo uow, IAccesoUsuarios accesoUsuarios)
     {
         _repositorioRecurso = rr;
         _uow = uow;
+        _accesoUsuarios = accesoUsuarios;
     }
 
     public async Task ConfigurarInicial(Partida partida)
     {
         if (partida == null) throw new PartidaExcepcion("No se proporcionó Partida");
-        Recurso recurso = new Recurso
-        {
-            PartidaId = partida.Id,
-            EcoCoins = 450,
-            Felicidad = 40,
-            Energia = 30,
-            Contaminacion = 60,
-        };
-        await this._repositorioRecurso.Agregar(recurso);
+        Recurso r = await this._repositorioRecurso.ObtenerPorId(partida.Id);
+        if (r is null) throw new Exception("No se encontraron los recursos");
+        r.EcoCoins = 450;
+        r.Felicidad = 40;
+        r.Energia = 30;
+        r.Contaminacion = 60;
+        await this._repositorioRecurso.Actualizar(r);
         await this._uow.CommitAsync();
     }
 
@@ -39,6 +40,8 @@ public class RecursoLogica : IRecursoLogica
         // Si no hay recursos o son menos de 4, error
         if (recursoPartida == null)
             throw new PartidaExcepcion("No se encontraron recursos para la partida especificada.");
+
+        //_accesoUsuarios.ValidarAcceso(recursoPartida.Partida.UsuarioId);
 
         return recursoPartida;
     }

@@ -15,6 +15,7 @@ public class TipoLogroRepositorio
     public async Task<TipoLogro?> ObtenerPorId(int id)
     {
         var tipoLogroEf = await _context.TipoLogro
+            .AsNoTracking()
             .FirstOrDefaultAsync(tl => tl.Id == id);
         return base.Mapear<TipoLogro>(tipoLogroEf);
     }

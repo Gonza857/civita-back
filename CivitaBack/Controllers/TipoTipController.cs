@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using Microsoft.AspNetCore.Http;
@@ -46,6 +47,10 @@ public class TipoTipController : BaseApiController
             await _tipoTipLogica.Guardar(base.Mapear<TipoTip>(nuevoTipTipDto));
             return Created();
         }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
@@ -60,6 +65,10 @@ public class TipoTipController : BaseApiController
         {
             await this._tipoTipLogica.Eliminar(id);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (Exception ex)
         {
@@ -94,6 +103,10 @@ public class TipoTipController : BaseApiController
         {
             await this._tipoTipLogica.Actualizar(base.Mapear<TipoTip>(tipoTipDto), id);
             return Ok();
+        }
+        catch (AccesoDenegadoExcepcion ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (Exception ex)
         {

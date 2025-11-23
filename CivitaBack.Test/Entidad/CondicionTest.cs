@@ -13,6 +13,7 @@ namespace CivitaBack.Tests
 
         private readonly Mock<ICondicionRepositorio> _mockCondicionRepositorio;
         private readonly Mock<IEstructuraRepositorio> _mockEstructuraRepositorio;
+        private readonly Mock<IRecompensaRepositorio> _mockRecompensaRepositorio;
         private readonly Mock<IUnidadDeTrabajo> _mockUow;
 
         private readonly ICondicionLogica _condicionLogica;
@@ -21,12 +22,14 @@ namespace CivitaBack.Tests
         {
             _mockCondicionRepositorio = new Mock<ICondicionRepositorio>();
             _mockEstructuraRepositorio = new Mock<IEstructuraRepositorio>();
+            _mockRecompensaRepositorio = new Mock<IRecompensaRepositorio>();
             _mockUow = new Mock<IUnidadDeTrabajo>();
 
             _condicionLogica = new CondicionLogica(
                 _mockCondicionRepositorio.Object,
                 _mockEstructuraRepositorio.Object,
-                _mockUow.Object
+                _mockUow.Object,
+                _mockRecompensaRepositorio.Object
             );
         }
 
@@ -99,83 +102,6 @@ namespace CivitaBack.Tests
             Assert.Equal(0, condicion.Cantidad);
             Assert.Equal(0, condicion.EstructuraId);
         }
-
-        [Fact]
-        public async void Recompensa_Crear_Correcto()
-        {
-            // Arrange
-            Condicion recompensa = TestData.CrearRecompensa(500, "Energia");
-
-            // Act
-            await _condicionLogica.CrearRecompensa(recompensa);
-
-            // Assert
-            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Once);
-        }
-
-        [Fact]
-        public async void Recompensa_Crear_FallaSiEligeRecuroAndEstructura()
-        {
-            // Arrange
-            Condicion recompensa = TestData.CrearRecompensa(500, "Energia");
-            recompensa.EstructuraId = 1;
-
-            // Act & Assert
-            await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
-        }
-
-        [Fact]
-        public async void Crear_ConColumnaMal_Falla()
-        {
-            // Arrange
-            Condicion recompensa = TestData.CrearRecompensa(500, "MAL");
-
-            // Act & Assert
-            await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
-        }
-
-        [Fact]
-        public async void Crear_ConColumnaAndEstructuraNull_Falla()
-        {
-            // Arrange
-            Condicion recompensa = TestData.CrearRecompensa(500);
-
-            // Act & Assert
-            await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
-        }
-
-        [Fact]
-        public async void Crear_ConCantidadNegativa_Falla()
-        {
-            // Arrange
-            Condicion recompensa = TestData.CrearRecompensa(-500, "Energia");
-
-            // Act & Assert
-            await Assert.ThrowsAsync<CondicionExcepcion>(() => _condicionLogica.CrearRecompensa(recompensa));
-            _mockCondicionRepositorio.Verify(r => r.Agregar(It.IsAny<Condicion>()), Times.Never);
-        }
-
-        [Fact]
-        public async void Obtener_Recompensa_OK()
-        {
-            // Arrange
-            Condicion recompensa1 = TestData.CrearRecompensa(500, "Energia");
-            Condicion recompensa2 = TestData.CrearRecompensa(300, "Energia");
-            Condicion recompensa3 = TestData.CrearRecompensa(400, "Energia");
-            var listaRecompensas = new List<Condicion> { recompensa1, recompensa2, recompensa3 };
-            _mockCondicionRepositorio
-                .Setup(r => r.ObtenerTodasRecompensas())
-                .ReturnsAsync(listaRecompensas);
-
-            // Act
-            var resultado = await _condicionLogica.ObtenerListadoRecompensas();
-
-            // Assert
-            Assert.Equal(listaRecompensas.Count, resultado.Count);
-            Assert.Equal(listaRecompensas[0].NombreColumna, resultado[0].NombreColumna);
-        }
+        
     }
 }

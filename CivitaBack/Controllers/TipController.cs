@@ -2,8 +2,10 @@
 using CivitaBack.Data.BO;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers
@@ -52,6 +54,7 @@ namespace CivitaBack.Api.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Actualizar([FromBody] TipDTO? tipDto, int id)
         {
             try
@@ -59,6 +62,30 @@ namespace CivitaBack.Api.Controllers
                 var tip = base.Mapear<Tip>(tipDto);
                 await this._tipLogica.Actualizar(tip, id);
                 return Ok();
+            }
+            catch (DominioException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Problem("Ocurrió un error al actualizar el Tip.");
+            }
+        }
+        
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            try
+            {
+                await this._tipLogica.Eliminar(id);
+                return NoContent();
+            }
+            catch (DominioException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
@@ -76,6 +103,10 @@ namespace CivitaBack.Api.Controllers
             {
                 await this._tipLogica.Crear(base.Mapear<Tip>(tipDto));
                 return Created();
+            }
+            catch (AccesoDenegadoExcepcion ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
             }
             catch (Exception ex)
             {

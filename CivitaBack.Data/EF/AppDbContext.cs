@@ -18,6 +18,8 @@ public partial class AppDbContext : DbContext
     public DbSet<TipEnPartidaEF> TipEnPartida { get; set; }
     public DbSet<TipoTipEF> TipoTip { get; set; }
     public DbSet<CondicionEF> Condicion { get; set; }
+    
+    public DbSet<RecompensaEF> Recompensa { get; set; }
     public DbSet<TipoLogroEF> TipoLogro { get; set; }
     public DbSet<LogroEF> Logro { get; set; }
     public DbSet<LogroPartidaEF> LogroPartida { get; set; }
@@ -25,6 +27,8 @@ public partial class AppDbContext : DbContext
     public DbSet<MisionEF> Mision { get; set; }
     
     public DbSet<MisionPartidaEF> MisionPartida { get; set; }
+
+    public DbSet<EfectoEventoEF> EfectoEvento { get; set; }
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 

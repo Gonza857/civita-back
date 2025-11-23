@@ -18,6 +18,8 @@ namespace CivitaBack.Data.BO
         public bool EfectoFiltro { get; set; }
         public int TipoId { get; set; }
         public TipoTipEF TipoTip { get; set; }
+        
+        public int? Orden { get; set; }
 
         public List<TipEnPartidaEF?> TipEnPartida { get; set; }
 

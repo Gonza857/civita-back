@@ -66,13 +66,12 @@ public static class TestData
         EstructuraId = 0,
     };
 
-    public static Condicion CrearRecompensa(int cantidad, string? columna = null, int? estructuraId = null) => new Condicion
+    public static Recompensa CrearRecompensa(int cantidad, string? columna = null, int? estructuraId = null) => new Recompensa
     {
         Id = 1,
         NombreColumna = columna,
         Cantidad = cantidad,
         EstructuraId = estructuraId,
-        EsRecompensa = true,
     };
 
     public static Condicion CrearRecompensaDTO(int cantidad, string? columna = null, int? estructuraId = null) => new Condicion
@@ -81,7 +80,6 @@ public static class TestData
         NombreColumna = columna,
         Cantidad = cantidad,
         EstructuraId = estructuraId,
-        EsRecompensa = true,
     };
 
 }

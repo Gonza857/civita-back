@@ -1,6 +1,8 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
 using Microsoft.Extensions.Configuration;
 
@@ -10,27 +12,30 @@ public class InicialLogica : IInicialLogica
 {
     private readonly IUnidadDeTrabajo _uow;
     private readonly IPartidaRepositorio _partidaRepositorio;
-    private readonly IUsuarioRepositorio _usuarioRepositorio;
     private readonly IMisionPartidaRepositorio _misionPartidaRepositorio;
     private readonly IMisionRepositorio _misionRepositorio;
+    private readonly IAccesoUsuarios _accesoUsuarios;
 
     public InicialLogica(
         IUnidadDeTrabajo uow, 
         IPartidaRepositorio partidaRepositorio, 
         IMisionPartidaRepositorio misionPartidaRepositorio,
         IUsuarioRepositorio usuarioRepositorio,
-        IMisionRepositorio misionRepositorio
+        IMisionRepositorio misionRepositorio,
+        IAccesoUsuarios accesoUsuarios
         )
     {
         _uow = uow;
-        _usuarioRepositorio = usuarioRepositorio;
         _misionPartidaRepositorio = misionPartidaRepositorio;
         _partidaRepositorio = partidaRepositorio;
         _misionRepositorio = misionRepositorio;
+        _accesoUsuarios = accesoUsuarios;
     }
 
     public async Task IniciarPartida(Usuario usuario)
     {
+        // _accesoUsuarios.ValidarAcceso(usuario.Id);
+
         var misiones = await this._misionRepositorio.ObtenerTodos();
         
         var partida = new Partida
@@ -38,37 +43,39 @@ public class InicialLogica : IInicialLogica
             Usuario = usuario,
             JsonMapa = this.GenerarMapa(),
             UltimaVez = DateTime.UtcNow,
+            Nivel = 0,
+            Experiencia = 0,
         };
-        partida.Recursos = this.GenerarRecursos(partida);
-        await this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida);
+        
+        partida.Recursos = this.GenerarRecursos();
         await this._partidaRepositorio.Agregar(partida);
+        await this._uow.CommitAsync();
+        
+        await this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida);
         await this._uow.CommitAsync();
     }
 
-    private Recurso GenerarRecursos(Partida partida)
+    private Recurso GenerarRecursos()
     {
         return new Recurso
         {
             EcoCoins = 450,
             Felicidad = 40,
-            Energia = 30,
-            Contaminacion = 60,
-            Partida = partida,
+            Energia = 70,
+            Contaminacion = 65,
         };
     }
 
     private string GenerarMapa()
     {
-        var rutaMapa = Path.Combine(
-            AppDomain.CurrentDomain.BaseDirectory,
-            "..", "..", "..", "..",
-            "CivitaBack.Data", "Mapa", "MapaJuego.json"
-        );
-
-        rutaMapa = Path.GetFullPath(rutaMapa);
-
+        string baseDirectorio = AppContext.BaseDirectory;
+        var rutaMapa = Path.Combine(baseDirectorio, "Mapa", "MapaJuego.json");
+        
         if (!File.Exists(rutaMapa))
+        {
+            // _logger.LogError("El archivo de mapa no se encuentra en la ruta esperada: {rutaMapa}", rutaMapa);
             throw new FileNotFoundException("No se encontró el archivo de mapa base.", rutaMapa);
+        }
 
         return File.ReadAllText(rutaMapa);
     }
