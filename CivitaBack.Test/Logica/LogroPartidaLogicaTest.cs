@@ -303,7 +303,7 @@ public class LogroPartidaLogicaTest
         partida.Recursos = TestData.CrearRecurso(partida, 500, 0, 0, 0); // 500 Energía, 0 Oro
         partida.EstructuraMapa = new List<EstructuraMapa>();
 
-        // La recompensa (que es de tipo Condicion) da 100 de Oro
+        // La recompensa (que es de tipo Condicion) da 500 de Oro
         Recompensa recompensa = TestData.CrearRecompensa(500, "EcoCoins");
         Condicion condicion = TestData.CrearCondicion("Energia", 500);
         condicion.Recompensas.Add(recompensa);
@@ -323,7 +323,7 @@ public class LogroPartidaLogicaTest
         // Assert
 
         // 1. ¿Se aplicó la recompensa? (El Oro subió a 100)
-        Assert.Equal(100, partida.Recursos.EcoCoins);
+        Assert.Equal(500, partida.Recursos.EcoCoins);
 
         // 2. ¿Se preparó la actualización de Recursos UNA VEZ?
         _mockRecursoRepo.Verify(

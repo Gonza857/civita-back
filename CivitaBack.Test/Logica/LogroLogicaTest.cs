@@ -258,8 +258,8 @@ public class LogroLogicaTest
         {
             Titulo = "Nuevo Logro",
             Descripcion = "Descripción",
-            TipoLogro = tipoLogro,
-            Condicion = condicion
+            TipoLogroId = tipoLogro.Id,
+            CondicionId = condicion.Id
         };
 
         _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(true);

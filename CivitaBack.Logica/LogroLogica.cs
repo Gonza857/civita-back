@@ -96,11 +96,9 @@ public class LogroLogica : ILogroLogica
     /// <summary>
     /// Guarda un logro
     /// </summary>
-    /// <param name="logroDTO">LogroDTO</param>
+    /// <param name="Logro">entidad</param>
     public async Task Crear(Logro entidad)
     {
-        ValidarAdmin();
-
         this.ValidarLogro(entidad);
         TipoLogro? tipoLogro = await this.repositorioTipoLogro.ObtenerPorId(entidad.TipoLogroId);
         if (tipoLogro == null) 

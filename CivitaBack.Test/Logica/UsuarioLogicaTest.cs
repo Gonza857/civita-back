@@ -51,13 +51,8 @@ public class UsuarioLogicaTest
         _mockUsuarioRepositorio.Setup(r => r.ObtenerPorId(idUsuario))
             .ReturnsAsync((Usuario?)null);
 
-        // Act
-        var resultado = await _usuarioLogica.ObtenerPorId(idUsuario);
-
-        // Assert
-        // El método actual no lanza excepción si el usuario es null, solo retorna null
-        // Esto es un comportamiento que podría mejorarse, pero por ahora el test refleja el comportamiento actual
-        Assert.Null(resultado);
+        // Act && Assert
+        await Assert.ThrowsAsync<DominioException>(() => _usuarioLogica.ObtenerPorId(idUsuario));
         _mockUsuarioRepositorio.Verify(r => r.ObtenerPorId(idUsuario), Times.Once);
     }
 
