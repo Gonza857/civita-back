@@ -7,6 +7,7 @@ public interface IPartidaLogica
     Task<Partida> ObtenerPorUsuarioId(int idUsuario);
     Task<Partida> CrearPartida(int idUsuario);
     Task Actualizar(Partida partida, Usuario usuario);
+    Task Actualizar(Partida partida);
     Task<List<Partida>> ObtenerPartidas();
     Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario);
     

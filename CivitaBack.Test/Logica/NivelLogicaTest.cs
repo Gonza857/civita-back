@@ -16,13 +16,15 @@ public class NivelLogicaTest
     [Fact]
     public void SaberSiPuedeSubirNivel_Sale_OK()
     {
-        this._nivelLogica.SubirNivel(0, 151);
+        int nivelActual = 0;
+        this._nivelLogica.SubirNivel(ref nivelActual, 151);
     }
     
     [Fact]
     public void SaberSiPuedeSubirNivel_Sale_MAL()
     {
-        Assert.Throws<Exception>(() => this._nivelLogica.SubirNivel(0, 99));
+        int nivelActual = 0;
+        Assert.Throws<Exception>(() => this._nivelLogica.SubirNivel(ref nivelActual, 99));
     }
     
     [Fact]
