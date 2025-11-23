@@ -46,7 +46,6 @@ public class AuthController : BaseApiController
         {
             Usuario? usuarioExistente = await this._usuarioLogica.ObtenerUsuarioPorNombre(request.NombreUsuario);
             Usuario usuario = this._authLogica.CrearUsuarioInicial(request.NombreUsuario, usuarioExistente);
-            
             await this._inicialLogica.IniciarPartida(usuario);
             
             var usuarioRegistrado = await this._authLogica.IniciarSesion(request.NombreUsuario);
