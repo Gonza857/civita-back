@@ -44,32 +44,19 @@ public class AuthController : BaseApiController
     {
         try
         {
-            Usuario usuario = await _authLogica.CrearUsuario(request.NombreUsuario, request.Mail, request.Password);
+            Usuario? usuarioExistente = await this._usuarioLogica.ObtenerUsuarioPorNombre(request.NombreUsuario);
+            Usuario usuario = this._authLogica.CrearUsuarioInicial(request.NombreUsuario, usuarioExistente);
+            
             await this._inicialLogica.IniciarPartida(usuario);
-            Usuario usuarioPartida = await _usuarioLogica.ObtenerPorCorreo(request.Mail);
-
-            Partida partida = usuarioPartida.Partida;
-
-            string token = await _authLogica.IniciarSesion(request.Mail, request.Password);
-
-            _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddHours(1));
-
-            var response = new LoginDTO
-            {
-                NombreUsuario = usuarioPartida.NombreUsuario!,
-                Mail = usuarioPartida.Mail!,
-                IdUsuario = usuarioPartida.Id!,
-                IdPartida = partida.Id
-            };
-
-            return Ok(new { mensaje = "Usuario registrado correctamente!", response });
+            
+            var usuarioRegistrado = await this._authLogica.IniciarSesion(request.NombreUsuario);
+            var token = this._authLogica.GenerarToken(usuarioRegistrado);
+            
+            _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddDays(7));
+            
+            return Ok(new {id = usuarioRegistrado.Id});
         }
-        catch (AutenticacionException ex)
-        {
-            Response.Cookies.Delete("jwt-auth");
-            return Unauthorized(new { error = ex.Message });
-        }
-        catch (ValidacionRegistroException ex)
+        catch (DominioException ex)
         {
             return BadRequest(ex.Message);
         }

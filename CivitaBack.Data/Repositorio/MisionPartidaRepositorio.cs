@@ -34,7 +34,7 @@ public class MisionPartidaRepositorio
         {
             var nuevaAsignacion = new MisionPartida
             {
-                PartidaId = partida.Id,
+                Partida = partida,
                 MisionId = mision.Id,
                 FechaEntrega = DateTime.UtcNow,
                 Reclamado = false 

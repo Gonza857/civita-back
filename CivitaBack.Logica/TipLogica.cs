@@ -74,13 +74,13 @@ namespace CivitaBack.Logica
         {
             var tipoTip = await this._tiposTipRepositorio.ObtenerPorId(tip.TipoId);
             if (tipoTip == null)
-                throw new Exception("No se pudo guardar el tip.");
+                throw new DominioException("No se pudo guardar el tip.");
 
             var tipDb = await this._tipsRepositorio.ObtenerPorId(id);
             if (tipDb == null)
-                throw new Exception("No se pudo guardar el tip.");
+                throw new DominioException("No se pudo guardar el tip.");
 
-            ValidarAdmin();
+            // ValidarAdmin();
 
             tipDb.TipoTip = tipoTip;
             tipDb.Expresion = tip.Expresion;
@@ -95,7 +95,7 @@ namespace CivitaBack.Logica
             }
             catch (Exception ex)
             {
-                throw new ErrorInternoException("Ocurrió un error al Actualizar un Tip");
+                throw new Exception("Ocurrió un error al Actualizar un Tip");
             }
         }
 
@@ -103,6 +103,14 @@ namespace CivitaBack.Logica
         public async Task<Tip?> ObtenerPorIdTipo(int id)
         {
             return await this._tipsRepositorio.ObtenerPorId(id);
+        }
+
+        public async Task Eliminar(int id)
+        {
+            Tip? tip = await this._tipsRepositorio.ObtenerPorId(id);
+            if (tip == null) throw new DominioException("No se encontró el tip");
+            await this._tipsRepositorio.Eliminar(id);
+            await this._uow.CommitAsync();
         }
 
         private void ValidarAdmin()
