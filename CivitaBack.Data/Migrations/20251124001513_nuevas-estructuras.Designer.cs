@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251124001513_nuevas-estructuras")]
+    partial class nuevasestructuras
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,7 +230,7 @@ namespace CivitaBack.Data.Migrations
                             EsMejorable = false,
                             FelicidadCiclo = 2,
                             Nombre = "Parque",
-                            RutaImagen = "/Assets/mapa/Estructura-Parque-Pequeño.png",
+                            RutaImagen = "Estructura-Parque-Pequeño.png",
                             TipoEstructuraId = 4
                         },
                         new
@@ -240,7 +243,7 @@ namespace CivitaBack.Data.Migrations
                             EsMejorable = false,
                             FelicidadCiclo = 5,
                             Nombre = "Hotel",
-                            RutaImagen = "/Assets/mapa/Estructura-Hotel.png",
+                            RutaImagen = "Estructura-Hotel.png",
                             TipoEstructuraId = 5
                         },
                         new
@@ -253,7 +256,7 @@ namespace CivitaBack.Data.Migrations
                             EsMejorable = false,
                             FelicidadCiclo = 3,
                             Nombre = "Planta Neocorp",
-                            RutaImagen = "/Assets/mapa/Estructura-Fabrica-Nivel-2.png",
+                            RutaImagen = "Estructura-Fabrica-Nivel-2.png",
                             TipoEstructuraId = 6
                         },
                         new
@@ -266,7 +269,7 @@ namespace CivitaBack.Data.Migrations
                             EsMejorable = false,
                             FelicidadCiclo = 0,
                             Nombre = "Panel solar",
-                            RutaImagen = "/Assets/mapa/Estructura-Panel-Solar.png",
+                            RutaImagen = "Estructura-Panel-Solar.png",
                             TipoEstructuraId = 7
                         });
                 });
