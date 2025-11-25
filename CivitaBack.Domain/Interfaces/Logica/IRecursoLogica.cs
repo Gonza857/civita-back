@@ -8,5 +8,5 @@ public interface IRecursoLogica
 
     Task<Recurso> ObtenerRecursos(int idPartida);
     Task ModificarEnergia(int idPartida, int cantidad);
-    
+    Task<Recurso> ImpactarPremiosMiniJuego(Partida partida,Recurso recursos);
 }

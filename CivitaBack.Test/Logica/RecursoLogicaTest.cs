@@ -14,18 +14,23 @@ public class RecursoLogicaTest
     private readonly Mock<IRecursoRepositorio> _mockRecursoRepositorio;
     private readonly Mock<IUnidadDeTrabajo> _mockUow;
     private readonly Mock<IAccesoUsuarios> _mockAccesoUsuarios;
+    private readonly Mock<IActualizarRecursosLogica> _mockActualizarRecursosLogica;
     private readonly IRecursoLogica _recursoLogica;
+    private readonly Mock<IPartidaRepositorio>_mockPartidaRepositorio;
 
     public RecursoLogicaTest()
     {
         _mockRecursoRepositorio = new Mock<IRecursoRepositorio>();
         _mockUow = new Mock<IUnidadDeTrabajo>();
         _mockAccesoUsuarios = new Mock<IAccesoUsuarios>();
-
+        _mockActualizarRecursosLogica = new Mock<IActualizarRecursosLogica>();
+        _mockPartidaRepositorio = new Mock<IPartidaRepositorio>(); 
         _recursoLogica = new RecursoLogica(
             _mockRecursoRepositorio.Object,
             _mockUow.Object,
-            _mockAccesoUsuarios.Object
+            _mockAccesoUsuarios.Object,
+            _mockActualizarRecursosLogica.Object,
+            _mockPartidaRepositorio.Object
         );
 
         _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(1);

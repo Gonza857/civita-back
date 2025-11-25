@@ -4,6 +4,7 @@ using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Utils;
 using CivitaBack.Logica.Interfaces;
+using CivitaBack.Data.DTO;
 
 namespace CivitaBack.Logica;
 
@@ -12,12 +13,16 @@ public class RecursoLogica : IRecursoLogica
     private readonly IRecursoRepositorio _repositorioRecurso;
     private readonly IUnidadDeTrabajo _uow;
     private readonly IAccesoUsuarios _accesoUsuarios;
+    private readonly IActualizarRecursosLogica _crudRecursosLogica;
+    private readonly IPartidaRepositorio _partidaRepositorio; 
 
-    public RecursoLogica(IRecursoRepositorio rr, IUnidadDeTrabajo uow, IAccesoUsuarios accesoUsuarios)
+    public RecursoLogica(IRecursoRepositorio rr, IUnidadDeTrabajo uow, IAccesoUsuarios accesoUsuarios, IActualizarRecursosLogica crl,IPartidaRepositorio pr)
     {
         _repositorioRecurso = rr;
         _uow = uow;
         _accesoUsuarios = accesoUsuarios;
+        _crudRecursosLogica = crl;
+        _partidaRepositorio = pr; 
     }
 
     public async Task ConfigurarInicial(Partida partida)
@@ -64,5 +69,19 @@ public class RecursoLogica : IRecursoLogica
         // Guardamos los cambios
         await _repositorioRecurso.Actualizar(recurso);
         await this._uow.CommitAsync();
+    }
+
+    public async Task<Recurso> ImpactarPremiosMiniJuego(Partida partida, Recurso recursos)
+    {
+        Recurso recursoAdevolver = new Recurso(); 
+        
+        _crudRecursosLogica.ActualizarRecursosAsync(partida,recursos.Felicidad, recursos.Contaminacion, recursos.EcoCoins, recursos .Energia);
+         await _partidaRepositorio.Actualizar(partida);
+        
+        await this._uow.CommitAsync();
+
+        recursoAdevolver = await ObtenerRecursos(partida.Id); 
+        return recursoAdevolver; 
+        
     }
 }
