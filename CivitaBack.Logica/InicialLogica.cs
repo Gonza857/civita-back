@@ -45,13 +45,12 @@ public class InicialLogica : IInicialLogica
             UltimaVez = DateTime.UtcNow,
             Nivel = 0,
             Experiencia = 0,
+            Recursos = this.GenerarRecursos(),
         };
         
-        partida.Recursos = this.GenerarRecursos();
-        await this._partidaRepositorio.Agregar(partida);
-        await this._uow.CommitAsync();
+        partida.MisionPartidas = this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida);
         
-        await this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida);
+        await this._partidaRepositorio.Agregar(partida);
         await this._uow.CommitAsync();
     }
 

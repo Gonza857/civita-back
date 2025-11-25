@@ -3,6 +3,7 @@ using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
@@ -41,6 +42,7 @@ public class MisionController : BaseApiController
     }
     
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Guardar([FromBody] MisionDTO? nuevaMisionDto)
     {
         if (nuevaMisionDto == null)
@@ -50,10 +52,6 @@ public class MisionController : BaseApiController
             Mision misionNueva = base.Mapear<Mision>(nuevaMisionDto);
             await _misionLogica.Crear(misionNueva);
             return Ok();
-        }
-        catch (AccesoDenegadoExcepcion ex)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (LogroExcepcion ex)
         {
@@ -99,20 +97,14 @@ public class MisionController : BaseApiController
     }
     
     [HttpPatch("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> PatchMision([FromBody] MisionDTO? misionDto, int id)
     {
-        if (misionDto == null)
-            return BadRequest("Los datos recibidos son inválidos");
-
         try
         {
             var mision = base.Mapear<Mision>(misionDto);
             await this._misionLogica.Actualizar(mision, id);
             return Ok();
-        }
-        catch (AccesoDenegadoExcepcion ex)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
         }
         catch (MisionExcepcion ex)
         {

@@ -391,8 +391,7 @@ public class PartidaController : BaseApiController
         try
         {
             Partida p = await _partidaLogica.ObtenerPorId(idPartida);
-            int nivelActual = p.Nivel;
-            this._nivelLogica.SubirNivel(ref nivelActual, p.Experiencia);
+            this._nivelLogica.SubirNivel(p);
             await this._partidaLogica.Actualizar(p);
             return Ok();
         }

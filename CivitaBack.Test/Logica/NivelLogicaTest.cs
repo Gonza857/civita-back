@@ -1,4 +1,5 @@
-﻿using CivitaBack.Logica;
+﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Logica;
 
 namespace CivitaBack.Tests.Logica;
 
@@ -16,15 +17,19 @@ public class NivelLogicaTest
     [Fact]
     public void SaberSiPuedeSubirNivel_Sale_OK()
     {
-        int nivelActual = 0;
-        this._nivelLogica.SubirNivel(ref nivelActual, 151);
+        Usuario u = TestData.CrearUsuarioBase();
+        Partida p = TestData.CrearPartida(u);
+        p.Experiencia = 151;
+        this._nivelLogica.SubirNivel(p);
     }
     
     [Fact]
     public void SaberSiPuedeSubirNivel_Sale_MAL()
     {
-        int nivelActual = 0;
-        Assert.Throws<Exception>(() => this._nivelLogica.SubirNivel(ref nivelActual, 99));
+        Usuario u = TestData.CrearUsuarioBase();
+        Partida p = TestData.CrearPartida(u);
+        p.Experiencia = 99;
+        Assert.Throws<Exception>(() => this._nivelLogica.SubirNivel(p));
     }
     
     [Fact]

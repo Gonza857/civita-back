@@ -225,7 +225,7 @@ using (var scope = app.Services.CreateScope())
         "mision-diaria",
         Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Diaria)),
         // Cron.Daily(0, 0)
-        "*/30 * * * * *" // <--- Modificado a 30 segundos
+        "0,30 * * * *" // <--- Modificado a 30 segundos
     );
     
     recurringJobs.AddOrUpdate(

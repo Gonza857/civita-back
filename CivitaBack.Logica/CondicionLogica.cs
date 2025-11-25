@@ -113,6 +113,21 @@ public class CondicionLogica : ICondicionLogica
         return condicionesOk;
     }
     
+    /// <summary>
+    /// Filtra una lista de condiciones para devolver solo las que se cumplen.
+    /// </summary>
+    public List<MisionPartida> FiltrarMisionesQueNoCumplen(List<MisionPartida> misionesPartida, Partida partida)
+    {
+        List<MisionPartida> mpsOk = new List<MisionPartida>();
+        
+        foreach (MisionPartida mp in misionesPartida)
+        {
+            if (!SeCumpleCondicion(mp.Mision.Condicion, partida))
+                mpsOk.Add(mp);
+        }
+        return mpsOk;
+    }
+    
     // --- MÉTODOS PRIVADOS REUTILIZABLES ---
     
     /// <summary>

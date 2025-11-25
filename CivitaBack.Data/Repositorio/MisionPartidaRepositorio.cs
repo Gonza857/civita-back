@@ -27,29 +27,45 @@ public class MisionPartidaRepositorio
         return Task.CompletedTask;
     }
 
-    public async Task AgregarMisionesPartida(List<Mision> misiones, Partida partida)
+    public List<MisionPartida> AgregarMisionesPartida(List<Mision> misiones, Partida partida)
     {
         var misionesPartida = new List<MisionPartida>();
         foreach (var mision in misiones)
         {
             var nuevaAsignacion = new MisionPartida
             {
-                Partida = partida,
                 MisionId = mision.Id,
                 FechaEntrega = DateTime.UtcNow,
                 Reclamado = false 
             };
+
+            if (partida.Id == 0)
+            {
+                nuevaAsignacion.Partida = partida;
+            }
+            else
+            {
+                nuevaAsignacion.PartidaId = partida.Id;
+            }
             
             misionesPartida.Add(nuevaAsignacion);
         }
-        
-        await base.AgregarVarios(misionesPartida);
+
+        return misionesPartida;
+    }
+
+    public void GuardarMisionesPartida(Partida partida)
+    {
+        PartidaEF pEf = _mapper.Map<PartidaEF>(partida);
+        _context.Attach(pEf);
+        base.AgregarVarios(partida.MisionPartidas);
     }
 
     public async Task<List<MisionPartida>> ObtenerMisionesPartida(int idPartida)
     {
         var misiones = await _context.MisionPartida
             .Include(mp => mp.Mision)
+            .ThenInclude(m => m.Condicion)
             .AsNoTracking()
             .Where(mp => mp.PartidaId == idPartida && mp.Mision.Disponible)
             .ToListAsync();
@@ -61,6 +77,16 @@ public class MisionPartidaRepositorio
     {
         var misionPartida = await this.ObtenerMisionDePartidaBase(idPartida, idMision);
         return base.Mapear<MisionPartida>(misionPartida);
+    }
+
+    public async Task<List<MisionPartida>> ObtenerMisionesAsignadas(int idPartida)
+    {
+        var mpList = await _context.MisionPartida
+            .Include(mp => mp.Mision)
+            .AsNoTracking()
+            .Where(mp => mp.PartidaId == idPartida)
+            .ToListAsync();
+        return base.MapearLista<MisionPartida>(mpList);
     }
 
     public async Task<Mision> ObtenerMisionPartidaPorId(int idPartida, int idMision)

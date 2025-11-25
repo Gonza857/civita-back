@@ -46,9 +46,11 @@ public class MisionPartidaController : BaseApiController
     {
         try
         {
-            Partida partida = await this._partidaLogica.ObtenerPorId(idPartida);
             var misionesActivas = await this._misionLogica.ObtenerMisionesDisponibles();
+            
+            Partida partida = await this._partidaLogica.ObtenerPorId(idPartida);
             await this._misionPartidaLogica.AsignarMisiones(misionesActivas, partida);
+            
             return Ok("Misiones asignadas a la partida");
         }
         catch (Exception ex)
@@ -96,8 +98,18 @@ public class MisionPartidaController : BaseApiController
         try
         {
             Partida? partida = await this._partidaLogica.ObtenerPorId(idPartida);
-            var misiones = await _misionLogica.ObtenerMisionesActivasParaPartida(partida);
-            return Ok(base.MapearLista<MisionDTO>(misiones));
+            List<MisionPartida> misionesPartida = await _misionPartidaLogica.ObtenerMisionesActivasParaPartida(partida);
+            List<MisionPartida> misionesNoReclamables = this._condicionLogica.FiltrarMisionesQueNoCumplen(misionesPartida, partida);
+            
+            misionesPartida = this._misionPartidaLogica.ProcesarMisionesPartida(misionesPartida, misionesNoReclamables);
+            var misionesNoReclamablesDto = this.mapearLista(misionesNoReclamables, false);
+            var misionesNormales = this.mapearLista(misionesPartida, true);
+            
+            var listaUnica = misionesNoReclamablesDto
+                .Concat(misionesNormales)
+                .ToList();
+
+            return Ok(listaUnica);
         }
         catch (MisionExcepcion ex)
         {
@@ -108,5 +120,12 @@ public class MisionPartidaController : BaseApiController
             _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al obtener el listado de Misiones.");
         }
+    }
+
+    private List<MisionPartidaDTO> mapearLista(List<MisionPartida> mps, bool noReclamable)
+    {
+        var dtos = base.MapearLista<MisionPartidaDTO>(mps);
+        dtos.ForEach(dto => dto.PuedeReclamar = noReclamable);
+        return dtos;
     }
 }

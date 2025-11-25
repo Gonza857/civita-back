@@ -4,7 +4,7 @@ namespace CivitaBack.Logica;
 
 public interface INivelLogica
 {
-    void SubirNivel(ref int nivel, int experiencia);
+    void SubirNivel(Partida partida);
     int ObtenerExperienciaFaltanteParaSiguienteNivel(int nivel, int experiencia);
     
     bool PuedeSubir (int xpActual, int nivelActual);
@@ -33,11 +33,11 @@ public class NivelLogica : INivelLogica
         return xpActual >= xpNecesaria;
     }
 
-    public void SubirNivel(ref int nivel, int experiencia)
+    public void SubirNivel(Partida partida)
     {
-        if (!PuedeSubir(experiencia, nivel))
+        if (!PuedeSubir(partida.Experiencia, partida.Nivel))
             throw new Exception("No puede subir de nivel todavía");
-        nivel++;
+        partida.Nivel++;
     }
 
     public int ObtenerExperienciaFaltanteParaSiguienteNivel(int nivel, int experiencia)
