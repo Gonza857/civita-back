@@ -65,10 +65,42 @@ public class PartidaLogica : IPartidaLogica
         if (partidaBuscada == null || partidaBuscada.Recursos == null)
             throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No encontrada.");
         
-        partidaBuscada!.Recursos.Contaminacion = partida.Recursos!.Contaminacion;
+        partidaBuscada.Recursos.Contaminacion = partida.Recursos!.Contaminacion;
         partidaBuscada.Recursos.Energia = partida.Recursos.Energia;
         partidaBuscada.Recursos.Felicidad = partida.Recursos.Felicidad;
         partidaBuscada.Recursos.EcoCoins = partida.Recursos.EcoCoins;
+        partidaBuscada.Nivel = partida.Nivel;
+        partidaBuscada.Experiencia = partida.Experiencia;
+        
+        try
+        {
+            await this._repositorioPartida.Actualizar(partidaBuscada);
+            await this._uow.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new ErrorInternoException("Ocurrió un error al Actualizar un la Partida");
+        }
+    }
+
+    public async Task Actualizar(Partida partida)
+    {
+        this.ValidarRecursosPartida(partida);
+        
+        Partida? partidaBuscada = await this._repositorioPartida.ObtenerPorId(partida.Id);
+        
+        partidaBuscada.Nivel = partida.Nivel;
+        partidaBuscada.Experiencia = partida.Experiencia;
+        
+        if (partidaBuscada == null || partidaBuscada.Recursos == null)
+            throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No encontrada.");
+        
+        partidaBuscada.Recursos.Contaminacion = partida.Recursos!.Contaminacion;
+        partidaBuscada.Recursos.Energia = partida.Recursos.Energia;
+        partidaBuscada.Recursos.Felicidad = partida.Recursos.Felicidad;
+        partidaBuscada.Recursos.EcoCoins = partida.Recursos.EcoCoins;
+        partidaBuscada.Nivel = partida.Nivel;
+        partidaBuscada.Experiencia = partida.Experiencia;
         
         try
         {

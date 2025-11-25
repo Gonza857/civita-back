@@ -66,6 +66,20 @@ public class AuthController : BaseApiController
         }
     }
 
+    [HttpGet("Logout")]
+    public IActionResult Logout()
+    {
+        try
+        {
+            Response.Cookies.Delete("jwt-auth");
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al cerrar sesión");
+        }
+    }
+
     [HttpGet("Validar")]
     public async Task<IActionResult> Validar()
     {

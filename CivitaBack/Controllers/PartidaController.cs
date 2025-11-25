@@ -4,6 +4,7 @@ using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Enum;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Excepciones;
+using CivitaBack.Logica;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
@@ -19,6 +20,7 @@ public class PartidaController : BaseApiController
     private readonly ILogroPartidaLogica _logroPartidaLogica;
     private readonly IMapaLogica _mapaLogica;
     private readonly ICompraEstructurasLogica _compraEstructurasLogica;
+    private readonly INivelLogica _nivelLogica;
     private readonly ILogger<PartidaController> _logger;
 
     public PartidaController(
@@ -31,6 +33,7 @@ public class PartidaController : BaseApiController
         ILogroPartidaLogica logroPartidaLogica,
         IMapaLogica mapaLogica,
         ICompraEstructurasLogica compraEstructurasLogica,
+        INivelLogica nivelLogica,
         IMapper mapper) : base(mapper)
     {
         _partidaLogica = partidaLogica;
@@ -42,6 +45,7 @@ public class PartidaController : BaseApiController
         _mapaLogica = mapaLogica;
         _compraEstructurasLogica = compraEstructurasLogica;
         _logger = logger;
+        _nivelLogica = nivelLogica;
     }
 
     [HttpPost("expo/iniciar")]
@@ -348,6 +352,53 @@ public class PartidaController : BaseApiController
         catch (Exception)
         {
             return Problem("Ocurrió un error interno al procesar la compra.");
+        }
+    }
+
+    [HttpGet("PuedeSubirNivel/{idPartida}")]
+    public async Task<IActionResult> SaberSiPuedeSubirNivel(int idPartida)
+    {
+        try
+        {
+            Partida p = await _partidaLogica.ObtenerPorId(idPartida);
+            bool puede = this._nivelLogica.PuedeSubir(p.Experiencia, p.Nivel);
+            return Ok(puede);
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error.");
+        }
+    }
+    
+    [HttpGet("ExperienciaSiguienteNivel/{idPartida}")]
+    public async Task<IActionResult> SaberExperienciaParaSiguienteNivel(int idPartida)
+    {
+        try
+        {
+            Partida p = await _partidaLogica.ObtenerPorId(idPartida);
+            int cantidad = this._nivelLogica.ObtenerExperienciaFaltanteParaSiguienteNivel(p.Nivel, p.Experiencia);
+            return Ok(cantidad);
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error.");
+        }
+    }
+    
+    [HttpGet("SubirNivelSiEsPosible/{idPartida}")]
+    public async Task<IActionResult> SubirNivelSiEsPosible(int idPartida)
+    {
+        try
+        {
+            Partida p = await _partidaLogica.ObtenerPorId(idPartida);
+            int nivelActual = p.Nivel;
+            this._nivelLogica.SubirNivel(ref nivelActual, p.Experiencia);
+            await this._partidaLogica.Actualizar(p);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error.");
         }
     }
 

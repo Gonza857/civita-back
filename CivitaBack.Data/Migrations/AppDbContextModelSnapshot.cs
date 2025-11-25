@@ -631,6 +631,9 @@ namespace CivitaBack.Data.Migrations
                     b.Property<DateTime?>("Editado")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("Experiencia")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("EstaPausada")
                         .HasColumnType("boolean");
 

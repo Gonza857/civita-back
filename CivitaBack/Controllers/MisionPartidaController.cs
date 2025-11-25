@@ -74,6 +74,7 @@ public class MisionPartidaController : BaseApiController
             await this._recompensaLogica.ReclamarRecompensas(mision.Condicion.Recompensas.ToList(), partida);
             await this._misionPartidaLogica.MarcarMisionCompletada(mision, partida);
             // await this._nivelLogica
+            // await _nivelLogica.
             
             return Ok();
         }
