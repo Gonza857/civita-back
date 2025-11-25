@@ -115,7 +115,7 @@ public class AuthController : BaseApiController
 
             Partida? partida = await _partidaLogica.ObtenerPartidaParaLogin(usuario.Id);
 
-            _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddHours(1));
+            _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddDays(7));
 
             var response = new LoginDTO
             {
