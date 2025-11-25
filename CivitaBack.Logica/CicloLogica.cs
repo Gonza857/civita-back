@@ -1,6 +1,8 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
+using CivitaBack.Logica.Backgrounds;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica
@@ -11,12 +13,14 @@ namespace CivitaBack.Logica
         private readonly IPartidaRepositorio _partidaRepositorio;
         private readonly IUnidadDeTrabajo _uow;
         private readonly IActualizarRecursosLogica _actualizarRecursosLogica;
+        private readonly BackgroundCicloLogica _backgroundCicloLogica;
 
-        public CicloLogica(IPartidaRepositorio partidaRepositorio, IUnidadDeTrabajo uow, IActualizarRecursosLogica actualizarRecursosLogica)
+        public CicloLogica(IPartidaRepositorio partidaRepositorio, IUnidadDeTrabajo uow, IActualizarRecursosLogica actualizarRecursosLogica, BackgroundCicloLogica backgroundCicloLogica)
         {
             _partidaRepositorio = partidaRepositorio;
             _uow = uow;
             _actualizarRecursosLogica = actualizarRecursosLogica;
+            _backgroundCicloLogica = backgroundCicloLogica;
         }
 
         public async Task<List<Partida>> EjecutarCicloAsync()
@@ -43,6 +47,30 @@ namespace CivitaBack.Logica
             await _uow.CommitAsync();
 
             return partidas;
+        }
+
+        public async Task PausarCiclo(Partida partida)
+        {
+            if (partida == null)
+                throw new PartidaExcepcion("La partida no puede ser nula.");
+
+            partida.EstaPausada = true;
+
+            await _partidaRepositorio.Actualizar(partida);
+
+            await _uow.CommitAsync();
+        }
+
+        public async Task ContinuarCiclo(Partida partida)
+        {
+            if (partida == null)
+                throw new PartidaExcepcion("La partida no puede ser nula.");
+
+            partida.EstaPausada = false;
+
+            await _partidaRepositorio.Actualizar(partida);
+
+            await _uow.CommitAsync();
         }
 
         private void ProcesarRecursosPorEstructurasMapa(Partida partida)
@@ -96,6 +124,9 @@ namespace CivitaBack.Logica
                 totalEnergia
             );
         }
+
+
+
     }
 
 }

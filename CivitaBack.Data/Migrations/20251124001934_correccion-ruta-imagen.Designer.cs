@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251124001934_correccion-ruta-imagen")]
+    partial class correccionrutaimagen
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -207,13 +210,13 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 3,
-                            ContaminacionCiclo = 3,
+                            ContaminacionCiclo = 5,
                             CostoDinero = 40,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
                             FelicidadCiclo = -4,
-                            Nombre = "Fábrica",
+                            Nombre = "Fabrica",
                             RutaImagen = "/Assets/mapa/Estructura-Fabrica-Nivel-1.png",
                             TipoEstructuraId = 3
                         },
@@ -233,7 +236,7 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 5,
-                            ContaminacionCiclo = 1,
+                            ContaminacionCiclo = 3,
                             CostoDinero = 150,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),

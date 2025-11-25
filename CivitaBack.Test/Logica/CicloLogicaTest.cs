@@ -2,7 +2,11 @@ using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
+using CivitaBack.Logica.Backgrounds;
+using CivitaBack.Logica.Hubs;
 using CivitaBack.Utils;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace CivitaBack.Tests;
@@ -13,17 +17,31 @@ public class CicloLogicaTest
     private readonly Mock<IUnidadDeTrabajo> _mockUow;
     private readonly Mock<IActualizarRecursosLogica> _mockActualizarRecursosLogica;
     private readonly ICicloLogica _cicloLogica;
+    private readonly Mock<BackgroundCicloLogica> _backgroundCicloLogica;
+    private readonly Mock<ILogger<BackgroundCicloLogica>> _mockLogger;
+    private readonly Mock<IServiceProvider> _mockProvider;
+    private readonly Mock<IHubContext<CicloHub>> _mockHub;
 
     public CicloLogicaTest()
     {
         _mockPartidaRepositorio = new Mock<IPartidaRepositorio>();
         _mockUow = new Mock<IUnidadDeTrabajo>();
         _mockActualizarRecursosLogica = new Mock<IActualizarRecursosLogica>();
+        _mockProvider = new Mock<IServiceProvider>();
+        _mockLogger = new Mock<ILogger<BackgroundCicloLogica>>();
+        _mockHub = new Mock<IHubContext<CicloHub>>();
+
+        _backgroundCicloLogica = new Mock<BackgroundCicloLogica>(
+            _mockProvider.Object,
+            _mockLogger.Object,
+            _mockHub.Object
+            );
 
         _cicloLogica = new CicloLogica(
             _mockPartidaRepositorio.Object,
             _mockUow.Object,
-            _mockActualizarRecursosLogica.Object
+            _mockActualizarRecursosLogica.Object,
+            _backgroundCicloLogica.Object
         );
 
         _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(1);
