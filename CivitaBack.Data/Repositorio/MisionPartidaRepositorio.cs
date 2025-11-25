@@ -56,8 +56,6 @@ public class MisionPartidaRepositorio
 
     public void GuardarMisionesPartida(Partida partida)
     {
-        PartidaEF pEf = _mapper.Map<PartidaEF>(partida);
-        _context.Attach(pEf);
         base.AgregarVarios(partida.MisionPartidas);
     }
 

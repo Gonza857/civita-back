@@ -157,8 +157,6 @@ public class PartidaLogica : IPartidaLogica
     /// <param name="idUsuario">ID del Usuario</param>
     public async Task<Partida> ObtenerPorUsuarioId(int IdUsuario)
     {
-        _accesoUsuarios.ValidarAcceso(IdUsuario);
-
         var partida = await this._repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
         if (partida == null) throw new PartidaExcepcion("Partida no encontrada");
         return partida;

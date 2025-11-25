@@ -84,8 +84,24 @@ builder.Configuration
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseNpgsql(connectionString)
-        .EnableSensitiveDataLogging(false) // opcional: evita mostrar valores de parámetros
+    options.UseNpgsql(connectionString, 
+        
+        // --- ¡AÑADE ESTO! ---
+        npgsqlOptions =>
+        {
+            // SOLUCIÓN 1: Habilitar el reintento para fallas transitorias
+            npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5, // Intentará 5 veces
+                maxRetryDelay: TimeSpan.FromSeconds(30), // Espera máxima
+                errorCodesToAdd: null // Usa los códigos de error por defecto de Npgsql
+            );
+            
+            // (Opcional) SOLUCIÓN 2: Aumentar el timeout del comando a 60 segundos
+            npgsqlOptions.CommandTimeout(60); 
+        });
+    // --- FIN DE LO QUE DEBÉS AÑADIR ---
+    
+    options.EnableSensitiveDataLogging(false)
         .EnableDetailedErrors(false);
 
 });
@@ -216,7 +232,6 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate(); 
 }
 
-// 🔹 Job cada 30 segundos (para probar tu servicio)
 using (var scope = app.Services.CreateScope())
 {
     var recurringJobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
@@ -225,7 +240,8 @@ using (var scope = app.Services.CreateScope())
         "mision-diaria",
         Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Diaria)),
         // Cron.Daily(0, 0)
-        "0,30 * * * *" // <--- Modificado a 30 segundos
+        // "0,30 * * * *" // 30m
+        "*/30 * * * * *" // 30s
     );
     
     recurringJobs.AddOrUpdate(

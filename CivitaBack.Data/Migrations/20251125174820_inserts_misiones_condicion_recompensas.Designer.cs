@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251125174820_inserts_misiones_condicion_recompensas")]
+    partial class inserts_misiones_condicion_recompensas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -586,10 +589,10 @@ namespace CivitaBack.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 3,
+                            Id = 1,
                             CondicionId = 1,
                             Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Descripcion = "Nuestros ciudadanos necesitan lugar para vivir. Construí 1 casa.",
+                            Descripcion = "Nuestros ciudadanos necesitan lugar para vivir. Construye 1 casa.",
                             Disponible = true,
                             Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Tipo = "Diaria",

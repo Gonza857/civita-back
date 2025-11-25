@@ -41,8 +41,8 @@ namespace CivitaBack.Logica.Backgrounds
                         _pauseEvent.Wait(stoppingToken);
 
                         var cicloLogica = scope.ServiceProvider.GetRequiredService<ICicloLogica>();
-
                         var eventoLogica = scope.ServiceProvider.GetRequiredService<IEventoLogica>();
+                        var nivelLogica = scope.ServiceProvider.GetRequiredService<INivelLogica>();
 
                         // 2. ¡HACE EL TRABAJO! (Esto ahora se ejecuta primero)
                         var partidas = await cicloLogica.EjecutarCicloAsync();
@@ -59,7 +59,10 @@ namespace CivitaBack.Logica.Backgrounds
                                 Contaminacion = partida.Recursos.Contaminacion,
                                 Felicidad = partida.Recursos.Felicidad,
                                 EcoCoins = partida.Recursos.EcoCoins,
-                                Poblacion = partida.Recursos.Poblacion
+                                Poblacion = partida.Recursos.Poblacion,
+                                Nivel = partida.Nivel,
+                                Experiencia = partida.Experiencia,
+                                ExperienciaSiguienteNivel = nivelLogica.ObtenerExperienciaTechoNivel(partida.Nivel)
                             };
 
                             if (partida.Recursos.Contaminacion > 80)

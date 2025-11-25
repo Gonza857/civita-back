@@ -1,17 +1,29 @@
-﻿using CivitaBack.Domain.Entidades;
+﻿using CivitaBack.Data.Repositorio;
+using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
+using CivitaBack.Utils;
+using Moq;
 
 namespace CivitaBack.Tests.Logica;
 
 public class NivelLogicaTest
 {
     private readonly INivelLogica _nivelLogica;
+    
+    private readonly Mock<IPartidaRepositorio> _mockPartidarepositorio;
+    private readonly Mock<IUnidadDeTrabajo> _mockUnidadDeTrabajo;
 
 
     public NivelLogicaTest()
     {
-        _nivelLogica = new NivelLogica();
-
+        _mockUnidadDeTrabajo = new Mock<IUnidadDeTrabajo>();
+        _mockPartidarepositorio = new Mock<IPartidaRepositorio>();
+        
+        _nivelLogica = new NivelLogica(
+                _mockPartidarepositorio.Object,
+                _mockUnidadDeTrabajo.Object
+            );
     }
 
     [Fact]

@@ -13,5 +13,9 @@ public class RecursoDTO
     public int Felicidad { get; set; }
     public int EcoCoins { get; set; }
     public int Poblacion { get; set; }
+    
+    public int? Nivel { get; set; }
+    public int? Experiencia { get; set; }
+    public int? ExperienciaSiguienteNivel { get; set; }
 
 }

@@ -75,8 +75,7 @@ public class MisionPartidaController : BaseApiController
             
             await this._recompensaLogica.ReclamarRecompensas(mision.Condicion.Recompensas.ToList(), partida);
             await this._misionPartidaLogica.MarcarMisionCompletada(mision, partida);
-            // await this._nivelLogica
-            // await _nivelLogica.
+            await this._nivelLogica.VerificarNivel(partida);
             
             return Ok();
         }
@@ -98,12 +97,16 @@ public class MisionPartidaController : BaseApiController
         try
         {
             Partida? partida = await this._partidaLogica.ObtenerPorId(idPartida);
+            List<Mision> misiones = await this._misionLogica.ObtenerMisionesDisponibles();
+            await this._misionPartidaLogica.AsignarMisiones(misiones, partida);
+            
             List<MisionPartida> misionesPartida = await _misionPartidaLogica.ObtenerMisionesActivasParaPartida(partida);
             List<MisionPartida> misionesNoReclamables = this._condicionLogica.FiltrarMisionesQueNoCumplen(misionesPartida, partida);
             
             misionesPartida = this._misionPartidaLogica.ProcesarMisionesPartida(misionesPartida, misionesNoReclamables);
-            var misionesNoReclamablesDto = this.mapearLista(misionesNoReclamables, false);
-            var misionesNormales = this.mapearLista(misionesPartida, true);
+            
+            var misionesNoReclamablesDto = this.MapearLista(misionesNoReclamables, false);
+            var misionesNormales = this.MapearLista(misionesPartida, true);
             
             var listaUnica = misionesNoReclamablesDto
                 .Concat(misionesNormales)
@@ -122,7 +125,7 @@ public class MisionPartidaController : BaseApiController
         }
     }
 
-    private List<MisionPartidaDTO> mapearLista(List<MisionPartida> mps, bool noReclamable)
+    private List<MisionPartidaDTO> MapearLista(List<MisionPartida> mps, bool noReclamable)
     {
         var dtos = base.MapearLista<MisionPartidaDTO>(mps);
         dtos.ForEach(dto => dto.PuedeReclamar = noReclamable);
