@@ -10,4 +10,6 @@ public interface IAuthLogica
     Task<Usuario> IniciarSesion(string usuario);
     public string GenerarToken(Usuario usuario);
 
+    Task<Usuario> CompletarRegistro (int idUsuario, string mail, string contrasena);
+
 }

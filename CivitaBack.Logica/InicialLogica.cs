@@ -59,9 +59,9 @@ public class InicialLogica : IInicialLogica
         return new Recurso
         {
             EcoCoins = 450,
-            Felicidad = 40,
-            Energia = 70,
-            Contaminacion = 65,
+            Felicidad = 50,
+            Energia = 40,
+            Contaminacion = 40,
         };
     }
 

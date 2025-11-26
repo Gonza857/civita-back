@@ -36,8 +36,8 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Nombre = "Energia",
                 Ocupacion = 0,
                 Capacidad = 0,
-                EnergiaPorCiclo = 5,
-                DineroPorCiclo = -12,
+                EnergiaPorCiclo = 3,
+                DineroPorCiclo = -5,
                 Creado = seedDate,
             },
             new TipoEstructuraEF
@@ -46,8 +46,8 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Nombre = "Industrial",
                 Ocupacion = 0,
                 Capacidad = 0,
-                EnergiaPorCiclo = -4,
-                DineroPorCiclo = 30,
+                EnergiaPorCiclo = -2,
+                DineroPorCiclo = 10,
                 Creado = seedDate,
             },
             new TipoEstructuraEF
@@ -57,7 +57,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Ocupacion = 0,
                 Capacidad = 0,
                 EnergiaPorCiclo = 1,
-                DineroPorCiclo = -3,
+                DineroPorCiclo = -2,
                 Creado = seedDate,
             },
             new TipoEstructuraEF
@@ -66,8 +66,8 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Nombre = "Alojamiento",
                 Ocupacion = 0,
                 Capacidad = 50,
-                EnergiaPorCiclo = -2,
-                DineroPorCiclo = 10,
+                EnergiaPorCiclo = -1,
+                DineroPorCiclo = 5,
                 Creado = seedDate,
             },
             new TipoEstructuraEF
@@ -87,7 +87,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Ocupacion = 0,
                 Capacidad = 0,
                 EnergiaPorCiclo = 2,
-                DineroPorCiclo = -5,
+                DineroPorCiclo = -2,
                 Creado = seedDate,
             }
         );

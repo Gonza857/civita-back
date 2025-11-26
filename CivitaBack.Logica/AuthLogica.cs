@@ -29,7 +29,7 @@ namespace CivitaBack.Logica
         public async Task<Usuario> CrearUsuario(string nombreUsuario, string mail, string password)
         {
             await this.ValidarExistenciaCorreo(mail);
-            
+
             var usuario = new Usuario
             {
                 NombreUsuario = nombreUsuario,
@@ -44,7 +44,7 @@ namespace CivitaBack.Logica
         {
             if (usuario != null)
                 throw new DominioException("Usuario ya existe");
-            
+
             var nuevoUsuario = new Usuario
             {
                 NombreUsuario = nombreUsuario,
@@ -52,7 +52,7 @@ namespace CivitaBack.Logica
 
             // await this._repositorioUsuario.CrearUsuario(nuevoUsuario);
             // await this._uow.CommitAsync();
-            
+
             return nuevoUsuario;
         }
 
@@ -72,11 +72,33 @@ namespace CivitaBack.Logica
             return this.GenerarToken(usuario!);
         }
 
+        public async Task<Usuario> CompletarRegistro(int usuarioId, string mail, string contrasena)
+        {
+            var usuario = await _repositorioUsuario.ObtenerPorId(usuarioId);
+            if (usuario == null)
+                throw new DominioException("El usuario no existe.");
+
+            var existeMail = await _repositorioUsuario.ObtenerUsuarioPorMail(mail);
+            if (existeMail != null && existeMail.Id != usuarioId)
+                throw new ValidacionRegistroException("El correo ya está en uso.");
+
+            usuario.Mail = mail;
+            usuario.HashDeContrasena = PasswordHelper.HashPassword(contrasena);
+
+            // usuario.RegistroCompleto = true; // IDEA
+
+            await _repositorioUsuario.Actualizar(usuario);
+
+            await _uow.CommitAsync();
+
+            return usuario;
+        }
+
         private void ValidarUsuarioIniciarSesion(string mail, string contrasena)
         {
-            if (string.IsNullOrWhiteSpace(mail)) 
+            if (string.IsNullOrWhiteSpace(mail))
                 throw new AutenticacionException("El nombre de usuario no puede estar vacio");
-            if (string.IsNullOrWhiteSpace(contrasena)) 
+            if (string.IsNullOrWhiteSpace(contrasena))
                 throw new AutenticacionException("La contrasena no puede estar vacia");
         }
 
@@ -84,7 +106,7 @@ namespace CivitaBack.Logica
         {
             if (usuario == null)
                 throw new AutenticacionException("Usuario o contraseña incorrectos.");
-            
+
             if (!PasswordHelper.VerifyPassword(inputContrasena, usuario.HashDeContrasena!))
                 throw new AutenticacionException("Usuario o contraseña incorrectos.");
         }
@@ -99,7 +121,7 @@ namespace CivitaBack.Logica
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            
+
             var claimRol = new Claim(
                 ClaimTypes.Role, usuario.EsDios ? "Admin" : usuario.Mail == null ? "Desconocido" : "Jugador");
 

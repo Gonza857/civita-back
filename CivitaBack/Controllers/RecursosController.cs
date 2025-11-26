@@ -3,6 +3,8 @@ using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Excepciones;
 using Microsoft.AspNetCore.Mvc;
+using Hangfire.PostgreSql.Properties;
+using CivitaBack.Domain.Entidades;
 
 namespace CivitaBack.Api.Controllers
 {
@@ -12,13 +14,20 @@ namespace CivitaBack.Api.Controllers
 
         private readonly IRecursoLogica _recursoLogica;
         private readonly ILogger<RecursosController> _logger;
+        private readonly IActualizarRecursosLogica _crudRecursosLogica;
+        private readonly IPartidaLogica _partidaLogica;
         public RecursosController(
-            IRecursoLogica rl, 
-            ILogger<RecursosController> logger, 
-            IMapper mapper) : base (mapper)
+            IRecursoLogica rl,
+            ILogger<RecursosController> logger,
+            IActualizarRecursosLogica rcl,
+            IPartidaLogica pl, 
+            IMapper mapper) : base(mapper)
+
         {
             this._recursoLogica = rl;
             this._logger = logger;
+            this._crudRecursosLogica = rcl;
+            this._partidaLogica = pl;
         }
 
         [HttpGet("{idPartida}")]
@@ -43,7 +52,7 @@ namespace CivitaBack.Api.Controllers
                 return Problem("Ocurrió un error");
             }
         }
-        
+
         [HttpPost("subirEnergia/{idPartida}")]
         public async Task<IActionResult> SubirEnergia(int idPartida)
         {
@@ -82,5 +91,29 @@ namespace CivitaBack.Api.Controllers
                 return Problem("Ocurrió un error al modificar la energía.");
             }
         }
+
+
+        [HttpPost("ImpactarResultado")]
+        public async Task<IActionResult> ResultadoMinijuego(MinijuegosDTO resultados)
+        {
+            try
+            {
+                var partidaActual = await _partidaLogica.ObtenerPorId(resultados.PartidaId);
+                var recursoAdevolver =  await _recursoLogica.ImpactarPremiosMiniJuego(partidaActual, resultados.Recurso);
+                var devolver = base.Mapear <RecursoDTO>(recursoAdevolver);
+                return Ok(new { exito = true, mensaje = "Recursos actualizados correctamente!" ,devolver} ) ;
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Problem("Ocurrió un error al impactar los resultados.");
+            }
+
+        }
+
     }
 }
