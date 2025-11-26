@@ -34,8 +34,8 @@ namespace CivitaBack.Logica
                 partida.EstructuraMapa = null;
                 partida.Evento = null;
                 partida.Tienda = null;
-                partida.LogroPartidas = null;
-                partida.MisionPartidas = null;
+                // partida.LogroPartidas = null;
+                // partida.MisionPartidas = null;
                 partida.TipEnPartida = null;
                 partida.Usuario = null;
 

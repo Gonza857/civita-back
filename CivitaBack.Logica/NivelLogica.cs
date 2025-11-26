@@ -43,13 +43,10 @@ public class NivelLogica : INivelLogica
 
     public async Task VerificarNivel(Partida partida)
     {
-        int nivelPrevio = partida.Nivel;
+        // int nivelPrevio = partida.Nivel;
         this.SubirNivel(partida);
-        if (nivelPrevio != partida.Nivel)
-        {
-            await this._partidaRepositorio.Actualizar(partida);
-            await this._unidadDeTrabajo.CommitAsync();
-        }
+        await this._partidaRepositorio.Actualizar(partida);
+        await this._unidadDeTrabajo.CommitAsync();
     }
 
     /// <summary>

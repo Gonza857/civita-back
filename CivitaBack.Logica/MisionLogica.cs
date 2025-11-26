@@ -40,9 +40,10 @@ public class MisionLogica : IMisionLogica
             misionPartida.FechaCompletado = null;
             misionPartida.FechaEntrega = DateTime.UtcNow;
         }
-
+        
         await this._misionPartidaRepositorio.ActualizarVarios(misionesPartida);
         await this._unidadDeTrabajo.CommitAsync();
+
     }
 
     public async Task<List<Mision>> Listado()
