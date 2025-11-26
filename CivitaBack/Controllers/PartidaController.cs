@@ -5,6 +5,8 @@ using CivitaBack.Domain.Enum;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Logica;
+using CivitaBack.Logica.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
@@ -22,6 +24,8 @@ public class PartidaController : BaseApiController
     private readonly ICompraEstructurasLogica _compraEstructurasLogica;
     private readonly INivelLogica _nivelLogica;
     private readonly ILogger<PartidaController> _logger;
+    private readonly IAccesoUsuarios _accesoUsuarios;
+
 
     public PartidaController(
         IPartidaLogica partidaLogica,
@@ -34,6 +38,7 @@ public class PartidaController : BaseApiController
         IMapaLogica mapaLogica,
         ICompraEstructurasLogica compraEstructurasLogica,
         INivelLogica nivelLogica,
+        IAccesoUsuarios accesoUsuarios,
         IMapper mapper) : base(mapper)
     {
         _partidaLogica = partidaLogica;
@@ -46,6 +51,7 @@ public class PartidaController : BaseApiController
         _compraEstructurasLogica = compraEstructurasLogica;
         _logger = logger;
         _nivelLogica = nivelLogica;
+        _accesoUsuarios = accesoUsuarios;
     }
 
     [HttpPost("expo/iniciar")]
@@ -94,7 +100,6 @@ public class PartidaController : BaseApiController
         {
             var partida = await _partidaLogica.CrearPartida(idUsuario);
             await _recursoLogica.ConfigurarInicial(partida);
-            //Ver estructuras iniciales segun mapa
             return Ok(base.Mapear<PartidaDTO>(partida));
         }
         catch (AccesoDenegadoExcepcion ex)
@@ -113,13 +118,24 @@ public class PartidaController : BaseApiController
     }
 
     // Obtener la partida de un usuario
+    
     [HttpGet("porUsuario/{idUsuario}")] // -> PascalCase -> PorUsuario/{idUsuario}
+    [Authorize(Roles = "Jugador, Desconocido, Admin")]
     public async Task<IActionResult> ObtenerPartidaPorUsuario(int idUsuario)
     {
         try
         {
+            _accesoUsuarios.ValidarAcceso(idUsuario);
+            
             Partida partida = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
-            return Ok(base.Mapear<PartidaDTO>(partida));
+            await this._nivelLogica.VerificarNivel(partida);
+            
+            int xpSiguienteNivel =  this._nivelLogica.ObtenerExperienciaTechoNivel(partida.Nivel);
+            
+            var dto = base.Mapear<PartidaDTO>(partida);
+            dto.ExperienciaSiguienteNivel = xpSiguienteNivel;
+            
+            return Ok(dto);
         }
         catch (AccesoDenegadoExcepcion ex)
         {
@@ -135,9 +151,9 @@ public class PartidaController : BaseApiController
             return Problem("Error al obtener la partida");
         }
     }
-
-    // 📜 Obtener todas las partidas
+    
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetPartidas()
     {
         try
@@ -155,14 +171,11 @@ public class PartidaController : BaseApiController
             return Problem("Ocurrió un error al obtener las partidas");
         }
     }
-
-    // ✏️ Actualizar datos de una partida (no mapa)
+    
     [HttpPatch("{id}")]
     public async Task<IActionResult> PatchPartida([FromBody] PartidaDTO? partidaDto, int id)
     {
-        if (partidaDto == null)
-            return BadRequest("No se encontró la partida.");
-
+        
         try
         {
             var usuario = await _usuarioLogica.ObtenerPorId(partidaDto.UsuarioId);
@@ -376,7 +389,7 @@ public class PartidaController : BaseApiController
         try
         {
             Partida p = await _partidaLogica.ObtenerPorId(idPartida);
-            int cantidad = this._nivelLogica.ObtenerExperienciaFaltanteParaSiguienteNivel(p.Nivel, p.Experiencia);
+            int cantidad = this._nivelLogica.ObtenerExperienciaTechoNivel(p.Nivel);
             return Ok(cantidad);
         }
         catch (Exception ex)
@@ -391,8 +404,7 @@ public class PartidaController : BaseApiController
         try
         {
             Partida p = await _partidaLogica.ObtenerPorId(idPartida);
-            int nivelActual = p.Nivel;
-            this._nivelLogica.SubirNivel(ref nivelActual, p.Experiencia);
+            this._nivelLogica.SubirNivel(p);
             await this._partidaLogica.Actualizar(p);
             return Ok();
         }

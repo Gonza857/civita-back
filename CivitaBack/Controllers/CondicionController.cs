@@ -89,7 +89,7 @@ public class CondicionController: BaseApiController
     }
     
     [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchCondicion([FromBody] ActualizarCondicionDTO? condicionDto, int id)
+    public async Task<IActionResult> PatchCondicion([FromBody] ActualizarCondicionDTO condicionDto, int id)
     {
         try
         {

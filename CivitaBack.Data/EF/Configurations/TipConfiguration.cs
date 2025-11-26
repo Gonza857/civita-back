@@ -33,6 +33,7 @@ namespace CivitaBack.Data.EF.Configurations
                 ElementoAdicional = "",
                 Expresion = "vitaSaluda",
                 Creado = seedDate,
+                Orden = 1
             },
             new TipEF
             {

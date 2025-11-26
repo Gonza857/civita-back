@@ -28,7 +28,7 @@ namespace CivitaBack.Data.EF.Configurations
             builder.HasData(
                 new EstructuraEF
                 {
-                    Id = 1, // ¡Id manual es obligatorio!
+                    Id = 1, 
                     Nombre = "Casa",
                     EsMejorable = false,
                     RutaImagen = "/Assets/mapa/Estructura-Edificio-3.png",

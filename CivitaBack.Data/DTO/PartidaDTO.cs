@@ -27,6 +27,7 @@ public class PartidaDTO
     
     [Range(0, int.MaxValue, ErrorMessage = "La experiencia no pueden ser negativa")]
     public int Experiencia { get; set; }
+    public int ExperienciaSiguienteNivel { get; set; }
     // public Partida? Partida { get; set; } 
 
 }

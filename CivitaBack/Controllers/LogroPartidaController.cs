@@ -4,6 +4,7 @@ using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CivitaBack.Api.Controllers;
@@ -21,6 +22,7 @@ public class LogroPartidaController : BaseApiController
     }
 
     [HttpGet("{idUsuario}/Reclamar")]
+    [Authorize(Roles = "Jugador, Desconocido")]
     public async Task<IActionResult> ReclamarLogros(int idUsuario)
     {
         try
@@ -29,11 +31,7 @@ public class LogroPartidaController : BaseApiController
             await _logroPartidaLogica.ReclamarLogros(partida);
             return Ok();
         }
-        catch (AccesoDenegadoExcepcion ex)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
-        }
-        catch (Exception e)
+        catch (Exception ex)
         {
             return Problem("Ocurrió un error al reclamar los logros");
         }

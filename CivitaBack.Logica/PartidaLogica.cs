@@ -89,9 +89,6 @@ public class PartidaLogica : IPartidaLogica
         
         Partida? partidaBuscada = await this._repositorioPartida.ObtenerPorId(partida.Id);
         
-        partidaBuscada.Nivel = partida.Nivel;
-        partidaBuscada.Experiencia = partida.Experiencia;
-        
         if (partidaBuscada == null || partidaBuscada.Recursos == null)
             throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No encontrada.");
         
@@ -151,8 +148,6 @@ public class PartidaLogica : IPartidaLogica
 
     public async Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario)
     {
-        _accesoUsuarios.ValidarAcceso(idUsuario);
-
         return await this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
     }
 
@@ -162,8 +157,6 @@ public class PartidaLogica : IPartidaLogica
     /// <param name="idUsuario">ID del Usuario</param>
     public async Task<Partida> ObtenerPorUsuarioId(int IdUsuario)
     {
-        _accesoUsuarios.ValidarAcceso(IdUsuario);
-
         var partida = await this._repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
         if (partida == null) throw new PartidaExcepcion("Partida no encontrada");
         return partida;
@@ -219,7 +212,7 @@ public class PartidaLogica : IPartidaLogica
         if (partida == null)
             throw new PartidaExcepcion("Partida no encontrada");
         
-        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
+        // _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
 
         return partida;
     }

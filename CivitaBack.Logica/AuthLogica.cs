@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using CivitaBack.Domain.Enum;
 using CivitaBack.Domain.Interfaces.Logica;
 
 namespace CivitaBack.Logica
@@ -39,7 +40,7 @@ namespace CivitaBack.Logica
             return usuario;
         }
 
-        public Usuario CrearUsuarioInicial(string nombreUsuario, Usuario? usuario)
+        public async Task<Usuario> CrearUsuarioInicial(string nombreUsuario, Usuario? usuario)
         {
             if (usuario != null)
                 throw new DominioException("Usuario ya existe");
@@ -49,6 +50,9 @@ namespace CivitaBack.Logica
                 NombreUsuario = nombreUsuario,
             };
 
+            // await this._repositorioUsuario.CrearUsuario(nuevoUsuario);
+            // await this._uow.CommitAsync();
+            
             return nuevoUsuario;
         }
 

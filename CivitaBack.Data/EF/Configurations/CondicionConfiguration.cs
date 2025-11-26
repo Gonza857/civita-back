@@ -20,6 +20,30 @@ namespace CivitaBack.Data.EF.Configurations
 
             builder.HasMany(c => c.Recompensas) 
                 .WithMany(r => r.Condiciones);
+            
+            var seedDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            
+            builder.HasData(
+                // Condición 1: Requisito de RECURSO (EcoCoins)
+                new CondicionEF
+                {
+                    Id = 1,
+                    Cantidad = 1,
+                    NombreColumna = null, 
+                    EstructuraId = 1,        
+                    Creado = seedDate,
+                    Editado = seedDate
+                },
+                new CondicionEF
+                {
+                    Id = 2,
+                    Cantidad = 1,
+                    NombreColumna = null,     
+                    EstructuraId = 3,           
+                    Creado = seedDate,
+                    Editado = seedDate,
+                }
+            );
         }
     }
 }

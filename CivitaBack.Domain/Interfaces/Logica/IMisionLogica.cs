@@ -10,7 +10,6 @@ public interface IMisionLogica
     Task Crear(Mision mision);
     Task Actualizar(Mision mision, int idMision);
     Task<Mision> ObtenerPorId(int idMision);
-    Task<List<Mision>> ObtenerMisionesActivasParaPartida(Partida partida);
     Task AsignarMisiones(Partida partida);
 
     Task<List<Mision>> ObtenerMisionesDisponibles();

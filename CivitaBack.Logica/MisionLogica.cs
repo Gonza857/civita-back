@@ -56,8 +56,6 @@ public class MisionLogica : IMisionLogica
         var condicion = await this._condicionRepositorio.ObtenerPorId(mision.CondicionId);
         this.ValidarCondicion(condicion);
 
-        ValidarAdmin();
-
         Mision nueva = new Mision
         {
             CondicionId = condicion.Id,
@@ -77,8 +75,6 @@ public class MisionLogica : IMisionLogica
         this.ValidarCondicion(condicion);
         var misionDb = await this.ObtenerPorId(idMision);
         this.ValidarMision(misionDb);
-
-        ValidarAdmin();
 
         misionDb.Descripcion = mision.Descripcion;
         misionDb.Disponible = mision.Disponible;
@@ -103,8 +99,8 @@ public class MisionLogica : IMisionLogica
     public async Task<List<Mision>> ObtenerMisionesActivasParaPartida(Partida partida)
     {
         this.ValidarPartida(partida);
-        var misionesPartidas = await this._misionPartidaRepositorio.ObtenerMisionesPartida(partida.Id);
-        return misionesPartidas.Select(mp => mp.Mision).ToList();
+        List<MisionPartida> mps =  await this._misionPartidaRepositorio.ObtenerMisionesPartida(partida.Id);
+        return mps.Select(mp => mp.Mision).ToList();
     }
     
     public async Task<List<Mision>> ObtenerMisionesDisponibles()
@@ -114,10 +110,10 @@ public class MisionLogica : IMisionLogica
 
     public async Task AsignarMisiones(Partida? partida)
     {
-        this.ValidarPartida(partida);
-        var misiones = await this._misionRepositorio.ListadoActivo();
-        await this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida!);
-        await this._unidadDeTrabajo.CommitAsync();
+        // this.ValidarPartida(partida);
+        // var misiones = await this._misionRepositorio.ListadoActivo();
+        // await this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida!);
+        // await this._unidadDeTrabajo.CommitAsync();
     }
     
 

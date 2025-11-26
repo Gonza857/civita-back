@@ -42,5 +42,6 @@ namespace CivitaBack.Domain.Interfaces.Logica
 
         List<Condicion> FiltrarCondicionSiCumple(Condicion condicion, Partida partida);
         public List<Condicion> FiltrarCondicionesSiCumplen(List<Condicion> condiciones, Partida partida);
+        public List<MisionPartida> FiltrarMisionesQueNoCumplen(List<MisionPartida> misionesPartida, Partida partida);
     }
 }
