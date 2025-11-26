@@ -29,9 +29,19 @@ public class EstructuraMapaRepositorio
         _context.EstructuraMapa.RemoveRange(eliminadasEF);
     }
 
-    public async Task AgregarNuevas(List<EstructuraMapa> emList)
+    public async Task AgregarNuevas(List<EstructuraMapa> estructuras, int partidaId)
     {
-        await base.AgregarVarios(emList);
+        var nuevas = estructuras.Select(e => new EstructuraMapa
+        {
+            PartidaId = partidaId,
+            EstructuraId = e.EstructuraId,
+            X = e.X,
+            Y = e.Y,
+            Width = e.Width,
+            Height = e.Height
+        }).ToList();
+        
+        await base.AgregarVarios(nuevas);
     }
 
     public async Task EliminarPorPartidaIdAsync(int partidaId)

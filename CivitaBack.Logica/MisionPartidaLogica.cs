@@ -68,7 +68,7 @@ public class MisionPartidaLogica : IMisionPartidaLogica
         mp.FechaCompletado = DateTime.UtcNow;
         mp.Reclamado = true;
         await this._misionPartidaRepositorio.MarcarCompletada(mp);
-        await this._unidadDeTrabajo.CommitAsync();
+        // await this._unidadDeTrabajo.CommitAsync();
     }
 
     public async Task<List<Mision>> ObtenerMisionesDia(int idUsuario)

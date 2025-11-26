@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.DTO;
+using CivitaBack.Data.Migrations;
 using CivitaBack.Domain.Entidades;
 using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Api.Controllers;
 
@@ -64,30 +66,41 @@ public class MisionPartidaController : BaseApiController
     [HttpGet("Reclamar/{idPartida}/{idMision}")]
     public async Task<IActionResult> ObtenerMisionesDisponibles(int idPartida, int idMision)
     {
-        try
+        const int MAX_REINTENTOS = 3; 
+
+        for (int intento = 0; intento < MAX_REINTENTOS; intento++)
         {
-            Partida partida = await this._partidaLogica.ObtenerPorId(idPartida);
-            var mision = await this._misionPartidaLogica.ObtenerMisionPartidaPorId(partida.Id, idMision);
-            var condicionesQueCumple = this._condicionLogica.FiltrarCondicionSiCumple(mision.Condicion, partida);
+            try
+            {
+                // 1. CARGA RASTREADA: Siempre cargamos la Partida fresca
+                Partida partida = await this._partidaLogica.ObtenerPorId(idPartida);
+                var mision = await this._misionPartidaLogica.ObtenerMisionPartidaPorId(partida.Id, idMision);
+                var condicionesQueCumple = this._condicionLogica.FiltrarCondicionSiCumple(mision.Condicion, partida);
             
-            if (condicionesQueCumple.Count == 0)
-                return BadRequest("No tenes misiones listas para reclamar");
+                if (condicionesQueCumple.Count == 0)
+                    return BadRequest("No tenes misiones listas para reclamar");
             
-            await this._recompensaLogica.ReclamarRecompensas(mision.Condicion.Recompensas.ToList(), partida);
-            await this._misionPartidaLogica.MarcarMisionCompletada(mision, partida);
-            await this._nivelLogica.VerificarNivel(partida);
-            
-            return Ok();
+                await this._recompensaLogica.ReclamarRecompensas(mision.Condicion.Recompensas.ToList(), partida);
+                await this._misionPartidaLogica.MarcarMisionCompletada(mision, partida);
+                await this._nivelLogica.VerificarNivel(partida);
+                
+                return Ok();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (intento == MAX_REINTENTOS - 1)
+                {
+                    throw new Exception("Fallo permanente de concurrencia.");
+                }
+                // Espera y reintenta con una nueva carga de la Partida (versión más fresca)
+                await Task.Delay(50);
+            }
+            catch (Exception ex) // Captura otras excepciones (CondicionExcepcion)
+            {
+                return StatusCode(500, new { mensaje = ex.Message });
+            }
         }
-        catch (CondicionExcepcion ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem("Ocurrió un error al obtener el listado de Misiones.");
-        }
+        return Problem("Fallo desconocido.");
     }
     
     // Misiones que tiene para cumplir el usuario en su partida (diarias, semanales y mensuales)

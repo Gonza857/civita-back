@@ -234,27 +234,41 @@ using (var scope = app.Services.CreateScope())
 
 using (var scope = app.Services.CreateScope())
 {
-    var recurringJobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
-    
-    recurringJobs.AddOrUpdate(
-        "mision-diaria",
-        Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Diaria)),
-        // Cron.Daily(0, 0)
-        // "0,30 * * * *" // 30m
-        "*/30 * * * * *" // 30s
-    );
-    
-    recurringJobs.AddOrUpdate(
-        "mision-semanal",
-        Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Semanal)),
-        Cron.Weekly(DayOfWeek.Monday, 0, 0)
-    );
-    
-    recurringJobs.AddOrUpdate(
-        "mision-mensual",
-        Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Mensual)),
-        Cron.Monthly(1, 0, 0)
-    );
+    try
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>(); 
+        var recurringJobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+        
+        logger.LogInformation("⚙️ Intentando registrar misiones recurrentes...");
+
+        // 1. Job Diario (30 segundos)
+        recurringJobs.AddOrUpdate(
+            "mision-diaria",
+            Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Diaria)),
+            "*/30 * * * * *" // 30s
+        );
+        
+        // 2. Job Semanal
+        recurringJobs.AddOrUpdate(
+            "mision-semanal",
+            Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Semanal)),
+            Cron.Weekly(DayOfWeek.Monday, 0, 0)
+        );
+        
+        // 3. Job Mensual
+        recurringJobs.AddOrUpdate(
+            "mision-mensual",
+            Job.FromExpression<IMisionLogica>(servicio => servicio.ResetMisiones(TipoMision.Mensual)),
+            Cron.Monthly(1, 0, 0)
+        );
+        
+        logger.LogInformation("✅ Jobs recurrentes de misiones registrados con éxito.");
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "❌ ERROR FATAL EN HANGFIRE: No se pudieron registrar los Recurring Jobs. La aplicación continuará, pero las misiones automáticas no funcionarán.");
+    }
 }
 
 if (app.Environment.IsDevelopment())

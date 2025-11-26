@@ -54,8 +54,8 @@ public class RecompensaLogica : IRecompensaLogica
         this.AplicarRecompensasRecurso(partida.Recursos!, listaRecompensaRecursos);
         this.AplicarExperienciaPartida(partida, listaRecompensaExperiencia);
         
-        await this._partidaRepositorio.Actualizar(partida);
-        await this._unidadDeTrabajo.CommitAsync();
+        // await this._partidaRepositorio.Actualizar(partida);
+        // await this._unidadDeTrabajo.CommitAsync();
     }
     
     

@@ -4,27 +4,31 @@ using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CivitaBack.Logica
 {
     public class MapaLogica : IMapaLogica
     {
-
         private readonly IPartidaRepositorio _repositorioPartida;
         private readonly IEstructuraMapaRepositorio _repositorioEstructuraMapa;
         private readonly IAccesoUsuarios _accesoUsuarios;
         private readonly IUnidadDeTrabajo _uow;
+        private readonly IServiceProvider _serviceProvider;
 
         public MapaLogica(
             IPartidaRepositorio repositorioPartida,
             IEstructuraMapaRepositorio repositorioEstructuraMapa,
             IAccesoUsuarios accesoUsuarios,
-            IUnidadDeTrabajo uow)
+            IUnidadDeTrabajo uow,
+            IServiceProvider serviceProvider)
         {
             _repositorioPartida = repositorioPartida;
             _repositorioEstructuraMapa = repositorioEstructuraMapa;
             _accesoUsuarios = accesoUsuarios;
             _uow = uow;
+            _serviceProvider = serviceProvider;
         }
 
         /// <summary>
@@ -40,7 +44,10 @@ namespace CivitaBack.Logica
 
             if (!string.IsNullOrWhiteSpace(partida.JsonMapa)) return partida;
 
-            var mapaReconstruido = await _repositorioPartida.ObtenerMapaJsonPorPartidaIdAsync(partidaId);
+            var x = await this._repositorioPartida.ObtenerPartidaConEstructuras(partida.Id);
+            var estructuras = x!.EstructuraMapa ?? new List<EstructuraMapa>();
+
+            string mapaReconstruido = await LectorMapa.ObtenerMapaFinal(estructuras);
             partida.JsonMapa = mapaReconstruido;
 
             await _repositorioPartida.ActualizarMapaAsync(partida);
@@ -54,46 +61,54 @@ namespace CivitaBack.Logica
         /// Guarda el mapa de la partida. Si tiene estructuras, las actualiza.
         /// </summary>
         /// <param name="dto">GuardarMapaDTO</param>
-        public async Task ActualizarMapaDePartidaAsync(int partidaId, string jsonMapa, List<EstructuraMapa>? estructuras)
+        public async Task ActualizarMapaDePartidaAsync(
+            int partidaId, 
+            string jsonMapa,
+            List<EstructuraMapa>? estructuras
+            )
         {
+            const int MAX_REINTENTOS = 3;
+            
             if (jsonMapa == null || partidaId <= 0 || estructuras == null)
-                throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: Datos inválidos.");
+                throw new PartidaExcepcion("Datos inválidos.");
 
-            var partida = await _repositorioPartida.ObtenerPartidaConMapaAsync(partidaId);
-            if (partida == null)
-                throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No existe la partida.");
-
-            this._accesoUsuarios.ValidarAcceso(partida.UsuarioId);
-
-            partida.JsonMapa = jsonMapa;
-            partida.UltimaVez = DateTime.UtcNow;
-            await _repositorioPartida.ActualizarMapaAsync(partida);
-
-            if (estructuras.Any())
+            for (int intento = 0; intento < MAX_REINTENTOS; intento++)
             {
-                // 1️⃣ Eliminar estructuras viejas de esa partida
-                await _repositorioEstructuraMapa.EliminarPorPartidaIdAsync(partida.Id);
-
-                // 2️⃣ Agregar las nuevas
-                var nuevas = estructuras.Select(e => new EstructuraMapa
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    PartidaId = partida.Id,
-                    EstructuraId = e.EstructuraId,
-                    X = e.X,
-                    Y = e.Y,
-                    Width = e.Width,
-                    Height = e.Height
-                }).ToList();
+                    var services = scope.ServiceProvider;
+                    
+                    var repoPartida = services.GetRequiredService<IPartidaRepositorio>();
+                    var repoEstructuraMapa = services.GetRequiredService<IEstructuraMapaRepositorio>();
+                    var uow = services.GetRequiredService<IUnidadDeTrabajo>();
 
-                await _repositorioEstructuraMapa.AgregarNuevas(nuevas);
+                    try
+                    {
+                        var partida = await repoPartida.ObtenerPartidaConMapaAsync(partidaId);
 
-                // 3️⃣ Guardar cambios
-                await this._uow.CommitAsync();
+                        if (partida == null)
+                            throw new PartidaExcepcion("Partida no encontrada.");
+
+                        partida.JsonMapa = jsonMapa;
+                        partida.UltimaVez = DateTime.UtcNow;
+
+                        if (estructuras.Any())
+                        {
+                            await repoEstructuraMapa.EliminarPorPartidaIdAsync(partida.Id);
+                            await repoEstructuraMapa.AgregarNuevas(estructuras, partida.Id);
+                        }
+
+                        await uow.CommitAsync();
+                        return;
+                    }
+                    catch (DbUpdateConcurrencyException) when (intento < MAX_REINTENTOS - 1)
+                    {
+                        await Task.Delay(50);
+                    }
+                }
             }
-            else
-            {
-                await this._uow.CommitAsync();
-            }
+
+            throw new PartidaExcepcion("Error de concurrencia al guardar el mapa. Reintentos agotados.");
         }
     }
 }

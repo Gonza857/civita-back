@@ -8,9 +8,13 @@ namespace CivitaBack.Domain.Interfaces.Repositorios
         Task<Partida?> ObtenerPorUsuarioCorreo(string correo);
         Task<Partida> CrearPartida(int idUsuario);
         Task<bool> ActualizarMapaAsync(Partida partida);
-        
+
+        void SincronizarCambios(Partida partidaDominio);
+
+        Task<Partida?> ObtenerPorIdTrackeada(int idPartida);
         Task<Partida?> ObtenerPartidaConMapaAsync(int partidaId);
-        Task<string> ObtenerMapaJsonPorPartidaIdAsync(int partidaId);
+
+        Task<Partida?> ObtenerPartidaConEstructuras(int partidaId);
         Task<List<EstructuraMapa>> ObtenerEstructurasDeUnMapa(int partidaId);
 
         Task<List<Partida>> ObtenerTodasConEstructurasYRecursosAsync();
