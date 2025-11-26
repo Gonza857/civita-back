@@ -87,7 +87,7 @@ namespace CivitaBack.Logica.Backgrounds
                                 }
                             }
 
-                            if (partida.Recursos.Felicidad < 10)
+                            if (partida.Recursos.Felicidad < 25)
                             {
                                 var tipDisparado = await eventoLogica.DispararEventoInformativoAsync(partida, 4);
 

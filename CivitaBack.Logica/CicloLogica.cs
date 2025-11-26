@@ -13,14 +13,12 @@ namespace CivitaBack.Logica
         private readonly IPartidaRepositorio _partidaRepositorio;
         private readonly IUnidadDeTrabajo _uow;
         private readonly IActualizarRecursosLogica _actualizarRecursosLogica;
-        private readonly BackgroundCicloLogica _backgroundCicloLogica;
 
-        public CicloLogica(IPartidaRepositorio partidaRepositorio, IUnidadDeTrabajo uow, IActualizarRecursosLogica actualizarRecursosLogica, BackgroundCicloLogica backgroundCicloLogica)
+        public CicloLogica(IPartidaRepositorio partidaRepositorio, IUnidadDeTrabajo uow, IActualizarRecursosLogica actualizarRecursosLogica)
         {
             _partidaRepositorio = partidaRepositorio;
             _uow = uow;
             _actualizarRecursosLogica = actualizarRecursosLogica;
-            _backgroundCicloLogica = backgroundCicloLogica;
         }
 
         public async Task<List<Partida>> EjecutarCicloAsync()
@@ -106,9 +104,9 @@ namespace CivitaBack.Logica
 
             partida.Recursos.Poblacion = nuevaPoblacion;
 
-            if (partida.Recursos.Contaminacion > 70)
+            if (partida.Recursos.Contaminacion > 80)
             {
-                totalFelicidad -= 5;
+                totalFelicidad -= 3;
             }
 
             if (partida.Recursos.Contaminacion < 10)

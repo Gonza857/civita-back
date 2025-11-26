@@ -17,31 +17,17 @@ public class CicloLogicaTest
     private readonly Mock<IUnidadDeTrabajo> _mockUow;
     private readonly Mock<IActualizarRecursosLogica> _mockActualizarRecursosLogica;
     private readonly ICicloLogica _cicloLogica;
-    private readonly Mock<BackgroundCicloLogica> _backgroundCicloLogica;
-    private readonly Mock<ILogger<BackgroundCicloLogica>> _mockLogger;
-    private readonly Mock<IServiceProvider> _mockProvider;
-    private readonly Mock<IHubContext<CicloHub>> _mockHub;
 
     public CicloLogicaTest()
     {
         _mockPartidaRepositorio = new Mock<IPartidaRepositorio>();
         _mockUow = new Mock<IUnidadDeTrabajo>();
         _mockActualizarRecursosLogica = new Mock<IActualizarRecursosLogica>();
-        _mockProvider = new Mock<IServiceProvider>();
-        _mockLogger = new Mock<ILogger<BackgroundCicloLogica>>();
-        _mockHub = new Mock<IHubContext<CicloHub>>();
-
-        _backgroundCicloLogica = new Mock<BackgroundCicloLogica>(
-            _mockProvider.Object,
-            _mockLogger.Object,
-            _mockHub.Object
-            );
 
         _cicloLogica = new CicloLogica(
             _mockPartidaRepositorio.Object,
             _mockUow.Object,
-            _mockActualizarRecursosLogica.Object,
-            _backgroundCicloLogica.Object
+            _mockActualizarRecursosLogica.Object
         );
 
         _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(1);
@@ -146,7 +132,7 @@ public class CicloLogicaTest
             Id = 1,
             Recursos = new Recurso
             {
-                Contaminacion = 80 // Mayor a 70
+                Contaminacion = 90 // Mayor a 80
             },
             EstructuraMapa = new List<EstructuraMapa>()
         };
@@ -164,8 +150,8 @@ public class CicloLogicaTest
         // Assert
         _mockActualizarRecursosLogica.Verify(a => a.ActualizarRecursosAsync(
             It.IsAny<Partida>(),
-            -5, // Felicidad reducida por contaminación alta
-            It.IsAny<int>(),
+            -3,// Felicidad reducida por contaminación alta
+            It.IsAny<int>(), 
             It.IsAny<int>(),
             It.IsAny<int>()
         ), Times.Once);
