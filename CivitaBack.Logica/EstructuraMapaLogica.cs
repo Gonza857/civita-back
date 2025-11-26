@@ -27,7 +27,7 @@ public class EstructuraMapaLogica : IEstructuraMapaLogica
     public async Task EliminarEstructuraAsync(EstructuraMapa em)
     {
         var entidad = await _estructuraMapaRepositorio.ObtenerCoincidenteAsync(
-            em.PartidaId, em.EstructuraId, em.X, em.Y, em.Width, em.Height
+            em.PartidaId, em.EstructuraId, em.X, em.Y
             );
 
         if (entidad is null)

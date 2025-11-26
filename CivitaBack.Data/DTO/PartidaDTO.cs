@@ -21,6 +21,13 @@ public class PartidaDTO
 
     [Range(0, int.MaxValue, ErrorMessage = "Las EcoCoins no pueden ser negativas")]
     public int EcoCoins { get; set; }
-    public Partida? Partida { get; set; } 
+    
+    [Range(0, int.MaxValue, ErrorMessage = "Los niveles no pueden ser negativos")]
+    public int Nivel { get; set; }
+    
+    [Range(0, int.MaxValue, ErrorMessage = "La experiencia no pueden ser negativa")]
+    public int Experiencia { get; set; }
+    public int ExperienciaSiguienteNivel { get; set; }
+    // public Partida? Partida { get; set; } 
 
 }

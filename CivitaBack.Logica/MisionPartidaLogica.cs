@@ -27,10 +27,41 @@ public class MisionPartidaLogica : IMisionPartidaLogica
     
     public async Task AsignarMisiones(List<Mision> misionesActivas, Partida partida)
     {
-        await this._misionPartidaRepositorio.AgregarMisionesPartida(misionesActivas, partida!);
+        List<MisionPartida> misionesYaAsignadas = await _misionPartidaRepositorio.ObtenerMisionesAsignadas(partida.Id);
+        
+        var idsAsignados = misionesYaAsignadas
+            .Select(mp => mp.MisionId) // Obtenemos solo el ID de la Misión
+            .ToHashSet();
+        
+        List<Mision> misionesNuevas = misionesActivas
+            .Where(m => !idsAsignados.Contains(m.Id))
+            .ToList();
+        
+        if (misionesNuevas.Count == 0)
+        {
+            return;
+        }
+        
+        partida.MisionPartidas = this._misionPartidaRepositorio.AgregarMisionesPartida(misionesNuevas, partida);
+        this._misionPartidaRepositorio.GuardarMisionesPartida(partida);
+        
         await this._unidadDeTrabajo.CommitAsync();
     }
 
+    public List<MisionPartida> ProcesarMisionesPartida(List<MisionPartida> reclamables, List<MisionPartida> noReclamables)
+    {
+        
+        var idsNoReclamables = noReclamables
+            .Select(mp => mp.MisionId) // Obtenemos solo el ID de la Misión
+            .ToHashSet();
+        
+        List<MisionPartida> misionesNoReclamables = reclamables
+            .Where(m => !idsNoReclamables.Contains(m.MisionId))
+            .ToList();
+
+        return misionesNoReclamables;
+
+    }
     public async Task MarcarMisionCompletada(Mision mision, Partida partida)
     {
         MisionPartida mp = await this._misionPartidaRepositorio.ObtenerUnaMisionDePartida(partida.Id, mision.Id);
@@ -53,5 +84,16 @@ public class MisionPartidaLogica : IMisionPartidaLogica
     public async Task<List<Mision>> ObtenerMisionesMes(int idUsuario)
     {
         return await this._misionPartidaRepositorio.ObtenerMisionesMes(idUsuario);
+    }
+    
+    public async Task<List<MisionPartida>> ObtenerMisionesActivasParaPartida(Partida partida)
+    {
+        this.ValidarPartida(partida);
+        return await this._misionPartidaRepositorio.ObtenerMisionesPartida(partida.Id);
+    }
+    
+    private void ValidarPartida(Partida? partida)
+    {
+        if (partida == null) throw new MisionExcepcion("No se encontró la partida");
     }
 }

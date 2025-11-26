@@ -13,9 +13,7 @@ namespace CivitaBack.Domain.Interfaces.Repositorios
                 int partidaId,
                 int estructuraId,
                 int x,
-                int y,
-                int width,
-                int height); 
+                int y); 
         Task EliminarAsync(EstructuraMapa entidad);
     }
 }

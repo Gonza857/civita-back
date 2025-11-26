@@ -78,6 +78,7 @@ public class PartidaRepositorio
             .Include(p => p.EstructuraMapa)
             .Include(p => p.Recursos)
             .Include(p => p.Usuario)
+            .AsNoTracking()
             .FirstOrDefaultAsync(p => p.UsuarioId == idUsuario);
         return base.Mapear<Partida>(partida);
     }

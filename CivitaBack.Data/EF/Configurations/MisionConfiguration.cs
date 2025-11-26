@@ -24,9 +24,20 @@ public class MisionConfiguration : IEntityTypeConfiguration<MisionEF>
         builder.HasData(
             new MisionEF
             {
-                Id = 1, // ID de esta misión
+                Id = 3, // ID de esta misión
                 Titulo = "¡Construye 1 casa!",
-                Descripcion = "Nuestros ciudadanos necesitan lugar para vivir. Construye 1 casa.",
+                Descripcion = "Nuestros ciudadanos necesitan lugar para vivir. Construí 1 casa.",
+                Disponible = true,
+                Tipo = TipoMision.Diaria,
+                CondicionId = 1, 
+                Creado = seedDate,
+                Editado = seedDate
+            },
+            new MisionEF
+            {
+                Id = 2, // ID de esta misión
+                Titulo = "¡Construye 1 fabrica!",
+                Descripcion = "La ciudad necesita generar ingresos.",
                 Disponible = true,
                 Tipo = TipoMision.Diaria,
                 CondicionId = 2, 

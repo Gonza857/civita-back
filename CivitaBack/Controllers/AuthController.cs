@@ -45,15 +45,17 @@ public class AuthController : BaseApiController
         try
         {
             Usuario? usuarioExistente = await this._usuarioLogica.ObtenerUsuarioPorNombre(request.NombreUsuario);
-            Usuario usuario = this._authLogica.CrearUsuarioInicial(request.NombreUsuario, usuarioExistente);
+            
+            Usuario usuario = await this._authLogica.CrearUsuarioInicial(request.NombreUsuario, usuarioExistente);
             await this._inicialLogica.IniciarPartida(usuario);
             
             var usuarioRegistrado = await this._authLogica.IniciarSesion(request.NombreUsuario);
             var token = this._authLogica.GenerarToken(usuarioRegistrado);
             
             _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddDays(7));
-            
-            return Ok(new {id = usuarioRegistrado.Id});
+
+            var dto = base.Mapear<UsuarioDTO>(usuarioRegistrado);
+            return Ok(dto);
         }
         catch (DominioException ex)
         {
@@ -63,6 +65,20 @@ public class AuthController : BaseApiController
         {
             _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al realizar el registro.");
+        }
+    }
+
+    [HttpGet("Logout")]
+    public IActionResult Logout()
+    {
+        try
+        {
+            Response.Cookies.Delete("jwt-auth");
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al cerrar sesión");
         }
     }
 

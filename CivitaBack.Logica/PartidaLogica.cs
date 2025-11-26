@@ -65,10 +65,39 @@ public class PartidaLogica : IPartidaLogica
         if (partidaBuscada == null || partidaBuscada.Recursos == null)
             throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No encontrada.");
         
-        partidaBuscada!.Recursos.Contaminacion = partida.Recursos!.Contaminacion;
+        partidaBuscada.Recursos.Contaminacion = partida.Recursos!.Contaminacion;
         partidaBuscada.Recursos.Energia = partida.Recursos.Energia;
         partidaBuscada.Recursos.Felicidad = partida.Recursos.Felicidad;
         partidaBuscada.Recursos.EcoCoins = partida.Recursos.EcoCoins;
+        partidaBuscada.Nivel = partida.Nivel;
+        partidaBuscada.Experiencia = partida.Experiencia;
+        
+        try
+        {
+            await this._repositorioPartida.Actualizar(partidaBuscada);
+            await this._uow.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new ErrorInternoException("Ocurrió un error al Actualizar un la Partida");
+        }
+    }
+
+    public async Task Actualizar(Partida partida)
+    {
+        this.ValidarRecursosPartida(partida);
+        
+        Partida? partidaBuscada = await this._repositorioPartida.ObtenerPorId(partida.Id);
+        
+        if (partidaBuscada == null || partidaBuscada.Recursos == null)
+            throw new PartidaExcepcion("Ocurrió un error al guardar el mapa: No encontrada.");
+        
+        partidaBuscada.Recursos.Contaminacion = partida.Recursos!.Contaminacion;
+        partidaBuscada.Recursos.Energia = partida.Recursos.Energia;
+        partidaBuscada.Recursos.Felicidad = partida.Recursos.Felicidad;
+        partidaBuscada.Recursos.EcoCoins = partida.Recursos.EcoCoins;
+        partidaBuscada.Nivel = partida.Nivel;
+        partidaBuscada.Experiencia = partida.Experiencia;
         
         try
         {
@@ -119,8 +148,6 @@ public class PartidaLogica : IPartidaLogica
 
     public async Task<Partida?> ObtenerPartidaPorIdInterno(int idUsuario)
     {
-        _accesoUsuarios.ValidarAcceso(idUsuario);
-
         return await this._repositorioPartida.ObtenerPorUsuarioId(idUsuario);
     }
 
@@ -130,8 +157,6 @@ public class PartidaLogica : IPartidaLogica
     /// <param name="idUsuario">ID del Usuario</param>
     public async Task<Partida> ObtenerPorUsuarioId(int IdUsuario)
     {
-        _accesoUsuarios.ValidarAcceso(IdUsuario);
-
         var partida = await this._repositorioPartida.ObtenerPorUsuarioId(IdUsuario);
         if (partida == null) throw new PartidaExcepcion("Partida no encontrada");
         return partida;
@@ -187,7 +212,7 @@ public class PartidaLogica : IPartidaLogica
         if (partida == null)
             throw new PartidaExcepcion("Partida no encontrada");
         
-        _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
+        // _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
 
         return partida;
     }

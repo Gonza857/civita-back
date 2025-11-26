@@ -27,9 +27,6 @@ namespace CivitaBack.Logica.Backgrounds
             _hubContext = hubContext;
         }
 
-        public void Pausar() => _pauseEvent.Reset();
-        public void Continuar() => _pauseEvent.Set();
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("🟢 CicloBackgroundService iniciado a las {Hora}", DateTime.Now);
@@ -44,8 +41,8 @@ namespace CivitaBack.Logica.Backgrounds
                         _pauseEvent.Wait(stoppingToken);
 
                         var cicloLogica = scope.ServiceProvider.GetRequiredService<ICicloLogica>();
-
                         var eventoLogica = scope.ServiceProvider.GetRequiredService<IEventoLogica>();
+                        var nivelLogica = scope.ServiceProvider.GetRequiredService<INivelLogica>();
 
                         // 2. ¡HACE EL TRABAJO! (Esto ahora se ejecuta primero)
                         var partidas = await cicloLogica.EjecutarCicloAsync();
@@ -53,13 +50,19 @@ namespace CivitaBack.Logica.Backgrounds
                         // 3. Enviar los recursos a cada grupo de SignalR
                         foreach (var partida in partidas)
                         {
+                            if (partida.EstaPausada)
+                                continue;
+
                             var payload = new RecursoDTO
                             {
                                 Energia = partida.Recursos.Energia,
                                 Contaminacion = partida.Recursos.Contaminacion,
                                 Felicidad = partida.Recursos.Felicidad,
                                 EcoCoins = partida.Recursos.EcoCoins,
-                                Poblacion = partida.Recursos.Poblacion
+                                Poblacion = partida.Recursos.Poblacion,
+                                Nivel = partida.Nivel,
+                                Experiencia = partida.Experiencia,
+                                ExperienciaSiguienteNivel = nivelLogica.ObtenerExperienciaTechoNivel(partida.Nivel)
                             };
 
                             if (partida.Recursos.Contaminacion > 80)

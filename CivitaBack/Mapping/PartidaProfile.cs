@@ -46,14 +46,14 @@ public class PartidaProfile : Profile
             .ForMember(
                 dto => dto.Usuario,
                 opt => opt.MapFrom(dominio => dominio.Usuario == null ? string.Empty : dominio.Usuario.NombreUsuario)
-            )
-
-            // --- Ignorar Propiedades Problemáticas ---
-            // Ignoramos la referencia circular 'Partida -> Partida' en el DTO
-            .ForMember(
-                dto => dto.Partida,
-                opt => opt.Ignore()
             );
+
+        // --- Ignorar Propiedades Problemáticas ---
+        // Ignoramos la referencia circular 'Partida -> Partida' en el DTO
+        // .ForMember(
+        //     dto => dto.Partida,
+        //     opt => opt.Ignore()
+        // );
 
 
     }

@@ -12,5 +12,10 @@ public interface IMisionPartidaLogica
     
     Task AsignarMisiones(List<Mision> misiones, Partida partida);
     Task MarcarMisionCompletada(Mision mision, Partida partida);
+    
+    Task<List<MisionPartida>> ObtenerMisionesActivasParaPartida(Partida partida);
+
+    List<MisionPartida> ProcesarMisionesPartida(List<MisionPartida> reclamables, List<MisionPartida> noReclamables);
+
 
 }

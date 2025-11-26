@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251125043426_balance_estructuras")]
+    partial class balance_estructuras
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,24 +53,6 @@ namespace CivitaBack.Data.Migrations
                     b.HasIndex("EstructuraId");
 
                     b.ToTable("Condicion");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Cantidad = 1,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EstructuraId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Cantidad = 1,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            EstructuraId = 3
-                        });
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.EfectoEventoEF", b =>
@@ -586,25 +571,14 @@ namespace CivitaBack.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 3,
-                            CondicionId = 1,
+                            Id = 1,
+                            CondicionId = 2,
                             Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Descripcion = "Nuestros ciudadanos necesitan lugar para vivir. Construí 1 casa.",
+                            Descripcion = "Nuestros ciudadanos necesitan lugar para vivir. Construye 1 casa.",
                             Disponible = true,
                             Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Tipo = "Diaria",
                             Titulo = "¡Construye 1 casa!"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CondicionId = 2,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Descripcion = "La ciudad necesita generar ingresos.",
-                            Disponible = true,
-                            Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Tipo = "Diaria",
-                            Titulo = "¡Construye 1 fabrica!"
                         });
                 });
 
@@ -715,48 +689,6 @@ namespace CivitaBack.Data.Migrations
                     b.HasIndex("EstructuraId");
 
                     b.ToTable("Recompensa");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 100,
-                            Cantidad = 50,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            NombreColumna = "EcoCoins"
-                        },
-                        new
-                        {
-                            Id = 101,
-                            Cantidad = 50,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            NombreColumna = "Experiencia"
-                        },
-                        new
-                        {
-                            Id = 102,
-                            Cantidad = 60,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            NombreColumna = "Experiencia"
-                        },
-                        new
-                        {
-                            Id = 103,
-                            Cantidad = 15,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            NombreColumna = "Energia"
-                        },
-                        new
-                        {
-                            Id = 104,
-                            Cantidad = 500,
-                            Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            NombreColumna = "EcoCoins"
-                        });
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.RecursoEF", b =>
@@ -1239,28 +1171,6 @@ namespace CivitaBack.Data.Migrations
                     b.HasIndex("RecompensasId");
 
                     b.ToTable("CondicionRecompensa", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            CondicionesId = 1,
-                            RecompensasId = 100
-                        },
-                        new
-                        {
-                            CondicionesId = 1,
-                            RecompensasId = 101
-                        },
-                        new
-                        {
-                            CondicionesId = 2,
-                            RecompensasId = 103
-                        },
-                        new
-                        {
-                            CondicionesId = 2,
-                            RecompensasId = 104
-                        });
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.CondicionEF", b =>

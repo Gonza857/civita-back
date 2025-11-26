@@ -1,4 +1,5 @@
-﻿using CivitaBack.Domain.Interfaces.Logica;
+﻿using CivitaBack.Domain.Excepciones;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Backgrounds;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,15 +11,16 @@ namespace CivitaBack.Api.Controllers
     {
         private readonly ICicloLogica _cicloLogica;
         private readonly ILogger<CicloController> _logger;
-        private readonly BackgroundCicloLogica _cicloBackground; 
+        private readonly BackgroundCicloLogica _cicloBackground;
+        private readonly IPartidaLogica _partidaLogica;
 
-        public CicloController(ICicloLogica cicloLogica, ILogger<CicloController> logger, BackgroundCicloLogica background)
+        public CicloController(ICicloLogica cicloLogica, ILogger<CicloController> logger, BackgroundCicloLogica background, IPartidaLogica partidaLogica)
         {
             _cicloLogica = cicloLogica;
             _logger = logger;
             _logger.LogInformation("CicloController instanciado");
-            _cicloBackground = background; 
-
+            _cicloBackground = background;
+            _partidaLogica = partidaLogica;
         }
 
         /// <summary>
@@ -46,18 +48,52 @@ namespace CivitaBack.Api.Controllers
             }
         }
 
-        [HttpPost("pausar")]
-        public IActionResult Pausar()
+        [HttpPost("pausar/{idPartida}")]
+        public async Task<IActionResult> PausarCiclo(int idPartida)
         {
-            _cicloBackground.Pausar();
-            return Ok(new { mensaje = "Ciclo pausado" });
+            try
+            {
+                var partida = await _partidaLogica.ObtenerPorId(idPartida);
+                if (partida == null)
+                    return NotFound(new { mensaje = "Partida no encontrada" });
+
+                await _cicloLogica.PausarCiclo(partida);
+
+                return Ok(new { mensaje = "Ciclo pausado" });
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al pausar el ciclo");
+                return StatusCode(500, new { mensaje = "Error interno del servidor" });
+            }
         }
 
-        [HttpPost("continuar")]
-        public IActionResult Continuar()
+        [HttpPost("continuar/{idPartida}")]
+        public async Task<IActionResult> ContinuarCiclo(int idPartida)
         {
-            _cicloBackground.Continuar();
-            return Ok(new { mensaje = "Ciclo continuado" });
+            try
+            {
+                var partida = await _partidaLogica.ObtenerPorId(idPartida);
+                if (partida == null)
+                    return NotFound(new { mensaje = "Partida no encontrada" });
+
+                await _cicloLogica.ContinuarCiclo(partida);
+
+                return Ok(new { mensaje = "Ciclo continuado" });
+            }
+            catch (PartidaExcepcion ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al continuar el ciclo");
+                return StatusCode(500, new { mensaje = "Error interno del servidor" });
+            }
         }
 
     }

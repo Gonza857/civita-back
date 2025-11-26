@@ -9,7 +9,19 @@ public class UsuarioProfile : Profile
 {
     public UsuarioProfile()
     {
-        CreateMap<UsuarioEF, Usuario>().ReverseMap();
-        CreateMap<UsuarioDTO, Usuario>().ReverseMap();
+        CreateMap<UsuarioEF, Usuario>()
+            .ReverseMap();
+        
+        CreateMap<Usuario, UsuarioDTO>()
+            .ForMember(
+                dto => dto.Nombre, 
+                opt => opt.MapFrom(src => src.NombreUsuario)
+            );
+        
+        CreateMap<UsuarioDTO, Usuario>()
+            .ForMember(
+                dominio => dominio.NombreUsuario, 
+                opt => opt.MapFrom(dto => dto.Nombre) 
+            );
     }
 }

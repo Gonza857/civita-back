@@ -283,48 +283,7 @@ public class MisionLogicaTest
         Assert.Equal(idMision, resultado.Id);
         _mockMisionRepositorio.Verify(r => r.ObtenerPorId(idMision), Times.Once);
     }
-
-    [Fact]
-    public async Task ObtenerMisionesActivasParaPartida_PartidaValida_RetornaMisiones()
-    {
-        // Arrange
-        var partida = new Partida { Id = 1 };
-        var misionesPartida = new List<MisionPartida>
-        {
-            new MisionPartida
-            {
-                PartidaId = 1,
-                Mision = new Mision { Id = 1, Titulo = "Mision 1" }
-            },
-            new MisionPartida
-            {
-                PartidaId = 1,
-                Mision = new Mision { Id = 2, Titulo = "Mision 2" }
-            }
-        };
-
-        _mockMisionPartidaRepositorio.Setup(r => r.ObtenerMisionesPartida(1))
-            .ReturnsAsync(misionesPartida);
-
-        // Act
-        var resultado = await _misionLogica.ObtenerMisionesActivasParaPartida(partida);
-
-        // Assert
-        Assert.NotNull(resultado);
-        Assert.Equal(2, resultado.Count);
-        _mockMisionPartidaRepositorio.Verify(r => r.ObtenerMisionesPartida(1), Times.Once);
-    }
-
-    [Fact]
-    public async Task ObtenerMisionesActivasParaPartida_PartidaNull_LanzaExcepcion()
-    {
-        // Arrange
-        Partida? partida = null;
-
-        // Act & Assert
-        await Assert.ThrowsAsync<MisionExcepcion>(() => 
-            _misionLogica.ObtenerMisionesActivasParaPartida(partida!));
-    }
+    
 
     [Fact]
     public async Task ObtenerMisionesDisponibles_RetornaMisionesActivas()
