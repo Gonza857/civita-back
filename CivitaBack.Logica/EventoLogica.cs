@@ -116,7 +116,8 @@ namespace CivitaBack.Logica
             return new EventoResueltoDTO
             {
                 Id = evento.Id,
-                TextoRespuesta = mensajeFinal, 
+                TextoRespuesta = mensajeFinal,
+                RecursosAplicados = FormatoEfectos(efectoAplicable),
                 PartidaId = partida.Id,
                 RecursosActualizados = recursosDTO
             };
@@ -160,7 +161,20 @@ namespace CivitaBack.Logica
         public static string FormatoEfectos(EfectoEvento? ef)
         {
             if (ef == null) return string.Empty;
-            return $"+{ef.EcoCoins} EcoCoins, +{ef.Felicidad} Felicidad, {ef.Contaminacion} Contaminación, +{ef.Energia} Energía";
+
+            string Format(string nombre, int valor)
+            {
+                string signo = valor > 0 ? "+" : "";
+                return $"{signo}{valor} {nombre}";
+            }
+
+            return string.Join(", ", new[]
+            {
+            Format("EcoCoins", ef.EcoCoins),
+            Format("Felicidad", ef.Felicidad),
+            Format("Contaminación", ef.Contaminacion),
+            Format("Energía", ef.Energia)
+            });
         }
     }
 }
