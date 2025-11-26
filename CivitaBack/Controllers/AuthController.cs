@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using CivitaBack.Data.DTO;
 using CivitaBack.Domain.Entidades;
-using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Excepciones;
-using Microsoft.AspNetCore.Mvc;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Logica.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CivitaBack.Api.Controllers;
 
@@ -65,6 +66,32 @@ public class AuthController : BaseApiController
         {
             _logger.LogError(ex.Message);
             return Problem("Ocurrió un error al realizar el registro.");
+        }
+    }
+
+    [HttpPost("registro/completo")]
+    public async Task<IActionResult> CompletarRegistro([FromBody] RegistroCompletoDTO dto)
+    {
+        try
+        {
+            var idStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(idStr, out int usuarioId))
+                return Unauthorized("Token inválido.");
+
+            var usuario = await _authLogica.CompletarRegistro(
+                usuarioId,
+                dto.Mail,
+                dto.Contrasena
+            );
+
+            var token = _authLogica.GenerarToken(usuario);
+            _configurarCookieLogica.ConfigurarCookie(token, DateTimeOffset.UtcNow.AddDays(7));
+
+            return Ok(new { exito = true });
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocurrió un error al completar el registro.");
         }
     }
 
