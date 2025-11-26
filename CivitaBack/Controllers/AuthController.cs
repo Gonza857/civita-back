@@ -73,7 +73,13 @@ public class AuthController : BaseApiController
     {
         try
         {
-            Response.Cookies.Delete("jwt-auth");
+            Response.Cookies.Delete("jwt-auth", new CookieOptions
+            {
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                HttpOnly = true,
+                Path = "/"
+            });
             return Ok();
         }
         catch (Exception ex)
