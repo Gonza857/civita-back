@@ -4,12 +4,12 @@ using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica.Interfaces;
 using CivitaBack.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace CivitaBack.Logica
 {
     public class CompraEstructurasLogica : ICompraEstructurasLogica
     {
-
         private readonly IPartidaRepositorio _repositorioPartida;
         private readonly IEstructuraRepositorio _estructuraRepositorio;
         private readonly IAccesoUsuarios _accesoUsuarios;
@@ -32,30 +32,51 @@ namespace CivitaBack.Logica
 
         public async Task<int> ComprarEstructuraAsync(int partidaId, int estructuraId)
         {
-            Partida? partida = await _repositorioPartida.ObtenerPorId(partidaId);
+            const int MAX_REINTENTOS = 3;
+            
             Estructura? estructura = await _estructuraRepositorio.ObtenerPorId(estructuraId);
 
-            if (partida == null || partida.Recursos == null)
-                throw new PartidaExcepcion("Partida inválida o recursos no encontrados.");
             if (estructura == null)
                 throw new PartidaExcepcion("Estructura no encontrada.");
+            
+            for (int intento = 0; intento < MAX_REINTENTOS; intento++)
+            {
+                try
+                {
+                    Partida? partida = await _repositorioPartida.ObtenerPorIdTrackeada(partidaId);
 
-            _accesoUsuarios.ValidarAcceso(partida.UsuarioId);
+                    if (partida == null || partida.Recursos == null)
+                        throw new PartidaExcepcion("Partida inválida o recursos no encontrados.");
+                    
+                    int costo = estructura.CostoDinero;
 
-            int costo = estructura.CostoDinero;
+                    if (partida.Recursos.EcoCoins < costo)
+                        throw new PartidaExcepcion("Dinero insuficiente.");
 
-            if (partida.Recursos.EcoCoins < costo)
-                throw new PartidaExcepcion("Dinero insuficiente.");
+                    int cambioEcoCoins = -costo;
+                    
+                    _actualizarRecursosLogica.ActualizarRecursosAsync(partida, 0, 0, cambioEcoCoins, 0);
+                    
+                    _repositorioPartida.SincronizarCambios(partida);
+                    
+                    await _uow.CommitAsync();
+                    
+                    return partida.Recursos.EcoCoins;
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
 
-            int cambioEcoCoins = -costo;
+                    if (intento == MAX_REINTENTOS - 1)
+                    {
+                        throw new PartidaExcepcion("Error de concurrencia. Intente de nuevo.");
+                    }
+                    
+                    await Task.Delay(50);
+                }
+            }
 
-            _actualizarRecursosLogica.ActualizarRecursosAsync(partida,0,0, cambioEcoCoins, 0);
-
-            await _repositorioPartida.Actualizar(partida);
-
-            await _uow.CommitAsync();
-
-            return partida.Recursos.EcoCoins;
+            // Debería ser inalcanzable, pero lo dejamos por seguridad.
+            throw new InvalidOperationException("Falló la operación después de todos los reintentos.");
         }
     }
 }

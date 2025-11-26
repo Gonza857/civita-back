@@ -10,4 +10,8 @@
     <Compile Remove="IRecursoLogica.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CivitaBack.Domain\CivitaBack.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -225,7 +225,7 @@ public class PartidaController : BaseApiController
     [HttpPost("guardar-mapa")]
     public async Task<IActionResult> GuardarMapa([FromBody] GuardarMapaDTO dto)
     {
-        if (dto == null || dto.PartidaId <= 0 || dto.Estructuras == null || dto.Estructuras.Count <= 0)
+        if (dto.PartidaId <= 0 || dto.Estructuras == null || dto.Estructuras.Count <= 0)
             return BadRequest("Datos de mapa inválidos.");
 
         try
