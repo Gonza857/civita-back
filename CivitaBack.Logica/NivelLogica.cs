@@ -1,20 +1,9 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
 
 namespace CivitaBack.Logica;
-
-public interface INivelLogica
-{
-    void SubirNivel(Partida partida);
-    int ObtenerExperienciaFaltanteParaSiguienteNivel(int nivel, int experiencia);
-    
-    bool PuedeSubir (int xpActual, int nivelActual);
-
-    Task VerificarNivel(Partida partida);
-
-    int ObtenerExperienciaTechoNivel(int nivel);
-}
 
 public class NivelLogica : INivelLogica
 {
@@ -31,28 +20,33 @@ public class NivelLogica : INivelLogica
     
     private int XpNecesariaParaSiguienteNivel(int nivelActual)
     {
-        // Fórmula correcta:
+        // Fórmula: Costo Incremental para pasar de N a N+1
         return BASE_XP + INCREMENTO_XP * nivelActual;
     }
 
+    /// <inheritdoc />
     public bool PuedeSubir(int xpActual, int nivelActual)
     {
-        int xpNecesaria = XpNecesariaParaSiguienteNivel(nivelActual);
-        return xpActual >= xpNecesaria;
+        // Usa el cálculo del umbral total para verificar si puede subir (aunque SubirNivel ya hace esto).
+        int xpUmbralTotalSiguiente = CalcularCostoTotalAcumulado(nivelActual + 1);
+        return xpActual >= xpUmbralTotalSiguiente;
     }
 
+    /// <inheritdoc />
     public async Task VerificarNivel(Partida partida)
     {
-        // int nivelPrevio = partida.Nivel;
+        int nivelPrevio = partida.Nivel;
         this.SubirNivel(partida);
-        await this._partidaRepositorio.Actualizar(partida);
-        await this._unidadDeTrabajo.CommitAsync();
+        
+        if (nivelPrevio != partida.Nivel)
+        {
+            // Si el nivel cambió, persistir los cambios de Nivel/XP
+            await this._partidaRepositorio.Actualizar(partida);
+            await this._unidadDeTrabajo.CommitAsync();
+        }
     }
 
-    /// <summary>
-    /// Sube el nivel de la partida, consumiendo el exceso de experiencia.
-    /// Esto maneja múltiples subidas de nivel en una sola llamada.
-    /// </summary>
+    /// <inheritdoc />
     public void SubirNivel(Partida partida)
     {
         while (true)
@@ -73,15 +67,14 @@ public class NivelLogica : INivelLogica
     
     /// <summary>
     /// Calcula la experiencia total acumulada que se necesita para alcanzar un nivel objetivo.
+    /// Este es el umbral.
     /// </summary>
-    /// <param name="nivelObjetivo">El nivel que se intenta alcanzar (ej: si el nivel actual es 1, el objetivo es 2).</param>
-    /// <returns>La cantidad total de XP requerida.</returns>
     private int CalcularCostoTotalAcumulado(int nivelObjetivo)
     {
-        if (nivelObjetivo <= 1) return 0; // Se asume que el nivel 1 requiere 0 XP total
+        if (nivelObjetivo <= 1) return 0;
 
         int xpTotal = 0;
-        // Suma el costo incremental para cada nivel de 1 hasta el objetivo
+        // Suma el costo incremental para cada nivel de 1 hasta el objetivo (nivelObjetivo - 1)
         for (int n = 1; n < nivelObjetivo; n++)
         {
             // El costo incremental para pasar de N a N+1 es: BASE_XP + INCREMENTO_XP * (N-1)
@@ -90,15 +83,22 @@ public class NivelLogica : INivelLogica
         return xpTotal;
     }
 
-    public int ObtenerExperienciaFaltanteParaSiguienteNivel(int nivel, int experiencia)
+    /// <inheritdoc />
+    public int ObtenerExperienciaFaltanteParaSiguienteNivel(int nivelActual, int experienciaActual)
     {
-        int xpUmbralTotalSiguiente = CalcularCostoTotalAcumulado(nivel + 1); 
-        int xpFaltante = xpUmbralTotalSiguiente - experiencia; 
+        // XP Total necesaria para el siguiente nivel
+        int xpUmbralTotalSiguiente = CalcularCostoTotalAcumulado(nivelActual + 1); 
+        
+        // XP que falta = Umbral Siguiente - XP Actual
+        int xpFaltante = xpUmbralTotalSiguiente - experienciaActual; 
+        
         return xpFaltante;
     }
 
+    /// <inheritdoc />
     public int ObtenerExperienciaTechoNivel(int nivel)
     {
+        // El "techo" de un nivel N es el umbral total que requiere el nivel N+1.
         return CalcularCostoTotalAcumulado(nivel + 1);
     }
     

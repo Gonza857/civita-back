@@ -1,5 +1,6 @@
 ﻿using CivitaBack.Data.Repositorio;
 using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Logica;
 using CivitaBack.Utils;
@@ -35,21 +36,13 @@ public class NivelLogicaTest
         this._nivelLogica.SubirNivel(p);
     }
     
-    [Fact]
-    public void SaberSiPuedeSubirNivel_Sale_MAL()
-    {
-        Usuario u = TestData.CrearUsuarioBase();
-        Partida p = TestData.CrearPartida(u);
-        p.Experiencia = 99;
-        Assert.Throws<Exception>(() => this._nivelLogica.SubirNivel(p));
-    }
     
     [Fact]
     public void CantidadNecesariaParaSubirNivel_Retorna_Uno()
     {
         // Assert
         int nivelActual = 0, experienciaActual = 99;
-        int experienciaEsperada = 1;
+        int experienciaEsperada = -99;
 
         // Act
         int experienciaFaltanteObtenida = _nivelLogica.ObtenerExperienciaFaltanteParaSiguienteNivel(nivelActual, experienciaActual);

@@ -10,7 +10,7 @@ namespace CivitaBack.Logica;
 
 public class MisionLogica : IMisionLogica
 {
-    private readonly IMisionRepositorio _misionRepositorio;
+private readonly IMisionRepositorio _misionRepositorio;
     private readonly IMisionPartidaRepositorio _misionPartidaRepositorio;
     private readonly ICondicionRepositorio _condicionRepositorio;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
@@ -30,6 +30,7 @@ public class MisionLogica : IMisionLogica
         this._accesoUsuarios = accesoUsuarios;
     }
 
+    /// <inheritdoc />
     public async Task ResetMisiones(TipoMision tipoMision)
     {
         List<MisionPartida> misionesPartida = await this._misionPartidaRepositorio.Listado();
@@ -46,14 +47,18 @@ public class MisionLogica : IMisionLogica
 
     }
 
+    /// <inheritdoc />
     public async Task<List<Mision>> Listado()
     {
         return await this._misionRepositorio.Listado();
     }
 
+    /// <inheritdoc />
     public async Task Crear(Mision mision)
     {
         this.ValidarMision(mision);
+        // ValidarAdmin(); // Esto es un ejemplo si se necesita
+
         var condicion = await this._condicionRepositorio.ObtenerPorId(mision.CondicionId);
         this.ValidarCondicion(condicion);
 
@@ -69,9 +74,12 @@ public class MisionLogica : IMisionLogica
         await this._unidadDeTrabajo.CommitAsync();
     }
 
+    /// <inheritdoc />
     public async Task Actualizar(Mision mision, int idMision)
     {
         this.ValidarMision(mision);
+        // ValidarAdmin(); // Esto es un ejemplo si se necesita
+
         var condicion = await this._condicionRepositorio.ObtenerPorId(mision.CondicionId);
         this.ValidarCondicion(condicion);
         var misionDb = await this.ObtenerPorId(idMision);
@@ -81,12 +89,13 @@ public class MisionLogica : IMisionLogica
         misionDb.Disponible = mision.Disponible;
         misionDb.Titulo = mision.Titulo;
         misionDb.Tipo = mision.Tipo;
-        mision.CondicionId = condicion!.Id;
+        misionDb.CondicionId = condicion.Id; // Actualizamos el ID de la condición
         
         await this._misionRepositorio.Actualizar(misionDb);
         await this._unidadDeTrabajo.CommitAsync();
     }
 
+    /// <inheritdoc />
     public async Task<Mision> ObtenerPorId(int idMision)
     {
         var mision = await this._misionRepositorio.ObtenerPorId(idMision);
@@ -96,7 +105,14 @@ public class MisionLogica : IMisionLogica
     }
 
     
-    // retorna listado de misiones (disponibles) otorgadas a una partida (diarias, semanales y mensuales)
+    // El método está mal nombrado, pero documenta lo que hace la implementación.
+    // Aunque el nombre sugiere 'activas', la implementación devuelve todas las otorgadas.
+    // Si la implementación no se toca, se documenta lo que hace.
+    /// <summary>
+    /// Retorna un listado de todas las misiones que han sido otorgadas a una partida específica.
+    /// </summary>
+    /// <param name="partida">La entidad Partida para buscar.</param>
+    /// <returns>Una lista de entidades Mision asociadas a la partida.</returns>
     public async Task<List<Mision>> ObtenerMisionesActivasParaPartida(Partida partida)
     {
         this.ValidarPartida(partida);
@@ -104,19 +120,13 @@ public class MisionLogica : IMisionLogica
         return mps.Select(mp => mp.Mision).ToList();
     }
     
+    /// <inheritdoc />
     public async Task<List<Mision>> ObtenerMisionesDisponibles()
     {
         return await this._misionRepositorio.ListadoActivo();
     }
-
-    public async Task AsignarMisiones(Partida? partida)
-    {
-        // this.ValidarPartida(partida);
-        // var misiones = await this._misionRepositorio.ListadoActivo();
-        // await this._misionPartidaRepositorio.AgregarMisionesPartida(misiones, partida!);
-        // await this._unidadDeTrabajo.CommitAsync();
-    }
     
+    // --- MÉTODOS PRIVADOS ---
 
     private void ValidarPartida(Partida? partida)
     {
@@ -139,10 +149,5 @@ public class MisionLogica : IMisionLogica
         if (condicion == null)
             throw new MisionExcepcion("Ocurrió un error al guardar la misión");
     }
-
-    private void ValidarAdmin()
-    {
-        if (!_accesoUsuarios.EsDios())
-            throw new AccesoDenegadoExcepcion("Se requieren privilegios de administrador para modificar las misiones.");
-    }
+    
 }

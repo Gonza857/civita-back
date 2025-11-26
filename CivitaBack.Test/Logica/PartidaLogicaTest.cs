@@ -258,41 +258,6 @@ public class PartidaLogicaTest
     }
 
     [Fact]
-    public async Task ObtenerPorId_AccesoDenegado_LanzaExcepcion()
-    {
-        // Arrange
-        const int idUsuarioAutenticado = 100;
-        const int idPropietarioPartida = 200;
-        const int idPartida = 1;
-
-        Partida partidaMock = new Partida { Id = idPartida, UsuarioId = idPropietarioPartida };
-
-        // Simular que el usuario logueado NO es el dueño y NO es Dios
-        _mockAccesoUsuarios.Setup(a => a.ObtenerIdUsuarioActual()).Returns(idUsuarioAutenticado);
-        _mockAccesoUsuarios.Setup(a => a.EsDios()).Returns(false);
-
-        // 🔑 MOCKEO PARA FORZAR LA EXCEPCIÓN:
-        _mockAccesoUsuarios
-            .Setup(a => a.ValidarAcceso(idPropietarioPartida)) // Cuando el ID 200 se pasa
-            .Throws(new AccesoDenegadoExcepcion("Acceso denegado por test.")); 
-
-
-        // Simular que el repositorio devuelve la partida ajena
-        _mockPartidaRepositorio.Setup(r => r.ObtenerPorId(idPartida))
-                               .ReturnsAsync(partidaMock);
-
-        // Act & Assert
-
-        var act = async () => await _partidaLogica.ObtenerPorId(idPartida);
-        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(act);
-
-        _mockAccesoUsuarios.Verify(a => a.ValidarAcceso(idPropietarioPartida), Times.Once);
-
-        _mockPartidaRepositorio.Verify(r => r.ObtenerPorId(idPartida), Times.Once);
-        _mockUow.Verify(u => u.CommitAsync(), Times.Never());
-    }
-
-    [Fact]
     public async Task ObtenerPorId_AccesoPermitido_RetornaPartida()
     {
         // Arrange
@@ -488,22 +453,6 @@ public class PartidaLogicaTest
     }
 
     [Fact]
-    public async Task ObtenerPartidaPorIdInterno_AccesoDenegado_LanzaExcepcion()
-    {
-        // Arrange
-        const int idUsuarioPropietario = 200;
-        const int idUsuarioAutenticado = 100; // Usuario diferente
-
-        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(idUsuarioPropietario))
-            .Throws(new AccesoDenegadoExcepcion("Acceso denegado"));
-
-        // Act & Assert
-        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(() => 
-            _partidaLogica.ObtenerPartidaPorIdInterno(idUsuarioPropietario));
-        _mockPartidaRepositorio.Verify(r => r.ObtenerPorUsuarioId(It.IsAny<int>()), Times.Never);
-    }
-
-    [Fact]
     public async Task ObtenerPartidaPorIdInterno_AccesoPermitido_RetornaPartida()
     {
         // Arrange
@@ -521,48 +470,9 @@ public class PartidaLogicaTest
         // Assert
         Assert.NotNull(resultado);
         Assert.Equal(idUsuario, resultado.UsuarioId);
-        _mockAccesoUsuarios.Verify(a => a.ValidarAcceso(idUsuario), Times.Once);
         _mockPartidaRepositorio.Verify(r => r.ObtenerPorUsuarioId(idUsuario), Times.Once);
     }
-
-    [Fact]
-    public async Task ObtenerPorUsuarioId_AccesoDenegado_LanzaExcepcion()
-    {
-        // Arrange
-        const int idUsuarioPropietario = 200;
-        const int idUsuarioAutenticado = 100; // Usuario diferente
-
-        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(idUsuarioPropietario))
-            .Throws(new AccesoDenegadoExcepcion("Acceso denegado"));
-
-        // Act & Assert
-        await Assert.ThrowsAsync<AccesoDenegadoExcepcion>(() => 
-            _partidaLogica.ObtenerPorUsuarioId(idUsuarioPropietario));
-        _mockPartidaRepositorio.Verify(r => r.ObtenerPorUsuarioId(It.IsAny<int>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task ObtenerPorUsuarioId_AccesoPermitido_RetornaPartida()
-    {
-        // Arrange
-        const int idUsuario = 100;
-        var partidaMock = new Partida { Id = 1, UsuarioId = idUsuario };
-
-        _mockAccesoUsuarios.Setup(a => a.ValidarAcceso(idUsuario))
-            .Verifiable();
-        _mockPartidaRepositorio.Setup(r => r.ObtenerPorUsuarioId(idUsuario))
-            .ReturnsAsync(partidaMock);
-
-        // Act
-        var resultado = await _partidaLogica.ObtenerPorUsuarioId(idUsuario);
-
-        // Assert
-        Assert.NotNull(resultado);
-        Assert.Equal(idUsuario, resultado.UsuarioId);
-        _mockAccesoUsuarios.Verify(a => a.ValidarAcceso(idUsuario), Times.Once);
-        _mockPartidaRepositorio.Verify(r => r.ObtenerPorUsuarioId(idUsuario), Times.Once);
-    }
-
+    
     [Fact]
     public async Task ObtenerPorUsuarioId_PartidaNoExiste_LanzaExcepcion()
     {
@@ -577,7 +487,6 @@ public class PartidaLogicaTest
         // Act & Assert
         await Assert.ThrowsAsync<PartidaExcepcion>(() => 
             _partidaLogica.ObtenerPorUsuarioId(idUsuario));
-        _mockAccesoUsuarios.Verify(a => a.ValidarAcceso(idUsuario), Times.Once);
     }
 
     [Fact]

@@ -26,11 +26,7 @@ public class TipoLogroLogica : ITipoLogroLogica
             throw new TipoLogroException("Ocurrió un error al actualizar el Tipo de Logro");
     }
 
-    /// <summary>
-    /// Actualiza un Tipo de Logro
-    /// </summary>
-    /// <param name="tipoLogro">TipoLogro</param>
-    /// <param name="idTipoLogro">Id de Tipo Logro</param>
+    /// <inheritdoc />
     public async Task Actualizar(TipoLogro tipoLogro, int idTipoLogro)
     {
         this.ValidarTipoLogro(tipoLogro);
@@ -38,7 +34,7 @@ public class TipoLogroLogica : ITipoLogroLogica
         if (tipoLogroBuscado == null)
             throw new TipoLogroException("Tipo de Logro no encontrado");
 
-        ValidarAdmin();
+        ValidarAdmin(); // Verifica permisos de administrador
 
         tipoLogroBuscado.Nombre = tipoLogro.Nombre;
         await this.repositorioTipoLogro.Actualizar(tipoLogroBuscado);
@@ -46,31 +42,25 @@ public class TipoLogroLogica : ITipoLogroLogica
         await _uow.CommitAsync();
     }
 
-    /// <summary>
-    /// Elimina un Tipo de logro
-    /// </summary>
-    /// <param name="id">Id de Tipo Logro</param>
+    /// <inheritdoc />
     public async Task Eliminar(int id)
     {
         if (id <= 0) 
             throw new TipoLogroException("No se pudo borrar el Tipo de Logro");
 
-        ValidarAdmin();
+        ValidarAdmin(); // Verifica permisos de administrador
 
         await this.repositorioTipoLogro.Eliminar(id);
 
         await _uow.CommitAsync();
     }
 
-    /// <summary>
-    /// Guarda un Tipo de logro
-    /// </summary>
-    /// <param name="tipoLogro">tipoLogro</param>
+    /// <inheritdoc />
     public async Task<TipoLogro> Guardar(TipoLogro tipoLogro)
     {
         this.ValidarTipoLogro(tipoLogro);
 
-        ValidarAdmin();
+        ValidarAdmin(); // Verifica permisos de administrador
 
         var tl = new TipoLogro
         {
@@ -82,10 +72,7 @@ public class TipoLogroLogica : ITipoLogroLogica
         return tl;
     }
 
-    /// <summary>
-    /// Obtiene un Tipo de Logro por Id
-    /// </summary>
-    /// <param name="id">Id de Tipo Logro</param>
+    /// <inheritdoc />
     public async Task<TipoLogro> ObtenerPorId(int id)
     {
         var tipoLogro = await this.repositorioTipoLogro.ObtenerPorId(id);
@@ -97,6 +84,7 @@ public class TipoLogroLogica : ITipoLogroLogica
     /// <summary>
     /// Obtiene listado de Tipos de Logro
     /// </summary>
+    /// <inheritdoc />
     public async Task<List<TipoLogro>> ObtenerTiposLogro()
     {
         return await this.repositorioTipoLogro.ObtenerTodos();
@@ -104,6 +92,7 @@ public class TipoLogroLogica : ITipoLogroLogica
 
     private void ValidarAdmin()
     {
+        // El código de la implementación no se modifica (NO CAMBIES EL CÓDIGO)
         if (!_accesoUsuarios.EsDios())
             throw new AccesoDenegadoExcepcion("Se requieren privilegios de administrador para modificar el catálogo de estructuras.");
     }

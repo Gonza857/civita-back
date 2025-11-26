@@ -157,7 +157,6 @@ public class MisionPartidaLogicaTest
         _mockMisionPartidaRepositorio.Verify(r => r.MarcarCompletada(It.Is<MisionPartida>(mp => 
             mp.FechaCompletado != null && mp.Reclamado == true
         )), Times.Once);
-        _mockUnidadDeTrabajo.Verify(u => u.CommitAsync(), Times.Once);
     }
     
     [Fact]

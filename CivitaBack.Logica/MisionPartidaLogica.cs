@@ -17,6 +17,7 @@ public class MisionPartidaLogica : IMisionPartidaLogica
         _unidadDeTrabajo = unidadDeTrabajo;
     }
     
+    /// <inheritdoc />
     public async Task<Mision> ObtenerMisionPartidaPorId(int idPartida, int idMision)
     {
         var mision = await this._misionPartidaRepositorio.ObtenerMisionPartidaPorId(idPartida, idMision);
@@ -25,6 +26,7 @@ public class MisionPartidaLogica : IMisionPartidaLogica
         return mision;
     }
     
+    /// <inheritdoc />
     public async Task AsignarMisiones(List<Mision> misionesActivas, Partida partida)
     {
         List<MisionPartida> misionesYaAsignadas = await _misionPartidaRepositorio.ObtenerMisionesAsignadas(partida.Id);
@@ -48,6 +50,7 @@ public class MisionPartidaLogica : IMisionPartidaLogica
         await this._unidadDeTrabajo.CommitAsync();
     }
 
+    /// <inheritdoc />
     public List<MisionPartida> ProcesarMisionesPartida(List<MisionPartida> reclamables, List<MisionPartida> noReclamables)
     {
         
@@ -62,30 +65,39 @@ public class MisionPartidaLogica : IMisionPartidaLogica
         return misionesNoReclamables;
 
     }
+    
+    /// <summary>
+    /// Marca una MisionPartida específica como completada y reclamada.
+    /// </summary>
+    /// <inheritdoc />
     public async Task MarcarMisionCompletada(Mision mision, Partida partida)
     {
         MisionPartida mp = await this._misionPartidaRepositorio.ObtenerUnaMisionDePartida(partida.Id, mision.Id);
         mp.FechaCompletado = DateTime.UtcNow;
         mp.Reclamado = true;
         await this._misionPartidaRepositorio.MarcarCompletada(mp);
-        // await this._unidadDeTrabajo.CommitAsync();
+        // await this._unidadDeTrabajo.CommitAsync(); // Se asume que el commit lo hace la lógica superior
     }
 
+    /// <inheritdoc />
     public async Task<List<Mision>> ObtenerMisionesDia(int idUsuario)
     {
         return await this._misionPartidaRepositorio.ObtenerMisionesDia(idUsuario);
     }
 
+    /// <inheritdoc />
     public async Task<List<Mision>> ObtenerMisionesSemana(int idUsuario)
     {
         return await this._misionPartidaRepositorio.ObtenerMisionesSemana(idUsuario);
     }
 
+    /// <inheritdoc />
     public async Task<List<Mision>> ObtenerMisionesMes(int idUsuario)
     {
         return await this._misionPartidaRepositorio.ObtenerMisionesMes(idUsuario);
     }
     
+    /// <inheritdoc />
     public async Task<List<MisionPartida>> ObtenerMisionesActivasParaPartida(Partida partida)
     {
         this.ValidarPartida(partida);
