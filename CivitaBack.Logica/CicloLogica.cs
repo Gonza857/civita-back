@@ -43,7 +43,6 @@ namespace CivitaBack.Logica
             }
 
             await _uow.CommitAsync();
-
             return partidas;
         }
 
