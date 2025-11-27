@@ -37,20 +37,20 @@ namespace CivitaBack.Logica.Backgrounds
                 {
                     using (var scope = _serviceProvider.CreateScope())
                     {
-                        // 1. Espera si está en pausa
                         _pauseEvent.Wait(stoppingToken);
 
                         var cicloLogica = scope.ServiceProvider.GetRequiredService<ICicloLogica>();
                         var eventoLogica = scope.ServiceProvider.GetRequiredService<IEventoLogica>();
                         var nivelLogica = scope.ServiceProvider.GetRequiredService<INivelLogica>();
 
-                        // 2. ¡HACE EL TRABAJO! (Esto ahora se ejecuta primero)
                         var partidas = await cicloLogica.EjecutarCicloAsync();
 
-                        // 3. Enviar los recursos a cada grupo de SignalR
                         foreach (var partida in partidas)
                         {
                             if (partida.EstaPausada)
+                                continue;
+
+                            if (partida == null || partida.Recursos == null)
                                 continue;
 
                             var payload = new RecursoDTO
@@ -105,17 +105,13 @@ namespace CivitaBack.Logica.Backgrounds
                         _logger.LogInformation("✅ Ciclo ejecutado y recursos enviados a SignalR a las {Hora}",
                             DateTime.Now);
 
-                        // 4. ¡ESPERA DESPUÉS de terminar el trabajo!
                         await Task.Delay(_intervalo, stoppingToken);
                     }
                 }
                 catch (Exception ex)
                 {
-                    // 5. Si algo falló (en EjecutarCicloAsync o SignalR), loguealo
                     _logger.LogError(ex, "❌ Error durante la ejecución del ciclo automático");
 
-                    // 6. Esperá 15 segundos antes de reintentar el ciclo
-                    //    (para no spamear la BD si el error es grave)
                     await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
                 }
             }

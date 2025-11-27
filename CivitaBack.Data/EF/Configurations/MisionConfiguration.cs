@@ -25,8 +25,8 @@ public class MisionConfiguration : IEntityTypeConfiguration<MisionEF>
             new MisionEF
             {
                 Id = 3, // ID de esta misión
-                Titulo = "¡Construye 1 casa!",
-                Descripcion = "Nuestros ciudadanos necesitan lugar para vivir. Construí 1 casa.",
+                Titulo = "¡Construí 1 casa!",
+                Descripcion = "Nuestros ciudadanos necesitan lugar para vivir.",
                 Disponible = true,
                 Tipo = TipoMision.Diaria,
                 CondicionId = 1, 
@@ -36,7 +36,7 @@ public class MisionConfiguration : IEntityTypeConfiguration<MisionEF>
             new MisionEF
             {
                 Id = 2, // ID de esta misión
-                Titulo = "¡Construye 1 fabrica!",
+                Titulo = "¡Construí 1 fábrica!",
                 Descripcion = "La ciudad necesita generar ingresos.",
                 Disponible = true,
                 Tipo = TipoMision.Diaria,
