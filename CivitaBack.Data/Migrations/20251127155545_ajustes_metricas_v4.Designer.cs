@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251127155545_ajustes_metricas_v4")]
+    partial class ajustes_metricas_v4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -238,12 +241,12 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 4,
-                            ContaminacionCiclo = 0,
+                            ContaminacionCiclo = -1,
                             CostoDinero = 100,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
-                            FelicidadCiclo = 2,
+                            FelicidadCiclo = 3,
                             Nombre = "Parque",
                             RutaImagen = "/Assets/mapa/Estructura-Parque-Pequeño.png",
                             TipoEstructuraId = 4
@@ -1075,7 +1078,7 @@ namespace CivitaBack.Data.Migrations
                             Capacidad = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DineroPorCiclo = -10,
-                            EnergiaPorCiclo = 5,
+                            EnergiaPorCiclo = 4,
                             Nombre = "Energia",
                             Ocupacion = 0
                         },
