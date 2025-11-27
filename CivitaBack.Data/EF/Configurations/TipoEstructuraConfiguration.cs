@@ -36,7 +36,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Nombre = "Energia",
                 Ocupacion = 0,
                 Capacidad = 0,
-                EnergiaPorCiclo = 3,
+                EnergiaPorCiclo = 2,
                 DineroPorCiclo = -5,
                 Creado = seedDate,
             },
@@ -86,7 +86,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Nombre = "Energia solar",
                 Ocupacion = 0,
                 Capacidad = 0,
-                EnergiaPorCiclo = 2,
+                EnergiaPorCiclo = 1,
                 DineroPorCiclo = -2,
                 Creado = seedDate,
             }
