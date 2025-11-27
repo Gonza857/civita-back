@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251127134908_correcciones_ortografia")]
+    partial class correcciones_ortografia
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -199,7 +202,7 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 1,
-                            ContaminacionCiclo = 0,
+                            ContaminacionCiclo = 1,
                             CostoDinero = 40,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -225,12 +228,12 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 3,
-                            ContaminacionCiclo = 2,
+                            ContaminacionCiclo = 3,
                             CostoDinero = 50,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
-                            FelicidadCiclo = -1,
+                            FelicidadCiclo = -2,
                             Nombre = "Fábrica",
                             RutaImagen = "/Assets/mapa/Estructura-Fabrica-Nivel-1.png",
                             TipoEstructuraId = 3
@@ -251,7 +254,7 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 5,
-                            ContaminacionCiclo = 1,
+                            ContaminacionCiclo = 2,
                             CostoDinero = 150,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -264,12 +267,12 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 6,
-                            ContaminacionCiclo = -2,
+                            ContaminacionCiclo = -3,
                             CostoDinero = 400,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
-                            FelicidadCiclo = 2,
+                            FelicidadCiclo = 3,
                             Nombre = "Planta Neocorp",
                             RutaImagen = "/Assets/mapa/Estructura-Fabrica-Nivel-2.png",
                             TipoEstructuraId = 6
@@ -1075,7 +1078,7 @@ namespace CivitaBack.Data.Migrations
                             Capacidad = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DineroPorCiclo = -5,
-                            EnergiaPorCiclo = 2,
+                            EnergiaPorCiclo = 3,
                             Nombre = "Energia",
                             Ocupacion = 0
                         },
@@ -1125,7 +1128,7 @@ namespace CivitaBack.Data.Migrations
                             Capacidad = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DineroPorCiclo = -2,
-                            EnergiaPorCiclo = 1,
+                            EnergiaPorCiclo = 2,
                             Nombre = "Energia solar",
                             Ocupacion = 0
                         });

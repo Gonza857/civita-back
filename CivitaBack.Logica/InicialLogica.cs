@@ -60,7 +60,7 @@ public class InicialLogica : IInicialLogica
         {
             EcoCoins = 450,
             Felicidad = 50,
-            Energia = 40,
+            Energia = 60,
             Contaminacion = 40,
         };
     }
