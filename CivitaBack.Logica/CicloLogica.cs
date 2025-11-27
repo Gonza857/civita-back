@@ -118,6 +118,13 @@ namespace CivitaBack.Logica
                 totalEnergia -= 2;
             }
 
+            if (partida.Recursos.Energia == 0)
+            {
+                totalEcoCoins -= 15;
+                totalFelicidad -= 1;
+            }
+
+
             _actualizarRecursosLogica.ActualizarRecursosAsync(
                 partida,
                 totalFelicidad,
