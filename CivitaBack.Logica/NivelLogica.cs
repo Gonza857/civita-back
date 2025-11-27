@@ -1,4 +1,5 @@
 ﻿using CivitaBack.Domain.Entidades;
+using CivitaBack.Domain.Excepciones;
 using CivitaBack.Domain.Interfaces.Logica;
 using CivitaBack.Domain.Interfaces.Repositorios;
 using CivitaBack.Utils;
@@ -41,10 +42,11 @@ public class NivelLogica : INivelLogica
         
         if (nivelPrevio != partida.Nivel)
         {
-            // Si el nivel cambió, persistir los cambios de Nivel/XP
             await this._partidaRepositorio.Actualizar(partida);
-            await this._unidadDeTrabajo.CommitAsync();
+
         }
+        await this._unidadDeTrabajo.CommitAsync(); 
+
     }
 
     /// <inheritdoc />
