@@ -36,6 +36,7 @@ public class NivelLogica : INivelLogica
     public async Task VerificarNivel(Partida partida)
     {
         int nivelPrevio = partida.Nivel;
+        
         this.SubirNivel(partida);
         
         if (nivelPrevio != partida.Nivel)

@@ -121,10 +121,8 @@ public class RecompensaLogica : IRecompensaLogica
     /// </summary>
     private async Task ProcesarCamposExcluyentes(Recompensa recompensa)
     {
-        // 1. Validar la lógica
         ValidarDatosBase(recompensa);
-
-        // 2. Procesar (Normalizar)
+        
         if (recompensa.EstructuraId.HasValue)
         {
             Estructura? e = await _estructuraRepositorio.ObtenerPorId(recompensa.EstructuraId.Value);
@@ -134,13 +132,13 @@ public class RecompensaLogica : IRecompensaLogica
             }
 
             recompensa.EstructuraId = e.Id;
-            recompensa.NombreColumna = null; // Asegura exclusividad
-            recompensa.Estructura = null; // No guardamos el objeto de navegación
+            recompensa.NombreColumna = null; 
+            recompensa.Estructura = null; 
         }
         else if (!string.IsNullOrWhiteSpace(recompensa.NombreColumna))
         {
             recompensa.NombreColumna = TipoRecursoHelper.ParseTipoRecurso(recompensa.NombreColumna).ToString();
-            recompensa.EstructuraId = null; // Asegura exclusividad
+            recompensa.EstructuraId = null; 
             recompensa.Estructura = null;
         }
     }

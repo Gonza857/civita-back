@@ -116,10 +116,8 @@ public class PartidaController : BaseApiController
             return Problem("Ocurrió un error al guardar la partida.");
         }
     }
-
-    // Obtener la partida de un usuario
     
-    [HttpGet("porUsuario/{idUsuario}")] // -> PascalCase -> PorUsuario/{idUsuario}
+    [HttpGet("porUsuario/{idUsuario}")] 
     [Authorize(Roles = "Jugador, Desconocido, Admin")]
     public async Task<IActionResult> ObtenerPartidaPorUsuario(int idUsuario)
     {
