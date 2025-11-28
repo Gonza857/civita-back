@@ -45,6 +45,9 @@ public class NivelLogica : INivelLogica
             await this._partidaRepositorio.Actualizar(partida);
             await this._unidadDeTrabajo.CommitAsync();
         }
+        await this._partidaRepositorio.Actualizar(partida);
+        await this._unidadDeTrabajo.CommitAsync();
+
     }
 
     /// <inheritdoc />
