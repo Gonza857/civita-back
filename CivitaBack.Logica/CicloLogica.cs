@@ -25,21 +25,24 @@ namespace CivitaBack.Logica
         {
             List<Partida> partidas = await _partidaRepositorio.ObtenerTodasConEstructurasYRecursosAsync();
 
-            if (partidas == null || partidas.Count == 0) return new List<Partida>();
+            if (partidas.Count == 0) return new List<Partida>();
 
             foreach (var partida in partidas)
             {
-                ProcesarRecursosPorEstructurasMapa(partida);
+                if (!partida.EstaPausada)
+                {
+                    ProcesarRecursosPorEstructurasMapa(partida);
 
-                partida.EstructuraMapa = null;
-                partida.Evento = null;
-                partida.Tienda = null;
-                // partida.LogroPartidas = null;
-                // partida.MisionPartidas = null;
-                partida.TipEnPartida = null;
-                partida.Usuario = null;
+                    partida.EstructuraMapa = null;
+                    partida.Evento = null;
+                    partida.Tienda = null;
+                    // partida.LogroPartidas = null;
+                    // partida.MisionPartidas = null;
+                    partida.TipEnPartida = null;
+                    partida.Usuario = null;
 
-                await _partidaRepositorio.Actualizar(partida);
+                    await _partidaRepositorio.Actualizar(partida);
+                }
             }
 
             await _uow.CommitAsync();
