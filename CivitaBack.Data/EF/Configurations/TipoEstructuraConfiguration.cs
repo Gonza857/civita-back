@@ -27,7 +27,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Ocupacion = 0,
                 Capacidad = 5,
                 EnergiaPorCiclo = -1,
-                DineroPorCiclo = 1,
+                DineroPorCiclo = -10,
                 Creado = seedDate,
             },
             new TipoEstructuraEF
@@ -36,8 +36,8 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Nombre = "Energia",
                 Ocupacion = 0,
                 Capacidad = 0,
-                EnergiaPorCiclo = 2,
-                DineroPorCiclo = -5,
+                EnergiaPorCiclo = 5,
+                DineroPorCiclo = -10,
                 Creado = seedDate,
             },
             new TipoEstructuraEF
@@ -56,7 +56,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Nombre = "Verde",
                 Ocupacion = 0,
                 Capacidad = 0,
-                EnergiaPorCiclo = 1,
+                EnergiaPorCiclo = -1,
                 DineroPorCiclo = -2,
                 Creado = seedDate,
             },
@@ -67,7 +67,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Ocupacion = 0,
                 Capacidad = 50,
                 EnergiaPorCiclo = -1,
-                DineroPorCiclo = 5,
+                DineroPorCiclo = -5,
                 Creado = seedDate,
             },
             new TipoEstructuraEF
@@ -76,8 +76,8 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Nombre = "Reciclaje",
                 Ocupacion = 0,
                 Capacidad = 0,
-                EnergiaPorCiclo = 0,
-                DineroPorCiclo = -10,
+                EnergiaPorCiclo = -3,
+                DineroPorCiclo = 50,
                 Creado = seedDate,
             },
             new TipoEstructuraEF
@@ -87,7 +87,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Ocupacion = 0,
                 Capacidad = 0,
                 EnergiaPorCiclo = 1,
-                DineroPorCiclo = -2,
+                DineroPorCiclo = -5,
                 Creado = seedDate,
             }
         );

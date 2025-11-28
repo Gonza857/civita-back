@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251127153717_ajustes_metricas_v3")]
+    partial class ajustes_metricas_v3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -212,8 +215,8 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 2,
-                            ContaminacionCiclo = -4,
-                            CostoDinero = 500,
+                            ContaminacionCiclo = -2,
+                            CostoDinero = 300,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
@@ -238,12 +241,12 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 4,
-                            ContaminacionCiclo = 0,
-                            CostoDinero = 100,
+                            ContaminacionCiclo = -1,
+                            CostoDinero = 30,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
-                            FelicidadCiclo = 2,
+                            FelicidadCiclo = 3,
                             Nombre = "Parque",
                             RutaImagen = "/Assets/mapa/Estructura-Parque-Pequeño.png",
                             TipoEstructuraId = 4
@@ -264,12 +267,12 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 6,
-                            ContaminacionCiclo = 4,
+                            ContaminacionCiclo = 2,
                             CostoDinero = 400,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
-                            FelicidadCiclo = -1,
+                            FelicidadCiclo = 0,
                             Nombre = "Planta Neocorp",
                             RutaImagen = "/Assets/mapa/Estructura-Fabrica-Nivel-2.png",
                             TipoEstructuraId = 6
@@ -278,7 +281,7 @@ namespace CivitaBack.Data.Migrations
                         {
                             Id = 7,
                             ContaminacionCiclo = -1,
-                            CostoDinero = 100,
+                            CostoDinero = 80,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
@@ -1074,8 +1077,8 @@ namespace CivitaBack.Data.Migrations
                             Id = 2,
                             Capacidad = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DineroPorCiclo = -10,
-                            EnergiaPorCiclo = 5,
+                            DineroPorCiclo = -5,
+                            EnergiaPorCiclo = 4,
                             Nombre = "Energia",
                             Ocupacion = 0
                         },
@@ -1124,7 +1127,7 @@ namespace CivitaBack.Data.Migrations
                             Id = 7,
                             Capacidad = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DineroPorCiclo = -5,
+                            DineroPorCiclo = -2,
                             EnergiaPorCiclo = 1,
                             Nombre = "Energia solar",
                             Ocupacion = 0

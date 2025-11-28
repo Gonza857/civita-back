@@ -43,10 +43,8 @@ public class NivelLogica : INivelLogica
         if (nivelPrevio != partida.Nivel)
         {
             await this._partidaRepositorio.Actualizar(partida);
-
         }
         await this._unidadDeTrabajo.CommitAsync(); 
-
     }
 
     /// <inheritdoc />

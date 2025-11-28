@@ -17,7 +17,7 @@ namespace CivitaBack.Logica.Backgrounds
         private readonly IHubContext<CicloHub> _hubContext;
         private readonly ManualResetEventSlim _pauseEvent = new(true); // empieza "activo"
 
-        private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(15); // 7/8
+        private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(10); // 7/8
 
         public BackgroundCicloLogica(IServiceProvider serviceProvider, ILogger<BackgroundCicloLogica> logger,
             IHubContext<CicloHub> hubContext)
