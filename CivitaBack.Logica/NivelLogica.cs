@@ -39,14 +39,11 @@ public class NivelLogica : INivelLogica
         
         this.SubirNivel(partida);
         
-        if (nivelPrevio != partida.Nivel)
-        {
+       
             // Si el nivel cambió, persistir los cambios de Nivel/XP
             await this._partidaRepositorio.Actualizar(partida);
-            await this._unidadDeTrabajo.CommitAsync();
-        }
-        await this._partidaRepositorio.Actualizar(partida);
-        await this._unidadDeTrabajo.CommitAsync();
+         
+    await this._unidadDeTrabajo.CommitAsync();
 
     }
 
