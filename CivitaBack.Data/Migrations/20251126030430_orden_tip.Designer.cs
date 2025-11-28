@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251126030430_orden_tip")]
+    partial class orden_tip
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +52,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("EstructuraId");
 
-                    b.ToTable("Condicion", (string)null);
+                    b.ToTable("Condicion");
 
                     b.HasData(
                         new
@@ -109,7 +112,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("EventoMaestroId");
 
-                    b.ToTable("EfectoEvento", (string)null);
+                    b.ToTable("EfectoEvento");
 
                     b.HasData(
                         new
@@ -193,18 +196,18 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("TipoEstructuraId");
 
-                    b.ToTable("Estructura", (string)null);
+                    b.ToTable("Estructura");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            ContaminacionCiclo = 0,
-                            CostoDinero = 40,
+                            ContaminacionCiclo = 1,
+                            CostoDinero = 25,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
-                            FelicidadCiclo = 1,
+                            FelicidadCiclo = 2,
                             Nombre = "Casa",
                             RutaImagen = "/Assets/mapa/Estructura-Edificio-3.png",
                             TipoEstructuraId = 1
@@ -212,8 +215,8 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 2,
-                            ContaminacionCiclo = -2,
-                            CostoDinero = 500,
+                            ContaminacionCiclo = -3,
+                            CostoDinero = 300,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
@@ -225,12 +228,12 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 3,
-                            ContaminacionCiclo = 2,
-                            CostoDinero = 50,
+                            ContaminacionCiclo = 3,
+                            CostoDinero = 40,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
-                            FelicidadCiclo = -2,
+                            FelicidadCiclo = -4,
                             Nombre = "Fábrica",
                             RutaImagen = "/Assets/mapa/Estructura-Fabrica-Nivel-1.png",
                             TipoEstructuraId = 3
@@ -239,7 +242,7 @@ namespace CivitaBack.Data.Migrations
                         {
                             Id = 4,
                             ContaminacionCiclo = 0,
-                            CostoDinero = 100,
+                            CostoDinero = 20,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
@@ -256,7 +259,7 @@ namespace CivitaBack.Data.Migrations
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
-                            FelicidadCiclo = 2,
+                            FelicidadCiclo = 5,
                             Nombre = "Hotel",
                             RutaImagen = "/Assets/mapa/Estructura-Hotel.png",
                             TipoEstructuraId = 5
@@ -264,12 +267,12 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 6,
-                            ContaminacionCiclo = 4,
+                            ContaminacionCiclo = -5,
                             CostoDinero = 400,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
-                            FelicidadCiclo = -1,
+                            FelicidadCiclo = 3,
                             Nombre = "Planta Neocorp",
                             RutaImagen = "/Assets/mapa/Estructura-Fabrica-Nivel-2.png",
                             TipoEstructuraId = 6
@@ -278,7 +281,7 @@ namespace CivitaBack.Data.Migrations
                         {
                             Id = 7,
                             ContaminacionCiclo = -1,
-                            CostoDinero = 100,
+                            CostoDinero = 80,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EsMejorable = false,
@@ -327,7 +330,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("EstructuraMapa", (string)null);
+                    b.ToTable("EstructuraMapa");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.EventoEF", b =>
@@ -386,7 +389,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("Evento", (string)null);
+                    b.ToTable("Evento");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.EventoMaestroEF", b =>
@@ -433,7 +436,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EventoMaestro", (string)null);
+                    b.ToTable("EventoMaestro");
 
                     b.HasData(
                         new
@@ -445,14 +448,14 @@ namespace CivitaBack.Data.Migrations
                             OpcionB_Texto = "B) Usar un auto moderno, solo con el conductor.",
                             RespuestaCorrecta = "A",
                             TipoEvento = 1,
-                            Titulo = "¿Cómo viajo hoy?"
+                            Titulo = "¿Cómo me muevo hoy?"
                         },
                         new
                         {
                             Id = 2,
-                            ContenidoPrincipal = "Tu nivel de Contaminación es críticamente alto. Intentá construir más estructuras que limpien el aire y sumar espacios verdes.",
+                            ContenidoPrincipal = "Tu nivel de contaminación es críticamente alto. Si excede el 80%, la Felicidad de tus ciudadanos caerá rápidamente. Intentá construir más estructuras que limpien el aire y sumar espacios verdes.",
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            OpcionA_Texto = "Entendido",
+                            OpcionA_Texto = "Entendido.",
                             OpcionB_Texto = "",
                             RespuestaCorrecta = "A",
                             TipoEvento = 2,
@@ -461,9 +464,9 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 3,
-                            ContenidoPrincipal = "Tus reservas de Energía están peligrosamente bajas. Considerá construir más fuentes de energía renovable.",
+                            ContenidoPrincipal = "Tus reservas de energía están peligrosamente bajas. Si caen por debajo del 10%, varias estructuras dejarán de funcionar, afectando la Felicidad y el crecimiento de tu ciudad. Considerá construir más fuentes de energía renovable.",
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            OpcionA_Texto = "Entendido",
+                            OpcionA_Texto = "Entendido.",
                             OpcionB_Texto = "",
                             RespuestaCorrecta = "A",
                             TipoEvento = 2,
@@ -472,9 +475,9 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 4,
-                            ContenidoPrincipal = "La Felicidad de tus ciudadanos está peligrosamente baja. Revisá si hay suficiente refugio disponible y tratá de reducir los niveles de contaminación para mejorar el ánimo de la población.",
+                            ContenidoPrincipal = "La Felicidad de tus ciudadanos está peligrosamente baja. Cuando esto ocurre, la población puede comenzar a disminuir y tu ciudad se vuelve menos estable. Revisá si hay suficiente refugio disponible y tratá de reducir los niveles de contaminación para mejorar el ánimo general de la población.",
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            OpcionA_Texto = "Entendido",
+                            OpcionA_Texto = "Entendido.",
                             OpcionB_Texto = "",
                             RespuestaCorrecta = "A",
                             TipoEvento = 2,
@@ -518,7 +521,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("TipoLogroId");
 
-                    b.ToTable("Logro", (string)null);
+                    b.ToTable("Logro");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.LogroPartidaEF", b =>
@@ -542,7 +545,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("LogroPartida", (string)null);
+                    b.ToTable("LogroPartida");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.MisionEF", b =>
@@ -589,11 +592,11 @@ namespace CivitaBack.Data.Migrations
                             Id = 3,
                             CondicionId = 1,
                             Creado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Descripcion = "Nuestros ciudadanos necesitan lugar para vivir.",
+                            Descripcion = "Nuestros ciudadanos necesitan lugar para vivir. Construí 1 casa.",
                             Disponible = true,
                             Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Tipo = "Diaria",
-                            Titulo = "¡Construí 1 casa!"
+                            Titulo = "¡Construye 1 casa!"
                         },
                         new
                         {
@@ -604,7 +607,7 @@ namespace CivitaBack.Data.Migrations
                             Disponible = true,
                             Editado = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Tipo = "Diaria",
-                            Titulo = "¡Construí 1 fábrica!"
+                            Titulo = "¡Construye 1 fabrica!"
                         });
                 });
 
@@ -643,7 +646,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("MisionPartida", (string)null);
+                    b.ToTable("MisionPartida");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.PartidaEF", b =>
@@ -683,7 +686,7 @@ namespace CivitaBack.Data.Migrations
                     b.HasIndex("UsuarioId")
                         .IsUnique();
 
-                    b.ToTable("Partida", (string)null);
+                    b.ToTable("Partida");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.RecompensaEF", b =>
@@ -714,7 +717,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("EstructuraId");
 
-                    b.ToTable("Recompensa", (string)null);
+                    b.ToTable("Recompensa");
 
                     b.HasData(
                         new
@@ -796,7 +799,7 @@ namespace CivitaBack.Data.Migrations
                     b.HasIndex("PartidaId")
                         .IsUnique();
 
-                    b.ToTable("Recurso", (string)null);
+                    b.ToTable("Recurso");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.TiendaEF", b =>
@@ -825,7 +828,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("Tienda", (string)null);
+                    b.ToTable("Tienda");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.TipEF", b =>
@@ -868,7 +871,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("TipoId");
 
-                    b.ToTable("Tip", (string)null);
+                    b.ToTable("Tip");
 
                     b.HasData(
                         new
@@ -1020,7 +1023,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("TipId");
 
-                    b.ToTable("TipEnPartida", (string)null);
+                    b.ToTable("TipEnPartida");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.TipoEstructuraEF", b =>
@@ -1056,7 +1059,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TipoEstructura", (string)null);
+                    b.ToTable("TipoEstructura");
 
                     b.HasData(
                         new
@@ -1064,7 +1067,7 @@ namespace CivitaBack.Data.Migrations
                             Id = 1,
                             Capacidad = 5,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DineroPorCiclo = -1,
+                            DineroPorCiclo = 1,
                             EnergiaPorCiclo = -1,
                             Nombre = "Vivienda",
                             Ocupacion = 0
@@ -1074,7 +1077,7 @@ namespace CivitaBack.Data.Migrations
                             Id = 2,
                             Capacidad = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DineroPorCiclo = -5,
+                            DineroPorCiclo = -12,
                             EnergiaPorCiclo = 5,
                             Nombre = "Energia",
                             Ocupacion = 0
@@ -1084,8 +1087,8 @@ namespace CivitaBack.Data.Migrations
                             Id = 3,
                             Capacidad = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DineroPorCiclo = 10,
-                            EnergiaPorCiclo = -2,
+                            DineroPorCiclo = 30,
+                            EnergiaPorCiclo = -4,
                             Nombre = "Industrial",
                             Ocupacion = 0
                         },
@@ -1094,8 +1097,8 @@ namespace CivitaBack.Data.Migrations
                             Id = 4,
                             Capacidad = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DineroPorCiclo = -2,
-                            EnergiaPorCiclo = -1,
+                            DineroPorCiclo = -3,
+                            EnergiaPorCiclo = 1,
                             Nombre = "Verde",
                             Ocupacion = 0
                         },
@@ -1104,8 +1107,8 @@ namespace CivitaBack.Data.Migrations
                             Id = 5,
                             Capacidad = 50,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DineroPorCiclo = -5,
-                            EnergiaPorCiclo = -1,
+                            DineroPorCiclo = 10,
+                            EnergiaPorCiclo = -2,
                             Nombre = "Alojamiento",
                             Ocupacion = 0
                         },
@@ -1114,8 +1117,8 @@ namespace CivitaBack.Data.Migrations
                             Id = 6,
                             Capacidad = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DineroPorCiclo = 50,
-                            EnergiaPorCiclo = -3,
+                            DineroPorCiclo = -10,
+                            EnergiaPorCiclo = 0,
                             Nombre = "Reciclaje",
                             Ocupacion = 0
                         },
@@ -1124,8 +1127,8 @@ namespace CivitaBack.Data.Migrations
                             Id = 7,
                             Capacidad = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DineroPorCiclo = -2,
-                            EnergiaPorCiclo = 1,
+                            DineroPorCiclo = -5,
+                            EnergiaPorCiclo = 2,
                             Nombre = "Energia solar",
                             Ocupacion = 0
                         });
@@ -1152,7 +1155,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TipoLogro", (string)null);
+                    b.ToTable("TipoLogro");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.TipoTipEF", b =>
@@ -1176,7 +1179,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TipoTip", (string)null);
+                    b.ToTable("TipoTip");
 
                     b.HasData(
                         new
@@ -1224,7 +1227,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Usuario", (string)null);
+                    b.ToTable("Usuario");
                 });
 
             modelBuilder.Entity("CondicionEFRecompensaEF", b =>

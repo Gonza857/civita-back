@@ -76,7 +76,7 @@ namespace CivitaBack.Logica.Backgrounds
                                 }
                             }
 
-                            if (partida.Recursos.Energia < 10)
+                            /*if (partida.Recursos.Energia < 15)
                             {
                                 var tipDisparado = await eventoLogica.DispararEventoInformativoAsync(partida, 3);
 
@@ -85,9 +85,9 @@ namespace CivitaBack.Logica.Backgrounds
                                     await _hubContext.Clients.Group(partida.Id.ToString())
                                         .SendAsync("EventoDisparado", tipDisparado);
                                 }
-                            }
+                            }*/
 
-                            if (partida.Recursos.Felicidad < 20)
+                            if (partida.Recursos.Felicidad < 10)
                             {
                                 var tipDisparado = await eventoLogica.DispararEventoInformativoAsync(partida, 4);
 

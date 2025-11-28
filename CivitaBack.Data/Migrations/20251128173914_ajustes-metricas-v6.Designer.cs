@@ -3,6 +3,7 @@ using System;
 using CivitaBack.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CivitaBack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251128173914_ajustes-metricas-v6")]
+    partial class ajustesmetricasv6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +52,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("EstructuraId");
 
-                    b.ToTable("Condicion", (string)null);
+                    b.ToTable("Condicion");
 
                     b.HasData(
                         new
@@ -109,7 +112,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("EventoMaestroId");
 
-                    b.ToTable("EfectoEvento", (string)null);
+                    b.ToTable("EfectoEvento");
 
                     b.HasData(
                         new
@@ -193,7 +196,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("TipoEstructuraId");
 
-                    b.ToTable("Estructura", (string)null);
+                    b.ToTable("Estructura");
 
                     b.HasData(
                         new
@@ -212,7 +215,7 @@ namespace CivitaBack.Data.Migrations
                         new
                         {
                             Id = 2,
-                            ContaminacionCiclo = -2,
+                            ContaminacionCiclo = -4,
                             CostoDinero = 500,
                             CostoEnergia = 0,
                             Creado = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -327,7 +330,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("EstructuraMapa", (string)null);
+                    b.ToTable("EstructuraMapa");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.EventoEF", b =>
@@ -386,7 +389,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("Evento", (string)null);
+                    b.ToTable("Evento");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.EventoMaestroEF", b =>
@@ -433,7 +436,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EventoMaestro", (string)null);
+                    b.ToTable("EventoMaestro");
 
                     b.HasData(
                         new
@@ -518,7 +521,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("TipoLogroId");
 
-                    b.ToTable("Logro", (string)null);
+                    b.ToTable("Logro");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.LogroPartidaEF", b =>
@@ -542,7 +545,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("LogroPartida", (string)null);
+                    b.ToTable("LogroPartida");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.MisionEF", b =>
@@ -643,7 +646,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("MisionPartida", (string)null);
+                    b.ToTable("MisionPartida");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.PartidaEF", b =>
@@ -683,7 +686,7 @@ namespace CivitaBack.Data.Migrations
                     b.HasIndex("UsuarioId")
                         .IsUnique();
 
-                    b.ToTable("Partida", (string)null);
+                    b.ToTable("Partida");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.RecompensaEF", b =>
@@ -714,7 +717,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("EstructuraId");
 
-                    b.ToTable("Recompensa", (string)null);
+                    b.ToTable("Recompensa");
 
                     b.HasData(
                         new
@@ -796,7 +799,7 @@ namespace CivitaBack.Data.Migrations
                     b.HasIndex("PartidaId")
                         .IsUnique();
 
-                    b.ToTable("Recurso", (string)null);
+                    b.ToTable("Recurso");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.TiendaEF", b =>
@@ -825,7 +828,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("PartidaId");
 
-                    b.ToTable("Tienda", (string)null);
+                    b.ToTable("Tienda");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.TipEF", b =>
@@ -868,7 +871,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("TipoId");
 
-                    b.ToTable("Tip", (string)null);
+                    b.ToTable("Tip");
 
                     b.HasData(
                         new
@@ -1020,7 +1023,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasIndex("TipId");
 
-                    b.ToTable("TipEnPartida", (string)null);
+                    b.ToTable("TipEnPartida");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.TipoEstructuraEF", b =>
@@ -1056,7 +1059,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TipoEstructura", (string)null);
+                    b.ToTable("TipoEstructura");
 
                     b.HasData(
                         new
@@ -1152,7 +1155,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TipoLogro", (string)null);
+                    b.ToTable("TipoLogro");
                 });
 
             modelBuilder.Entity("CivitaBack.Data.BO.TipoTipEF", b =>
@@ -1176,7 +1179,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TipoTip", (string)null);
+                    b.ToTable("TipoTip");
 
                     b.HasData(
                         new
@@ -1224,7 +1227,7 @@ namespace CivitaBack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Usuario", (string)null);
+                    b.ToTable("Usuario");
                 });
 
             modelBuilder.Entity("CondicionEFRecompensaEF", b =>

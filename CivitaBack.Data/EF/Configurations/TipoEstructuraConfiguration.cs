@@ -27,7 +27,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Ocupacion = 0,
                 Capacidad = 5,
                 EnergiaPorCiclo = -1,
-                DineroPorCiclo = -10,
+                DineroPorCiclo = -1,
                 Creado = seedDate,
             },
             new TipoEstructuraEF
@@ -37,7 +37,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Ocupacion = 0,
                 Capacidad = 0,
                 EnergiaPorCiclo = 5,
-                DineroPorCiclo = -10,
+                DineroPorCiclo = -5,
                 Creado = seedDate,
             },
             new TipoEstructuraEF
@@ -87,7 +87,7 @@ public class TipoEstructuraConfiguration : IEntityTypeConfiguration<TipoEstructu
                 Ocupacion = 0,
                 Capacidad = 0,
                 EnergiaPorCiclo = 1,
-                DineroPorCiclo = -5,
+                DineroPorCiclo = -2,
                 Creado = seedDate,
             }
         );

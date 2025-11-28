@@ -58,10 +58,10 @@ public class InicialLogica : IInicialLogica
     {
         return new Recurso
         {
-            EcoCoins = 450,
+            EcoCoins = 2000,
             Felicidad = 30,
-            Energia = 30,
-            Contaminacion = 40,
+            Energia = 40,
+            Contaminacion = 45,
         };
     }
 
